@@ -1,0 +1,16 @@
+
+include LICENSE
+include MANIFEST.in
+include README
+include .gitignore
+
+recursive-include bflb_mcu_tool/bl56x *
+recursive-include bflb_mcu_tool/bl562 *
+recursive-include bflb_mcu_tool/bl60x *
+recursive-include bflb_mcu_tool/bl602 *
+recursive-include bflb_mcu_tool/bl702 *
+recursive-include bflb_mcu_tool/common *
+recursive-include bflb_mcu_tool/img *
+
+
+

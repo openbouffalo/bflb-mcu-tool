@@ -1,0 +1,19 @@
+Metadata-Version: 1.2
+Name: bflb-mcu-tool
+Version: 1.0.0
+Summary: Bouffalolab Mcu Tool
+Home-page: https://pypi.org/project/bflb-mcu-tool/
+Author: bouffalolab
+Author-email: jxtan@bouffalolab.com
+License: MIT
+Description: UNKNOWN
+Platform: UNKNOWN
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: MacOS
+Classifier: Operating System :: Microsoft
+Classifier: Operating System :: Unix
+Classifier: Environment :: Console
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Programming Language :: Python :: 3
+Requires-Python: >3.0,<4.0
