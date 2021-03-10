@@ -131,7 +131,7 @@ def compress_dir(chipname, zippath, efuse_load=False):
 
 def img_create(args, chipname="bl60x", chiptype="bl60x", img_dir=None, config_file=None):
     sub_module = __import__("libs." + chiptype, fromlist=[chiptype])
-    img_dir_path = os.path.join(app_path, chipname, "img_create")
+    img_dir_path = os.path.join(app_path, chipname, "img_create_iot")
     if img_dir is None:
         sub_module.img_create_do.img_create_do(args, img_dir_path, config_file)
     else:
@@ -164,8 +164,8 @@ def run():
         }
         chipname = args.chipname
         chiptype = chip_dict[chipname]
-        img_create_path = os.path.join(app_path, chipname, "img_create2")
-        img_create_cfg = os.path.join(app_path, chipname, "img_create2") + "/img_create_cfg.ini"
+        img_create_path = os.path.join(app_path, chipname, "img_create_mcu")
+        img_create_cfg = os.path.join(app_path, chipname, "img_create_mcu") + "/img_create_cfg.ini"
         bh_cfg_file = img_create_path + "/bootheader_cfg.ini"
         bh_file = img_create_path + "/bootheader.bin"
         if args.imgfile:

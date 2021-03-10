@@ -57,13 +57,13 @@ class BflbMcuTool(object):
         self.eflash_loader_cfg = os.path.join(app_path, chipname, "eflash_loader/eflash_loader_cfg.conf")
         self.eflash_loader_cfg_tmp = os.path.join(app_path, chipname, "eflash_loader/eflash_loader_cfg.ini")
         self.eflash_loader_bin = os.path.join(app_path, chipname, "eflash_loader/eflash_loader_40m.bin")
-        self.img_create_path = os.path.join(app_path, chipname, "img_create2")
+        self.img_create_path = os.path.join(app_path, chipname, "img_create_mcu")
         self.efuse_bh_path = os.path.join(app_path, chipname, "efuse_bootheader")
         self.efuse_bh_default_cfg = os.path.join(app_path, chipname, "efuse_bootheader") + "/efuse_bootheader_cfg.conf"
         self.efuse_bh_default_cfg_dp = os.path.join(app_path, chipname, "efuse_bootheader") + "/efuse_bootheader_cfg_dp.conf"
-        self.img_create_cfg_org = os.path.join(app_path, chipname, "img_create") + "/img_create_cfg.conf"
-        self.img_create_cfg_dp_org = os.path.join(app_path, chipname, "img_create") + "/img_create_cfg_dp.conf"
-        self.img_create_cfg = os.path.join(app_path, chipname, "img_create2") + "/img_create_cfg.ini"
+        self.img_create_cfg_org = os.path.join(app_path, chipname, "img_create_mcu") + "/img_create_cfg.conf"
+        self.img_create_cfg_dp_org = os.path.join(app_path, chipname, "img_create_mcu") + "/img_create_cfg_dp.conf"
+        self.img_create_cfg = os.path.join(app_path, chipname, "img_create_mcu") + "/img_create_cfg.ini"
         if not os.path.exists(self.img_create_path):
             os.makedirs(self.img_create_path)
         if os.path.isfile(self.eflash_loader_cfg_tmp) is False:
@@ -290,19 +290,19 @@ class BflbMcuTool(object):
                 if values["img_type"] == "SingleCPU":
                     bootinfo_file = self.img_create_path + "/bootinfo.bin"
                     img_file = self.img_create_path + "/img.bin"
-                    img_output_file = self.img_create_path + "/wholeimg_flash.bin"
+                    img_output_file = self.img_create_path + "/whole_img.bin"
                 elif values["img_type"] == "BLSP_Boot2":
                     bootinfo_file = self.img_create_path + "/bootinfo_blsp_boot2.bin"
                     img_file = self.img_create_path + "/img_blsp_boot2.bin"
-                    img_output_file = self.img_create_path + "/wholeimg_blsp_boot2_flash.bin"
+                    img_output_file = self.img_create_path + "/whole_img_blsp_boot2.bin"
                 elif values["img_type"] == "CPU0":
                     bootinfo_file = self.img_create_path + "/bootinfo_cpu0.bin"
                     img_file = self.img_create_path + "/img_cpu0.bin"
-                    img_output_file = self.img_create_path + "/wholeimg_cpu0_flash.bin"
+                    img_output_file = self.img_create_path + "/whole_img_cpu0.bin"
                 elif values["img_type"] == "CPU1":
                     bootinfo_file = self.img_create_path + "/bootinfo_cpu1.bin"
                     img_file = self.img_create_path + "/img_cpu1.bin"
-                    img_output_file = self.img_create_path + "/wholeimg_cpu1_flash.bin"
+                    img_output_file = self.img_create_path + "/whole_img_cpu1.bin"
                 if values["img_type"] == "SingleCPU":
                     dummy_data = bytearray(8192)
                 else:
@@ -1432,7 +1432,7 @@ class BflbMcuTool(object):
                                 options.extend(["--efuse",\
                                 "--createcfg=" + self.img_create_cfg])
                                 self.efuse_load_en = True
-            ret = bflb_img_create.compress_dir(self.chipname, "img_create2", self.efuse_load_en)
+            ret = bflb_img_create.compress_dir(self.chipname, "img_create_mcu", self.efuse_load_en)
             if ret is not True:
                 return bflb_utils.errorcode_msg()
             args = parser_eflash.parse_args(options)
@@ -1592,7 +1592,12 @@ def run():
     bflb_utils.printf("==================================================")
     try:
         obj_mcu.create_img(args.chipname, chip_dict[args.chipname], config)
-        if not args.build:
+        if args.build:
+            obj_mcu.bind_img(config)
+            f_org = os.path.join(app_path, args.chipname, "img_create_mcu", "whole_img.bin")
+            f = "firmware.bin"
+            shutil.copy(f_org, f)
+        else:
             obj_mcu.program_img_thread(config)
     except Exception as e:
         error = str(e)

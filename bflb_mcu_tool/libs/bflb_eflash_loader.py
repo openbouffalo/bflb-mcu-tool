@@ -2252,7 +2252,7 @@ class BflbEflashLoader(object):
                         address = re.compile('\s+').split(cfg.get("FLASH_CFG", "address"))
                     if csvfile and csvaddr:
                         bflb_utils.printf("factory info burn")
-                        csvbin = self._chip_name.lower() + "/img_create/media.bin"
+                        csvbin = self._chip_name.lower() + "/img_create_iot/media.bin"
                         ret, csv_mac = self.get_factory_config_info(csvfile, csvbin)
                         if ret is not False:
                             flash_file.append(csvbin)

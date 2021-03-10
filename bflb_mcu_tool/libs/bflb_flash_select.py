@@ -123,8 +123,7 @@ def update_flash_cfg_data(chipname, chiptype, flash_id, cfg, bh_cfg_file, cfg_ke
     flash_magic_code = cfg2.get(cfg_key, "flashcfg_magic_code")
     flash_magic_code = int(flash_magic_code, 16)
     sub_module = __import__("libs." + chiptype, fromlist=[chiptype])
-    offset, flashCfgLen, data, flashCrcOffset, crcOffset =\
-        sub_module.flash_select_do.update_flash_cfg_data_do(chipname, chiptype, flash_id)
+    offset, flashCfgLen, data, flashCrcOffset, crcOffset = update_flash_cfg_data_do(chipname, chiptype, flash_id)
 
     para_file = cfg.get("FLASH_CFG", "flash_para")
     fp = open(para_file, 'wb')

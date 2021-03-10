@@ -234,7 +234,7 @@ def run():
     }
     chipname = sys.argv[1]
     chiptype = chip_dict[chipname]
-    img_create_path = os.path.join(app_path, chipname, "img_create2")
+    img_create_path = os.path.join(app_path, chipname, "img_create_mcu")
     bh_cfg_file = img_create_path + "/bootheader_cfg.ini"
     bh_file = img_create_path + "/bootheader.bin"
     bootheader_create_process(chipname, chiptype, bh_cfg_file, bh_file,
