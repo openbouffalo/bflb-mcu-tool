@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 
-
+import re
 import os
 import sys
 import shutil
@@ -798,6 +798,18 @@ class BflbMcuTool(object):
                 return error
             else:
                 if values["img_file"] == "":
+                    if values["device_tree"]:
+                        ro_params_d = values["device_tree"]
+                        try:
+                            dts_hex = bl_ro_device_tree.bl_dts2hex(ro_params_d)
+                            dts_bytearray = bflb_utils.hexstr_to_bytearray(dts_hex)
+                        except Exception as e:
+                            dts_bytearray = None
+                        tlv_bin = self.img_create_path + "/tlv.bin"
+                        with open(tlv_bin, "wb") as fp:
+                            fp.write(dts_bytearray)
+                        error = "tvl bin created"
+                        return error
                     if values["dl_chiperase"] == "True":
                         bflb_utils.printf("flash chiperase operation")
                         return True
@@ -814,6 +826,9 @@ class BflbMcuTool(object):
                             dts_bytearray = bflb_utils.hexstr_to_bytearray(dts_hex)
                         except Exception as e:
                             dts_bytearray = None
+                        tlv_bin = self.img_create_path + "/tlv.bin"
+                        with open(tlv_bin, "wb") as fp:
+                            fp.write(dts_bytearray)
                         img_org = values["img_file"]
                         if parse_rfpa(img_org) == b'BLRFPARA' and dts_bytearray:
                             length = len(dts_bytearray)
@@ -1556,14 +1571,15 @@ def get_value(args):
     
 
 def run():  
-    WINDOWS = sys.platform.startswith("win")
     port = None
+    ports = []
     for item in get_serial_ports():
-        port = item["port"]
-        if WINDOWS and port.startswith("COM") and len(port) > 4:
-            port = "\\\\.\\%s" % port
-        else:
-            port = port  
+        ports.append(item["port"])
+    if ports:
+        try:
+            port = sorted(ports, key=lambda x: int(re.match('COM(\d+)', x).group(1)))[0]
+        except Exception:
+            port = sorted(ports)[0]
     firmware_default = os.path.join(app_path, "img/project.bin")
     parser = argparse.ArgumentParser(description='bflb mcu tool')
     parser.add_argument('--chipname', required=True, help='chip name')
@@ -1584,7 +1600,7 @@ def run():
     if not args.port:
         bflb_utils.printf("Serial port is not found")
     else:
-        bflb_utils.printf("Serial port is " + port) 
+        bflb_utils.printf("Serial port is " + str(port)) 
     bflb_utils.printf("Baudrate is " + str(args.baudrate)) 
     bflb_utils.printf("Firmware is " + args.firmware)
     config = get_value(args)      
