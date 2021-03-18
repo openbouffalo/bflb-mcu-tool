@@ -14,8 +14,6 @@ Archive member included to satisfy reference by file (symbol)
                               out/ChipTest/Eflash_Loader/bflb_eflash_loader_uart.o (__divdf3)
 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(muldf3.o)
                               out/ChipTest/Eflash_Loader/bflb_eflash_loader_uart.o (__muldf3)
-/home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(subdf3.o)
-                              out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o (__subdf3)
 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(fixdfsi.o)
                               out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o (__fixdfsi)
 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(fixunsdfsi.o)
@@ -24,10 +22,6 @@ Archive member included to satisfy reference by file (symbol)
                               out/BSP_Common/libc/atof.o (__floatsidf)
 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(floatunsidf.o)
                               out/ChipTest/Eflash_Loader/bflb_eflash_loader_uart.o (__floatunsidf)
-/home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(extendsfdf2.o)
-                              out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o (__extendsfdf2)
-/home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(truncdfsf2.o)
-                              out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o (__truncdfsf2)
 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(_clz.o)
                               /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(_clzsi2.o) (__clz_tab)
 
@@ -5979,7 +5973,7 @@ Discarded input sections
  .text.ADC_Read_FIFO
                 0x0000000000000000        0x8 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
  .text.ADC_Parse_Result
-                0x0000000000000000      0x2fe out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
+                0x0000000000000000      0x22e out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
  .text.ADC_IntMask
                 0x0000000000000000       0xde out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
  .text.ADC_IntClr
@@ -5997,13 +5991,13 @@ Discarded input sections
  .text.TSEN_Get_V_Error
                 0x0000000000000000      0x102 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
  .sclock_rlt_code
-                0x0000000000000000      0x286 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
+                0x0000000000000000      0x1da out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
  .text.ADC_SET_TSVBE_LOW
                 0x0000000000000000       0x12 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
  .text.ADC_SET_TSVBE_HIGH
                 0x0000000000000000       0x14 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
  .text.TSEN_Get_Temp
-                0x0000000000000000      0x146 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
+                0x0000000000000000      0x158 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
  .text.ADC_Mic_Init
                 0x0000000000000000       0xa4 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
  .text.ADC_MIC_Bias_Enable
@@ -6017,15 +6011,13 @@ Discarded input sections
  .data.adcGainCoeffCal
                 0x0000000000000000        0x8 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
  .rodata.ADC_Parse_Result.cst4
-                0x0000000000000000        0xc out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
- .rodata.ADC_Parse_Result.cst8
-                0x0000000000000000       0x30 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
- .rodata.TSEN_Get_Temp.cst8
-                0x0000000000000000        0x8 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
- .rodata.cst8   0x0000000000000000       0x20 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
- .debug_info    0x0000000000000000     0x1929 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
- .debug_abbrev  0x0000000000000000      0x3b5 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
- .debug_loc     0x0000000000000000     0x150c out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
+                0x0000000000000000       0x24 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
+ .rodata.TSEN_Get_Temp.cst4
+                0x0000000000000000        0x4 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
+ .srodata.cst4  0x0000000000000000        0xc out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
+ .debug_info    0x0000000000000000     0x1922 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
+ .debug_abbrev  0x0000000000000000      0x37b out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
+ .debug_loc     0x0000000000000000     0x1610 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
  .debug_aranges
                 0x0000000000000000      0x110 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
  .debug_ranges  0x0000000000000000      0x2d0 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
@@ -6047,10 +6039,10 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x82 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
  .debug_macro   0x0000000000000000      0xd67 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
  .debug_macro   0x0000000000000000       0x3c out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
- .debug_line    0x0000000000000000     0x342a out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
- .debug_str     0x0000000000000000    0x2226f out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
+ .debug_line    0x0000000000000000     0x353c out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
+ .debug_str     0x0000000000000000    0x22268 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
  .comment       0x0000000000000000       0x33 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
- .debug_frame   0x0000000000000000      0x30c out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
+ .debug_frame   0x0000000000000000      0x2c8 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
  .riscv.attributes
                 0x0000000000000000       0x2e out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
  .group         0x0000000000000000        0xc out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_acomp.o
@@ -7667,21 +7659,6 @@ Discarded input sections
  .debug_frame   0x0000000000000000       0x58 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(muldf3.o)
  .riscv.attributes
                 0x0000000000000000       0x2e /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(muldf3.o)
- .text          0x0000000000000000      0x8e0 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(subdf3.o)
- .data          0x0000000000000000        0x0 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(subdf3.o)
- .bss           0x0000000000000000        0x0 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(subdf3.o)
- .debug_info    0x0000000000000000      0x5e4 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(subdf3.o)
- .debug_abbrev  0x0000000000000000      0x189 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(subdf3.o)
- .debug_loc     0x0000000000000000     0x1acb /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(subdf3.o)
- .debug_aranges
-                0x0000000000000000       0x20 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(subdf3.o)
- .debug_ranges  0x0000000000000000      0x398 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(subdf3.o)
- .debug_line    0x0000000000000000     0x1669 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(subdf3.o)
- .debug_str     0x0000000000000000      0x363 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(subdf3.o)
- .comment       0x0000000000000000       0x33 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(subdf3.o)
- .debug_frame   0x0000000000000000       0x44 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(subdf3.o)
- .riscv.attributes
-                0x0000000000000000       0x2e /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(subdf3.o)
  .text          0x0000000000000000       0xc2 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(fixdfsi.o)
  .data          0x0000000000000000        0x0 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(fixdfsi.o)
  .bss           0x0000000000000000        0x0 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(fixdfsi.o)
@@ -7742,36 +7719,6 @@ Discarded input sections
  .debug_frame   0x0000000000000000       0x34 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(floatunsidf.o)
  .riscv.attributes
                 0x0000000000000000       0x2e /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(floatunsidf.o)
- .text          0x0000000000000000       0xc2 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(extendsfdf2.o)
- .data          0x0000000000000000        0x0 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(extendsfdf2.o)
- .bss           0x0000000000000000        0x0 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(extendsfdf2.o)
- .debug_info    0x0000000000000000      0x2af /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(extendsfdf2.o)
- .debug_abbrev  0x0000000000000000      0x16c /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(extendsfdf2.o)
- .debug_loc     0x0000000000000000      0x264 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(extendsfdf2.o)
- .debug_aranges
-                0x0000000000000000       0x20 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(extendsfdf2.o)
- .debug_ranges  0x0000000000000000       0x20 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(extendsfdf2.o)
- .debug_line    0x0000000000000000      0x40f /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(extendsfdf2.o)
- .debug_str     0x0000000000000000      0x29e /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(extendsfdf2.o)
- .comment       0x0000000000000000       0x33 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(extendsfdf2.o)
- .debug_frame   0x0000000000000000       0x3c /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(extendsfdf2.o)
- .riscv.attributes
-                0x0000000000000000       0x2e /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(extendsfdf2.o)
- .text          0x0000000000000000      0x212 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(truncdfsf2.o)
- .data          0x0000000000000000        0x0 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(truncdfsf2.o)
- .bss           0x0000000000000000        0x0 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(truncdfsf2.o)
- .debug_info    0x0000000000000000      0x2f3 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(truncdfsf2.o)
- .debug_abbrev  0x0000000000000000      0x179 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(truncdfsf2.o)
- .debug_loc     0x0000000000000000      0x5f6 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(truncdfsf2.o)
- .debug_aranges
-                0x0000000000000000       0x20 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(truncdfsf2.o)
- .debug_ranges  0x0000000000000000       0x80 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(truncdfsf2.o)
- .debug_line    0x0000000000000000      0x6df /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(truncdfsf2.o)
- .debug_str     0x0000000000000000      0x2fc /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(truncdfsf2.o)
- .comment       0x0000000000000000       0x33 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(truncdfsf2.o)
- .debug_frame   0x0000000000000000       0x20 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(truncdfsf2.o)
- .riscv.attributes
-                0x0000000000000000       0x2e /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(truncdfsf2.o)
  .text          0x0000000000000000        0x0 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(_clz.o)
  .data          0x0000000000000000        0x0 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(_clz.o)
  .bss           0x0000000000000000        0x0 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(_clz.o)
@@ -8164,173 +8111,173 @@ LOAD /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-u
                 0x0000000022012cf8       0x74 out/ChipTest/Eflash_Loader/bflb_spi_flash.o
                 0x0000000022012cf8                bflb_clear_flash_status_register
  .text.bflb_spi_flash_init
-                0x0000000022012d6c      0x106 out/ChipTest/Eflash_Loader/bflb_spi_flash.o
+                0x0000000022012d6c      0x10e out/ChipTest/Eflash_Loader/bflb_spi_flash.o
                 0x0000000022012d6c                bflb_spi_flash_init
  .text.bflb_efuse_write
-                0x0000000022012e72       0x56 out/ChipTest/Eflash_Loader/bflb_efuse.o
-                0x0000000022012e72                bflb_efuse_write
+                0x0000000022012e7a       0x56 out/ChipTest/Eflash_Loader/bflb_efuse.o
+                0x0000000022012e7a                bflb_efuse_write
  .text.bflb_efuse_read
-                0x0000000022012ec8       0x2c out/ChipTest/Eflash_Loader/bflb_efuse.o
-                0x0000000022012ec8                bflb_efuse_read
+                0x0000000022012ed0       0x2c out/ChipTest/Eflash_Loader/bflb_efuse.o
+                0x0000000022012ed0                bflb_efuse_read
  .text.xz_BSP_init
-                0x0000000022012ef4        0x2 out/ChipTest/Eflash_Loader/bflb_eflash_loader_cfg.o
-                0x0000000022012ef4                xz_BSP_init
+                0x0000000022012efc        0x2 out/ChipTest/Eflash_Loader/bflb_eflash_loader_cfg.o
+                0x0000000022012efc                xz_BSP_init
  .text.xz_BSP_get_dict_buffer
-                0x0000000022012ef6        0x6 out/ChipTest/Eflash_Loader/bflb_eflash_loader_cfg.o
-                0x0000000022012ef6                xz_BSP_get_dict_buffer
+                0x0000000022012efe        0x6 out/ChipTest/Eflash_Loader/bflb_eflash_loader_cfg.o
+                0x0000000022012efe                xz_BSP_get_dict_buffer
  .text.xz_BSP_get_work_buffer
-                0x0000000022012efc        0x6 out/ChipTest/Eflash_Loader/bflb_eflash_loader_cfg.o
-                0x0000000022012efc                xz_BSP_get_work_buffer
+                0x0000000022012f04        0x6 out/ChipTest/Eflash_Loader/bflb_eflash_loader_cfg.o
+                0x0000000022012f04                xz_BSP_get_work_buffer
  .text.xz_BSP_get_output_size
-                0x0000000022012f02        0x4 out/ChipTest/Eflash_Loader/bflb_eflash_loader_cfg.o
-                0x0000000022012f02                xz_BSP_get_output_size
+                0x0000000022012f0a        0x4 out/ChipTest/Eflash_Loader/bflb_eflash_loader_cfg.o
+                0x0000000022012f0a                xz_BSP_get_output_size
  .text.bflb_set_high_speed_system_clock
-                0x0000000022012f06        0x6 out/ChipTest/Eflash_Loader/bflb_set_clock.o
-                0x0000000022012f06                bflb_set_high_speed_system_clock
+                0x0000000022012f0e        0x6 out/ChipTest/Eflash_Loader/bflb_set_clock.o
+                0x0000000022012f0e                bflb_set_high_speed_system_clock
  .text.bflb_set_high_speed_flash_clock
-                0x0000000022012f0c        0xa out/ChipTest/Eflash_Loader/bflb_set_clock.o
-                0x0000000022012f0c                bflb_set_high_speed_flash_clock
+                0x0000000022012f14        0xa out/ChipTest/Eflash_Loader/bflb_set_clock.o
+                0x0000000022012f14                bflb_set_high_speed_flash_clock
  .text.bflb_set_low_speed_flash_clock
-                0x0000000022012f16        0xa out/ChipTest/Eflash_Loader/bflb_set_clock.o
-                0x0000000022012f16                bflb_set_low_speed_flash_clock
+                0x0000000022012f1e        0xa out/ChipTest/Eflash_Loader/bflb_set_clock.o
+                0x0000000022012f1e                bflb_set_low_speed_flash_clock
  .text.bflb_set_flash_clock_div
-                0x0000000022012f20        0xa out/ChipTest/Eflash_Loader/bflb_set_clock.o
-                0x0000000022012f20                bflb_set_flash_clock_div
+                0x0000000022012f28        0xa out/ChipTest/Eflash_Loader/bflb_set_clock.o
+                0x0000000022012f28                bflb_set_flash_clock_div
  .text.sdu_init
-                0x0000000022012f2a       0x12 out/ChipTest/Eflash_Loader/sdu.o
-                0x0000000022012f2a                sdu_init
+                0x0000000022012f32       0x12 out/ChipTest/Eflash_Loader/sdu.o
+                0x0000000022012f32                sdu_init
  .text.sdu_host_check
-                0x0000000022012f3c      0x160 out/ChipTest/Eflash_Loader/sdu.o
-                0x0000000022012f3c                sdu_host_check
+                0x0000000022012f44      0x160 out/ChipTest/Eflash_Loader/sdu.o
+                0x0000000022012f44                sdu_host_check
  .text.sdu_deinit
-                0x000000002201309c       0x1e out/ChipTest/Eflash_Loader/sdu.o
-                0x000000002201309c                sdu_deinit
+                0x00000000220130a4       0x1e out/ChipTest/Eflash_Loader/sdu.o
+                0x00000000220130a4                sdu_deinit
  .text.sdu_receive_data
-                0x00000000220130ba      0x16c out/ChipTest/Eflash_Loader/sdu.o
-                0x00000000220130ba                sdu_receive_data
+                0x00000000220130c2      0x16c out/ChipTest/Eflash_Loader/sdu.o
+                0x00000000220130c2                sdu_receive_data
  .text.sdu_send_data
-                0x0000000022013226      0x124 out/ChipTest/Eflash_Loader/sdu.o
-                0x0000000022013226                sdu_send_data
- .text.memcpy   0x000000002201334a       0x18 out/BSP_Common/libc/memcpy.o
-                0x000000002201334a                memcpy
- .text.memset   0x0000000022013362       0x18 out/BSP_Common/libc/memset.o
-                0x0000000022013362                memset
- .text.memcmp   0x000000002201337a       0x1e out/BSP_Common/libc/memcmp.o
-                0x000000002201337a                memcmp
+                0x000000002201322e      0x124 out/ChipTest/Eflash_Loader/sdu.o
+                0x000000002201322e                sdu_send_data
+ .text.memcpy   0x0000000022013352       0x18 out/BSP_Common/libc/memcpy.o
+                0x0000000022013352                memcpy
+ .text.memset   0x000000002201336a       0x18 out/BSP_Common/libc/memset.o
+                0x000000002201336a                memset
+ .text.memcmp   0x0000000022013382       0x1e out/BSP_Common/libc/memcmp.o
+                0x0000000022013382                memcmp
  .text.vsnprintf
-                0x0000000022013398      0xae2 out/BSP_Common/libc/vsnprintf.o
-                0x0000000022013398                vsnprintf
- .text.strlen   0x0000000022013e7a       0x1a out/BSP_Common/libc/strlen.o
-                0x0000000022013e7a                strlen
+                0x00000000220133a0      0xae2 out/BSP_Common/libc/vsnprintf.o
+                0x00000000220133a0                vsnprintf
+ .text.strlen   0x0000000022013e82       0x1a out/BSP_Common/libc/strlen.o
+                0x0000000022013e82                strlen
  .text.xz_crc32_init
-                0x0000000022013e94        0x2 out/BSP_Common/xz/xz_crc32.o
-                0x0000000022013e94                xz_crc32_init
+                0x0000000022013e9c        0x2 out/BSP_Common/xz/xz_crc32.o
+                0x0000000022013e9c                xz_crc32_init
  .text.xz_crc32
-                0x0000000022013e96       0x34 out/BSP_Common/xz/xz_crc32.o
-                0x0000000022013e96                xz_crc32
+                0x0000000022013e9e       0x34 out/BSP_Common/xz/xz_crc32.o
+                0x0000000022013e9e                xz_crc32
  .text.lzma_len
-                0x0000000022013eca      0x17c out/BSP_Common/xz/xz_dec_lzma2.o
+                0x0000000022013ed2      0x17c out/BSP_Common/xz/xz_dec_lzma2.o
  .text.dict_repeat.part.1
-                0x0000000022014046       0x64 out/BSP_Common/xz/xz_dec_lzma2.o
+                0x000000002201404e       0x64 out/BSP_Common/xz/xz_dec_lzma2.o
  .text.lzma_main
-                0x00000000220140aa      0x74c out/BSP_Common/xz/xz_dec_lzma2.o
+                0x00000000220140b2      0x74c out/BSP_Common/xz/xz_dec_lzma2.o
  .text.xz_dec_lzma2_run
-                0x00000000220147f6      0x612 out/BSP_Common/xz/xz_dec_lzma2.o
-                0x00000000220147f6                xz_dec_lzma2_run
+                0x00000000220147fe      0x612 out/BSP_Common/xz/xz_dec_lzma2.o
+                0x00000000220147fe                xz_dec_lzma2_run
  .text.xz_dec_lzma2_create
-                0x0000000022014e08       0x68 out/BSP_Common/xz/xz_dec_lzma2.o
-                0x0000000022014e08                xz_dec_lzma2_create
+                0x0000000022014e10       0x68 out/BSP_Common/xz/xz_dec_lzma2.o
+                0x0000000022014e10                xz_dec_lzma2_create
  .text.xz_dec_lzma2_reset
-                0x0000000022014e70       0x78 out/BSP_Common/xz/xz_dec_lzma2.o
-                0x0000000022014e70                xz_dec_lzma2_reset
+                0x0000000022014e78       0x78 out/BSP_Common/xz/xz_dec_lzma2.o
+                0x0000000022014e78                xz_dec_lzma2_reset
  .text.xz_dec_lzma2_end
-                0x0000000022014ee8       0x2c out/BSP_Common/xz/xz_dec_lzma2.o
-                0x0000000022014ee8                xz_dec_lzma2_end
+                0x0000000022014ef0       0x2c out/BSP_Common/xz/xz_dec_lzma2.o
+                0x0000000022014ef0                xz_dec_lzma2_end
  .text.fill_temp
-                0x0000000022014f14       0x72 out/BSP_Common/xz/xz_dec_stream.o
+                0x0000000022014f1c       0x72 out/BSP_Common/xz/xz_dec_stream.o
  .text.dec_vli.isra.0
-                0x0000000022014f86       0x9a out/BSP_Common/xz/xz_dec_stream.o
+                0x0000000022014f8e       0x9a out/BSP_Common/xz/xz_dec_stream.o
  .text.index_update.isra.2
-                0x0000000022015020       0x36 out/BSP_Common/xz/xz_dec_stream.o
+                0x0000000022015028       0x36 out/BSP_Common/xz/xz_dec_stream.o
  .text.xz_dec_reset
-                0x0000000022015056       0x46 out/BSP_Common/xz/xz_dec_stream.o
-                0x0000000022015056                xz_dec_reset
+                0x000000002201505e       0x46 out/BSP_Common/xz/xz_dec_stream.o
+                0x000000002201505e                xz_dec_reset
  .text.xz_dec_run
-                0x000000002201509c      0x794 out/BSP_Common/xz/xz_dec_stream.o
-                0x000000002201509c                xz_dec_run
+                0x00000000220150a4      0x794 out/BSP_Common/xz/xz_dec_stream.o
+                0x00000000220150a4                xz_dec_run
  .text.xz_dec_init
-                0x0000000022015830       0x46 out/BSP_Common/xz/xz_dec_stream.o
-                0x0000000022015830                xz_dec_init
+                0x0000000022015838       0x46 out/BSP_Common/xz/xz_dec_stream.o
+                0x0000000022015838                xz_dec_init
  .text.xz_dec_end
-                0x0000000022015876       0x1e out/BSP_Common/xz/xz_dec_stream.o
-                0x0000000022015876                xz_dec_end
+                0x000000002201587e       0x1e out/BSP_Common/xz/xz_dec_stream.o
+                0x000000002201587e                xz_dec_end
  .text.simple_malloc_init
-                0x0000000022015894       0x1a out/BSP_Common/xz/xz_port.o
-                0x0000000022015894                simple_malloc_init
+                0x000000002201589c       0x1a out/BSP_Common/xz/xz_port.o
+                0x000000002201589c                simple_malloc_init
  .text.simple_malloc
-                0x00000000220158ae       0x44 out/BSP_Common/xz/xz_port.o
-                0x00000000220158ae                simple_malloc
+                0x00000000220158b6       0x44 out/BSP_Common/xz/xz_port.o
+                0x00000000220158b6                simple_malloc
  .text.simple_free
-                0x00000000220158f2        0xe out/BSP_Common/xz/xz_port.o
-                0x00000000220158f2                simple_free
+                0x00000000220158fa        0xe out/BSP_Common/xz/xz_port.o
+                0x00000000220158fa                simple_free
  .text.SystemInit
-                0x0000000022015900       0xac out/startup/system_bl602.o
-                0x0000000022015900                SystemInit
+                0x0000000022015908       0xac out/startup/system_bl602.o
+                0x0000000022015908                SystemInit
  .text.start_load
-                0x00000000220159ac      0x126 out/startup/GCC/start_load.o
-                0x00000000220159ac                start_load
+                0x00000000220159b4      0x126 out/startup/GCC/start_load.o
+                0x00000000220159b4                start_load
  .text.Interrupt_Handler_Stub
-                0x0000000022015ad2       0x9a out/startup/interrupt.o
-                0x0000000022015ad2                SDIO_IRQHandler_Wrapper
-                0x0000000022015ad2                TIMER_WDT_IRQHandler_Wrapper
-                0x0000000022015ad2                GPIO_INT0_IRQHandler_Wrapper
-                0x0000000022015ad2                SEC_PKA_IRQHandler_Wrapper
-                0x0000000022015ad2                SEC_TRNG_IRQHandler_Wrapper
-                0x0000000022015ad2                MAC_GEN_IRQHandler_Wrapper
-                0x0000000022015ad2                DMA_BMX_ERR_IRQHandler_Wrapper
-                0x0000000022015ad2                EFUSE_IRQHandler_Wrapper
-                0x0000000022015ad2                WIFI_IRQHandler_Wrapper
-                0x0000000022015ad2                SEC_CDET_IRQHandler_Wrapper
-                0x0000000022015ad2                SEC_AES_IRQHandler_Wrapper
-                0x0000000022015ad2                PWM_IRQHandler_Wrapper
-                0x0000000022015ad2                RF_TOP_INT1_IRQHandler_Wrapper
-                0x0000000022015ad2                HBN_OUT0_IRQHandler_Wrapper
-                0x0000000022015ad2                SF_CTRL_IRQHandler_Wrapper
-                0x0000000022015ad2                TIMER_CH0_IRQHandler_Wrapper
-                0x0000000022015ad2                clic_mext_handler_Wrapper
-                0x0000000022015ad2                MAC_TXRX_TIMER_IRQHandler_Wrapper
-                0x0000000022015ad2                Interrupt_Handler_Stub
-                0x0000000022015ad2                clic_csoft_handler_Wrapper
-                0x0000000022015ad2                I2C_IRQHandler_Wrapper
-                0x0000000022015ad2                SPI_IRQHandler_Wrapper
-                0x0000000022015ad2                MAC_PORT_TRG_IRQHandler_Wrapper
-                0x0000000022015ad2                PDS_WAKEUP_IRQHandler_Wrapper
-                0x0000000022015ad2                clic_mtimer_handler_Wrapper
-                0x0000000022015ad2                L1C_BMX_ERR_IRQHandler_Wrapper
-                0x0000000022015ad2                SEC_BMX_ERR_IRQHandler_Wrapper
-                0x0000000022015ad2                MAC_RX_TRG_IRQHandler_Wrapper
-                0x0000000022015ad2                MAC_TX_TRG_IRQHandler_Wrapper
-                0x0000000022015ad2                HBN_OUT1_IRQHandler_Wrapper
-                0x0000000022015ad2                SEC_GMAC_IRQHandler_Wrapper
-                0x0000000022015ad2                clic_msip_handler_Wrapper
-                0x0000000022015ad2                UART1_IRQHandler_Wrapper
-                0x0000000022015ad2                GPADC_DMA_IRQHandler_Wrapper
-                0x0000000022015ad2                MAC_TXRX_MISC_IRQHandler_Wrapper
-                0x0000000022015ad2                DMA_ALL_IRQHandler_Wrapper
-                0x0000000022015ad2                BLE_IRQHandler_Wrapper
-                0x0000000022015ad2                SEC_SHA_IRQHandler_Wrapper
-                0x0000000022015ad2                IRRX_IRQHandler_Wrapper
-                0x0000000022015ad2                BMX_TO_IRQHandler_Wrapper
-                0x0000000022015ad2                TIMER_CH1_IRQHandler_Wrapper
-                0x0000000022015ad2                UART0_IRQHandler_Wrapper
-                0x0000000022015ad2                BMX_ERR_IRQHandler_Wrapper
-                0x0000000022015ad2                WIFI_IPC_PUBLIC_IRQHandler_Wrapper
-                0x0000000022015ad2                L1C_BMX_TO_IRQHandler_Wrapper
-                0x0000000022015ad2                BZ_PHY_IRQHandler_Wrapper
-                0x0000000022015ad2                RF_TOP_INT0_IRQHandler_Wrapper
-                0x0000000022015ad2                IRTX_IRQHandler_Wrapper
-                0x0000000022015ad2                BOR_IRQHandler_Wrapper
- *fill*         0x0000000022015b6c       0x14 
+                0x0000000022015ada       0x9a out/startup/interrupt.o
+                0x0000000022015ada                SDIO_IRQHandler_Wrapper
+                0x0000000022015ada                TIMER_WDT_IRQHandler_Wrapper
+                0x0000000022015ada                GPIO_INT0_IRQHandler_Wrapper
+                0x0000000022015ada                SEC_PKA_IRQHandler_Wrapper
+                0x0000000022015ada                SEC_TRNG_IRQHandler_Wrapper
+                0x0000000022015ada                MAC_GEN_IRQHandler_Wrapper
+                0x0000000022015ada                DMA_BMX_ERR_IRQHandler_Wrapper
+                0x0000000022015ada                EFUSE_IRQHandler_Wrapper
+                0x0000000022015ada                WIFI_IRQHandler_Wrapper
+                0x0000000022015ada                SEC_CDET_IRQHandler_Wrapper
+                0x0000000022015ada                SEC_AES_IRQHandler_Wrapper
+                0x0000000022015ada                PWM_IRQHandler_Wrapper
+                0x0000000022015ada                RF_TOP_INT1_IRQHandler_Wrapper
+                0x0000000022015ada                HBN_OUT0_IRQHandler_Wrapper
+                0x0000000022015ada                SF_CTRL_IRQHandler_Wrapper
+                0x0000000022015ada                TIMER_CH0_IRQHandler_Wrapper
+                0x0000000022015ada                clic_mext_handler_Wrapper
+                0x0000000022015ada                MAC_TXRX_TIMER_IRQHandler_Wrapper
+                0x0000000022015ada                Interrupt_Handler_Stub
+                0x0000000022015ada                clic_csoft_handler_Wrapper
+                0x0000000022015ada                I2C_IRQHandler_Wrapper
+                0x0000000022015ada                SPI_IRQHandler_Wrapper
+                0x0000000022015ada                MAC_PORT_TRG_IRQHandler_Wrapper
+                0x0000000022015ada                PDS_WAKEUP_IRQHandler_Wrapper
+                0x0000000022015ada                clic_mtimer_handler_Wrapper
+                0x0000000022015ada                L1C_BMX_ERR_IRQHandler_Wrapper
+                0x0000000022015ada                SEC_BMX_ERR_IRQHandler_Wrapper
+                0x0000000022015ada                MAC_RX_TRG_IRQHandler_Wrapper
+                0x0000000022015ada                MAC_TX_TRG_IRQHandler_Wrapper
+                0x0000000022015ada                HBN_OUT1_IRQHandler_Wrapper
+                0x0000000022015ada                SEC_GMAC_IRQHandler_Wrapper
+                0x0000000022015ada                clic_msip_handler_Wrapper
+                0x0000000022015ada                UART1_IRQHandler_Wrapper
+                0x0000000022015ada                GPADC_DMA_IRQHandler_Wrapper
+                0x0000000022015ada                MAC_TXRX_MISC_IRQHandler_Wrapper
+                0x0000000022015ada                DMA_ALL_IRQHandler_Wrapper
+                0x0000000022015ada                BLE_IRQHandler_Wrapper
+                0x0000000022015ada                SEC_SHA_IRQHandler_Wrapper
+                0x0000000022015ada                IRRX_IRQHandler_Wrapper
+                0x0000000022015ada                BMX_TO_IRQHandler_Wrapper
+                0x0000000022015ada                TIMER_CH1_IRQHandler_Wrapper
+                0x0000000022015ada                UART0_IRQHandler_Wrapper
+                0x0000000022015ada                BMX_ERR_IRQHandler_Wrapper
+                0x0000000022015ada                WIFI_IPC_PUBLIC_IRQHandler_Wrapper
+                0x0000000022015ada                L1C_BMX_TO_IRQHandler_Wrapper
+                0x0000000022015ada                BZ_PHY_IRQHandler_Wrapper
+                0x0000000022015ada                RF_TOP_INT0_IRQHandler_Wrapper
+                0x0000000022015ada                IRTX_IRQHandler_Wrapper
+                0x0000000022015ada                BOR_IRQHandler_Wrapper
+ *fill*         0x0000000022015b74        0xc 
  .text.Trap_Handler_Stub
                 0x0000000022015b80       0xbc out/startup/interrupt.o
                 0x0000000022015b80                Trap_Handler_Stub
@@ -9024,7 +8971,7 @@ RAM_DATA        0x0000000042020000       0xec load address 0x0000000022018ab4
                 0x000000004202dcc8                __HeapLimit = .
 OUTPUT(out/ChipTest/Eflash_Loader/chiptest_eflash_loader.elf elf32-littleriscv)
 
-.debug_info     0x0000000000000000    0x23f7e
+.debug_info     0x0000000000000000    0x23fad
  .debug_info    0x0000000000000000      0xbb3 out/ChipTest/Eflash_Loader/main.o
  .debug_info    0x0000000000000bb3     0x25d2 out/ChipTest/Eflash_Loader/bflb_eflash_loader_cmds.o
  .debug_info    0x0000000000003185      0x78c out/ChipTest/Eflash_Loader/bflb_eflash_loader_gpio.o
@@ -9033,42 +8980,42 @@ OUTPUT(out/ChipTest/Eflash_Loader/chiptest_eflash_loader.elf elf32-littleriscv)
  .debug_info    0x0000000000004ccc     0x13da out/ChipTest/Eflash_Loader/bflb_eflash_loader_uart.o
  .debug_info    0x00000000000060a6      0x8c7 out/ChipTest/Eflash_Loader/bflb_eflash_loader_sdio.o
  .debug_info    0x000000000000696d     0x1785 out/ChipTest/Eflash_Loader/bflb_eflash_loader_boot.o
- .debug_info    0x00000000000080f2     0x1be2 out/ChipTest/Eflash_Loader/bflb_spi_flash.o
- .debug_info    0x0000000000009cd4      0x1fc out/ChipTest/Eflash_Loader/bflb_efuse.o
- .debug_info    0x0000000000009ed0      0x143 out/ChipTest/Eflash_Loader/bflb_eflash_loader_cfg.o
- .debug_info    0x000000000000a013      0x2b7 out/ChipTest/Eflash_Loader/bflb_set_clock.o
- .debug_info    0x000000000000a2ca      0x8de out/ChipTest/Eflash_Loader/sdu.o
- .debug_info    0x000000000000aba8       0xf7 out/BSP_Common/libc/memcpy.o
- .debug_info    0x000000000000ac9f       0xd7 out/BSP_Common/libc/memset.o
- .debug_info    0x000000000000ad76       0xf8 out/BSP_Common/libc/memcmp.o
- .debug_info    0x000000000000ae6e      0x525 out/BSP_Common/libc/vsnprintf.o
- .debug_info    0x000000000000b393       0xbf out/BSP_Common/libc/strlen.o
- .debug_info    0x000000000000b452      0x1dd out/BSP_Common/soft_crc/softcrc.o
- .debug_info    0x000000000000b62f      0x11b out/BSP_Common/xz/xz_crc32.o
- .debug_info    0x000000000000b74a     0x1b15 out/BSP_Common/xz/xz_dec_lzma2.o
- .debug_info    0x000000000000d25f      0xcde out/BSP_Common/xz/xz_dec_stream.o
- .debug_info    0x000000000000df3d      0x18b out/BSP_Common/xz/xz_port.o
- .debug_info    0x000000000000e0c8      0x3da out/startup/system_bl602.o
- .debug_info    0x000000000000e4a2      0x1cb out/startup/GCC/start_load.o
- .debug_info    0x000000000000e66d      0x24e out/startup/interrupt.o
- .debug_info    0x000000000000e8bb       0x22 out/startup/GCC/entry.o
- .debug_info    0x000000000000e8dd      0x577 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_common.o
- .debug_info    0x000000000000ee54     0x1481 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_uart.o
- .debug_info    0x00000000000102d5     0x1c3d out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_glb.o
- .debug_info    0x0000000000011f12     0x1a16 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_ef_ctrl.o
- .debug_info    0x0000000000013928     0x1f9f out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_hbn.o
- .debug_info    0x00000000000158c7     0x49e0 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sec_eng.o
- .debug_info    0x000000000001a2a7      0x41c out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sdu.o
- .debug_info    0x000000000001a6c3     0x3b0d out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_romapi.o
- .debug_info    0x000000000001e1d0     0x104b out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sflash_ext.o
- .debug_info    0x000000000001f21b      0x870 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sf_cfg_ext.o
- .debug_info    0x000000000001fa8b     0x110b out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_device.o
- .debug_info    0x0000000000020b96      0x303 out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_gpio.o
- .debug_info    0x0000000000020e99     0x1276 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(_udivdi3.o)
- .debug_info    0x000000000002210f     0x12d4 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(_umoddi3.o)
- .debug_info    0x00000000000233e3      0xb9b /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(_clz.o)
+ .debug_info    0x00000000000080f2     0x1c11 out/ChipTest/Eflash_Loader/bflb_spi_flash.o
+ .debug_info    0x0000000000009d03      0x1fc out/ChipTest/Eflash_Loader/bflb_efuse.o
+ .debug_info    0x0000000000009eff      0x143 out/ChipTest/Eflash_Loader/bflb_eflash_loader_cfg.o
+ .debug_info    0x000000000000a042      0x2b7 out/ChipTest/Eflash_Loader/bflb_set_clock.o
+ .debug_info    0x000000000000a2f9      0x8de out/ChipTest/Eflash_Loader/sdu.o
+ .debug_info    0x000000000000abd7       0xf7 out/BSP_Common/libc/memcpy.o
+ .debug_info    0x000000000000acce       0xd7 out/BSP_Common/libc/memset.o
+ .debug_info    0x000000000000ada5       0xf8 out/BSP_Common/libc/memcmp.o
+ .debug_info    0x000000000000ae9d      0x525 out/BSP_Common/libc/vsnprintf.o
+ .debug_info    0x000000000000b3c2       0xbf out/BSP_Common/libc/strlen.o
+ .debug_info    0x000000000000b481      0x1dd out/BSP_Common/soft_crc/softcrc.o
+ .debug_info    0x000000000000b65e      0x11b out/BSP_Common/xz/xz_crc32.o
+ .debug_info    0x000000000000b779     0x1b15 out/BSP_Common/xz/xz_dec_lzma2.o
+ .debug_info    0x000000000000d28e      0xcde out/BSP_Common/xz/xz_dec_stream.o
+ .debug_info    0x000000000000df6c      0x18b out/BSP_Common/xz/xz_port.o
+ .debug_info    0x000000000000e0f7      0x3da out/startup/system_bl602.o
+ .debug_info    0x000000000000e4d1      0x1cb out/startup/GCC/start_load.o
+ .debug_info    0x000000000000e69c      0x24e out/startup/interrupt.o
+ .debug_info    0x000000000000e8ea       0x22 out/startup/GCC/entry.o
+ .debug_info    0x000000000000e90c      0x577 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_common.o
+ .debug_info    0x000000000000ee83     0x1481 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_uart.o
+ .debug_info    0x0000000000010304     0x1c3d out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_glb.o
+ .debug_info    0x0000000000011f41     0x1a16 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_ef_ctrl.o
+ .debug_info    0x0000000000013957     0x1f9f out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_hbn.o
+ .debug_info    0x00000000000158f6     0x49e0 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sec_eng.o
+ .debug_info    0x000000000001a2d6      0x41c out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sdu.o
+ .debug_info    0x000000000001a6f2     0x3b0d out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_romapi.o
+ .debug_info    0x000000000001e1ff     0x104b out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sflash_ext.o
+ .debug_info    0x000000000001f24a      0x870 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sf_cfg_ext.o
+ .debug_info    0x000000000001faba     0x110b out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_device.o
+ .debug_info    0x0000000000020bc5      0x303 out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_gpio.o
+ .debug_info    0x0000000000020ec8     0x1276 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(_udivdi3.o)
+ .debug_info    0x000000000002213e     0x12d4 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(_umoddi3.o)
+ .debug_info    0x0000000000023412      0xb9b /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(_clz.o)
 
-.debug_abbrev   0x0000000000000000     0x5826
+.debug_abbrev   0x0000000000000000     0x585d
  .debug_abbrev  0x0000000000000000      0x1ea out/ChipTest/Eflash_Loader/main.o
  .debug_abbrev  0x00000000000001ea      0x4fc out/ChipTest/Eflash_Loader/bflb_eflash_loader_cmds.o
  .debug_abbrev  0x00000000000006e6      0x27d out/ChipTest/Eflash_Loader/bflb_eflash_loader_gpio.o
@@ -9077,40 +9024,40 @@ OUTPUT(out/ChipTest/Eflash_Loader/chiptest_eflash_loader.elf elf32-littleriscv)
  .debug_abbrev  0x0000000000000e4d      0x3aa out/ChipTest/Eflash_Loader/bflb_eflash_loader_uart.o
  .debug_abbrev  0x00000000000011f7      0x1a8 out/ChipTest/Eflash_Loader/bflb_eflash_loader_sdio.o
  .debug_abbrev  0x000000000000139f      0x48d out/ChipTest/Eflash_Loader/bflb_eflash_loader_boot.o
- .debug_abbrev  0x000000000000182c      0x3ef out/ChipTest/Eflash_Loader/bflb_spi_flash.o
- .debug_abbrev  0x0000000000001c1b      0x10b out/ChipTest/Eflash_Loader/bflb_efuse.o
- .debug_abbrev  0x0000000000001d26       0xb0 out/ChipTest/Eflash_Loader/bflb_eflash_loader_cfg.o
- .debug_abbrev  0x0000000000001dd6      0x11a out/ChipTest/Eflash_Loader/bflb_set_clock.o
- .debug_abbrev  0x0000000000001ef0      0x21c out/ChipTest/Eflash_Loader/sdu.o
- .debug_abbrev  0x000000000000210c       0xba out/BSP_Common/libc/memcpy.o
- .debug_abbrev  0x00000000000021c6       0x9d out/BSP_Common/libc/memset.o
- .debug_abbrev  0x0000000000002263       0xa2 out/BSP_Common/libc/memcmp.o
- .debug_abbrev  0x0000000000002305      0x1f4 out/BSP_Common/libc/vsnprintf.o
- .debug_abbrev  0x00000000000024f9       0x8c out/BSP_Common/libc/strlen.o
- .debug_abbrev  0x0000000000002585      0x109 out/BSP_Common/soft_crc/softcrc.o
- .debug_abbrev  0x000000000000268e       0xcb out/BSP_Common/xz/xz_crc32.o
- .debug_abbrev  0x0000000000002759      0x3a0 out/BSP_Common/xz/xz_dec_lzma2.o
- .debug_abbrev  0x0000000000002af9      0x36c out/BSP_Common/xz/xz_dec_stream.o
- .debug_abbrev  0x0000000000002e65      0x111 out/BSP_Common/xz/xz_port.o
- .debug_abbrev  0x0000000000002f76      0x199 out/startup/system_bl602.o
- .debug_abbrev  0x000000000000310f       0x94 out/startup/GCC/start_load.o
- .debug_abbrev  0x00000000000031a3      0x130 out/startup/interrupt.o
- .debug_abbrev  0x00000000000032d3       0x12 out/startup/GCC/entry.o
- .debug_abbrev  0x00000000000032e5      0x191 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_common.o
- .debug_abbrev  0x0000000000003476      0x2ba out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_uart.o
- .debug_abbrev  0x0000000000003730      0x2af out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_glb.o
- .debug_abbrev  0x00000000000039df      0x2fa out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_ef_ctrl.o
- .debug_abbrev  0x0000000000003cd9      0x38b out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_hbn.o
- .debug_abbrev  0x0000000000004064      0x473 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sec_eng.o
- .debug_abbrev  0x00000000000044d7      0x14d out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sdu.o
- .debug_abbrev  0x0000000000004624      0x2ab out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_romapi.o
- .debug_abbrev  0x00000000000048cf      0x202 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sflash_ext.o
- .debug_abbrev  0x0000000000004ad1      0x179 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sf_cfg_ext.o
- .debug_abbrev  0x0000000000004c4a      0x336 out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_device.o
- .debug_abbrev  0x0000000000004f80       0xef out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_gpio.o
- .debug_abbrev  0x000000000000506f      0x2d5 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(_udivdi3.o)
- .debug_abbrev  0x0000000000005344      0x2f1 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(_umoddi3.o)
- .debug_abbrev  0x0000000000005635      0x1f1 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(_clz.o)
+ .debug_abbrev  0x000000000000182c      0x426 out/ChipTest/Eflash_Loader/bflb_spi_flash.o
+ .debug_abbrev  0x0000000000001c52      0x10b out/ChipTest/Eflash_Loader/bflb_efuse.o
+ .debug_abbrev  0x0000000000001d5d       0xb0 out/ChipTest/Eflash_Loader/bflb_eflash_loader_cfg.o
+ .debug_abbrev  0x0000000000001e0d      0x11a out/ChipTest/Eflash_Loader/bflb_set_clock.o
+ .debug_abbrev  0x0000000000001f27      0x21c out/ChipTest/Eflash_Loader/sdu.o
+ .debug_abbrev  0x0000000000002143       0xba out/BSP_Common/libc/memcpy.o
+ .debug_abbrev  0x00000000000021fd       0x9d out/BSP_Common/libc/memset.o
+ .debug_abbrev  0x000000000000229a       0xa2 out/BSP_Common/libc/memcmp.o
+ .debug_abbrev  0x000000000000233c      0x1f4 out/BSP_Common/libc/vsnprintf.o
+ .debug_abbrev  0x0000000000002530       0x8c out/BSP_Common/libc/strlen.o
+ .debug_abbrev  0x00000000000025bc      0x109 out/BSP_Common/soft_crc/softcrc.o
+ .debug_abbrev  0x00000000000026c5       0xcb out/BSP_Common/xz/xz_crc32.o
+ .debug_abbrev  0x0000000000002790      0x3a0 out/BSP_Common/xz/xz_dec_lzma2.o
+ .debug_abbrev  0x0000000000002b30      0x36c out/BSP_Common/xz/xz_dec_stream.o
+ .debug_abbrev  0x0000000000002e9c      0x111 out/BSP_Common/xz/xz_port.o
+ .debug_abbrev  0x0000000000002fad      0x199 out/startup/system_bl602.o
+ .debug_abbrev  0x0000000000003146       0x94 out/startup/GCC/start_load.o
+ .debug_abbrev  0x00000000000031da      0x130 out/startup/interrupt.o
+ .debug_abbrev  0x000000000000330a       0x12 out/startup/GCC/entry.o
+ .debug_abbrev  0x000000000000331c      0x191 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_common.o
+ .debug_abbrev  0x00000000000034ad      0x2ba out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_uart.o
+ .debug_abbrev  0x0000000000003767      0x2af out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_glb.o
+ .debug_abbrev  0x0000000000003a16      0x2fa out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_ef_ctrl.o
+ .debug_abbrev  0x0000000000003d10      0x38b out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_hbn.o
+ .debug_abbrev  0x000000000000409b      0x473 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sec_eng.o
+ .debug_abbrev  0x000000000000450e      0x14d out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sdu.o
+ .debug_abbrev  0x000000000000465b      0x2ab out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_romapi.o
+ .debug_abbrev  0x0000000000004906      0x202 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sflash_ext.o
+ .debug_abbrev  0x0000000000004b08      0x179 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sf_cfg_ext.o
+ .debug_abbrev  0x0000000000004c81      0x336 out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_device.o
+ .debug_abbrev  0x0000000000004fb7       0xef out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_gpio.o
+ .debug_abbrev  0x00000000000050a6      0x2d5 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(_udivdi3.o)
+ .debug_abbrev  0x000000000000537b      0x2f1 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(_umoddi3.o)
+ .debug_abbrev  0x000000000000566c      0x1f1 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(_clz.o)
 
 .debug_aranges  0x0000000000000000     0x17e8
  .debug_aranges
@@ -9198,7 +9145,7 @@ OUTPUT(out/ChipTest/Eflash_Loader/chiptest_eflash_loader.elf elf32-littleriscv)
  .debug_aranges
                 0x00000000000017d0       0x18 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(_clz.o)
 
-.debug_ranges   0x0000000000000000     0x2a88
+.debug_ranges   0x0000000000000000     0x2aa0
  .debug_ranges  0x0000000000000000       0x10 out/ChipTest/Eflash_Loader/main.o
  .debug_ranges  0x0000000000000010      0x138 out/ChipTest/Eflash_Loader/bflb_eflash_loader_cmds.o
  .debug_ranges  0x0000000000000148       0x68 out/ChipTest/Eflash_Loader/bflb_eflash_loader_gpio.o
@@ -9207,39 +9154,39 @@ OUTPUT(out/ChipTest/Eflash_Loader/chiptest_eflash_loader.elf elf32-littleriscv)
  .debug_ranges  0x0000000000000270      0x110 out/ChipTest/Eflash_Loader/bflb_eflash_loader_uart.o
  .debug_ranges  0x0000000000000380       0x38 out/ChipTest/Eflash_Loader/bflb_eflash_loader_sdio.o
  .debug_ranges  0x00000000000003b8       0xc8 out/ChipTest/Eflash_Loader/bflb_eflash_loader_boot.o
- .debug_ranges  0x0000000000000480      0x118 out/ChipTest/Eflash_Loader/bflb_spi_flash.o
- .debug_ranges  0x0000000000000598       0x18 out/ChipTest/Eflash_Loader/bflb_efuse.o
- .debug_ranges  0x00000000000005b0       0x28 out/ChipTest/Eflash_Loader/bflb_eflash_loader_cfg.o
- .debug_ranges  0x00000000000005d8       0x30 out/ChipTest/Eflash_Loader/bflb_set_clock.o
- .debug_ranges  0x0000000000000608       0x50 out/ChipTest/Eflash_Loader/sdu.o
- .debug_ranges  0x0000000000000658       0x10 out/BSP_Common/libc/memcpy.o
- .debug_ranges  0x0000000000000668       0x10 out/BSP_Common/libc/memset.o
- .debug_ranges  0x0000000000000678       0x10 out/BSP_Common/libc/memcmp.o
- .debug_ranges  0x0000000000000688       0x90 out/BSP_Common/libc/vsnprintf.o
- .debug_ranges  0x0000000000000718       0x10 out/BSP_Common/libc/strlen.o
- .debug_ranges  0x0000000000000728       0x18 out/BSP_Common/soft_crc/softcrc.o
- .debug_ranges  0x0000000000000740       0x18 out/BSP_Common/xz/xz_crc32.o
- .debug_ranges  0x0000000000000758      0x618 out/BSP_Common/xz/xz_dec_lzma2.o
- .debug_ranges  0x0000000000000d70      0x290 out/BSP_Common/xz/xz_dec_stream.o
- .debug_ranges  0x0000000000001000       0x20 out/BSP_Common/xz/xz_port.o
- .debug_ranges  0x0000000000001020       0x20 out/startup/system_bl602.o
- .debug_ranges  0x0000000000001040       0x10 out/startup/GCC/start_load.o
- .debug_ranges  0x0000000000001050       0x58 out/startup/interrupt.o
- .debug_ranges  0x00000000000010a8       0x28 out/startup/GCC/entry.o
- .debug_ranges  0x00000000000010d0       0x28 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_common.o
- .debug_ranges  0x00000000000010f8      0x168 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_uart.o
- .debug_ranges  0x0000000000001260      0x290 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_glb.o
- .debug_ranges  0x00000000000014f0      0x278 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_ef_ctrl.o
- .debug_ranges  0x0000000000001768      0x330 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_hbn.o
- .debug_ranges  0x0000000000001a98      0x720 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sec_eng.o
- .debug_ranges  0x00000000000021b8       0x18 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sdu.o
- .debug_ranges  0x00000000000021d0      0x540 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_romapi.o
- .debug_ranges  0x0000000000002710       0x30 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sflash_ext.o
- .debug_ranges  0x0000000000002740       0x18 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sf_cfg_ext.o
- .debug_ranges  0x0000000000002758      0x148 out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_device.o
- .debug_ranges  0x00000000000028a0       0x18 out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_gpio.o
- .debug_ranges  0x00000000000028b8      0x100 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(_udivdi3.o)
- .debug_ranges  0x00000000000029b8       0xd0 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(_umoddi3.o)
+ .debug_ranges  0x0000000000000480      0x130 out/ChipTest/Eflash_Loader/bflb_spi_flash.o
+ .debug_ranges  0x00000000000005b0       0x18 out/ChipTest/Eflash_Loader/bflb_efuse.o
+ .debug_ranges  0x00000000000005c8       0x28 out/ChipTest/Eflash_Loader/bflb_eflash_loader_cfg.o
+ .debug_ranges  0x00000000000005f0       0x30 out/ChipTest/Eflash_Loader/bflb_set_clock.o
+ .debug_ranges  0x0000000000000620       0x50 out/ChipTest/Eflash_Loader/sdu.o
+ .debug_ranges  0x0000000000000670       0x10 out/BSP_Common/libc/memcpy.o
+ .debug_ranges  0x0000000000000680       0x10 out/BSP_Common/libc/memset.o
+ .debug_ranges  0x0000000000000690       0x10 out/BSP_Common/libc/memcmp.o
+ .debug_ranges  0x00000000000006a0       0x90 out/BSP_Common/libc/vsnprintf.o
+ .debug_ranges  0x0000000000000730       0x10 out/BSP_Common/libc/strlen.o
+ .debug_ranges  0x0000000000000740       0x18 out/BSP_Common/soft_crc/softcrc.o
+ .debug_ranges  0x0000000000000758       0x18 out/BSP_Common/xz/xz_crc32.o
+ .debug_ranges  0x0000000000000770      0x618 out/BSP_Common/xz/xz_dec_lzma2.o
+ .debug_ranges  0x0000000000000d88      0x290 out/BSP_Common/xz/xz_dec_stream.o
+ .debug_ranges  0x0000000000001018       0x20 out/BSP_Common/xz/xz_port.o
+ .debug_ranges  0x0000000000001038       0x20 out/startup/system_bl602.o
+ .debug_ranges  0x0000000000001058       0x10 out/startup/GCC/start_load.o
+ .debug_ranges  0x0000000000001068       0x58 out/startup/interrupt.o
+ .debug_ranges  0x00000000000010c0       0x28 out/startup/GCC/entry.o
+ .debug_ranges  0x00000000000010e8       0x28 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_common.o
+ .debug_ranges  0x0000000000001110      0x168 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_uart.o
+ .debug_ranges  0x0000000000001278      0x290 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_glb.o
+ .debug_ranges  0x0000000000001508      0x278 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_ef_ctrl.o
+ .debug_ranges  0x0000000000001780      0x330 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_hbn.o
+ .debug_ranges  0x0000000000001ab0      0x720 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sec_eng.o
+ .debug_ranges  0x00000000000021d0       0x18 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sdu.o
+ .debug_ranges  0x00000000000021e8      0x540 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_romapi.o
+ .debug_ranges  0x0000000000002728       0x30 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sflash_ext.o
+ .debug_ranges  0x0000000000002758       0x18 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sf_cfg_ext.o
+ .debug_ranges  0x0000000000002770      0x148 out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_device.o
+ .debug_ranges  0x00000000000028b8       0x18 out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_gpio.o
+ .debug_ranges  0x00000000000028d0      0x100 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(_udivdi3.o)
+ .debug_ranges  0x00000000000029d0       0xd0 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(_umoddi3.o)
 
 .debug_macro    0x0000000000000000    0x1aabb
  .debug_macro   0x0000000000000000      0x20f out/ChipTest/Eflash_Loader/main.o
@@ -9338,7 +9285,7 @@ OUTPUT(out/ChipTest/Eflash_Loader/chiptest_eflash_loader.elf elf32-littleriscv)
  .debug_macro   0x000000000001a704      0x21a out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_device.o
  .debug_macro   0x000000000001a91e      0x19d out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_gpio.o
 
-.debug_line     0x0000000000000000    0x2a329
+.debug_line     0x0000000000000000    0x2a359
  .debug_line    0x0000000000000000      0x6c7 out/ChipTest/Eflash_Loader/main.o
  .debug_line    0x00000000000006c7     0x2b5c out/ChipTest/Eflash_Loader/bflb_eflash_loader_cmds.o
  .debug_line    0x0000000000003223      0xf01 out/ChipTest/Eflash_Loader/bflb_eflash_loader_gpio.o
@@ -9347,40 +9294,40 @@ OUTPUT(out/ChipTest/Eflash_Loader/chiptest_eflash_loader.elf elf32-littleriscv)
  .debug_line    0x0000000000005689      0xcdd out/ChipTest/Eflash_Loader/bflb_eflash_loader_uart.o
  .debug_line    0x0000000000006366      0x659 out/ChipTest/Eflash_Loader/bflb_eflash_loader_sdio.o
  .debug_line    0x00000000000069bf      0xe18 out/ChipTest/Eflash_Loader/bflb_eflash_loader_boot.o
- .debug_line    0x00000000000077d7     0x12ff out/ChipTest/Eflash_Loader/bflb_spi_flash.o
- .debug_line    0x0000000000008ad6      0x515 out/ChipTest/Eflash_Loader/bflb_efuse.o
- .debug_line    0x0000000000008feb      0x4b7 out/ChipTest/Eflash_Loader/bflb_eflash_loader_cfg.o
- .debug_line    0x00000000000094a2      0x4a8 out/ChipTest/Eflash_Loader/bflb_set_clock.o
- .debug_line    0x000000000000994a      0xd1b out/ChipTest/Eflash_Loader/sdu.o
- .debug_line    0x000000000000a665       0xf6 out/BSP_Common/libc/memcpy.o
- .debug_line    0x000000000000a75b       0xe8 out/BSP_Common/libc/memset.o
- .debug_line    0x000000000000a843      0x116 out/BSP_Common/libc/memcmp.o
- .debug_line    0x000000000000a959     0x16cb out/BSP_Common/libc/vsnprintf.o
- .debug_line    0x000000000000c024       0xd4 out/BSP_Common/libc/strlen.o
- .debug_line    0x000000000000c0f8      0x552 out/BSP_Common/soft_crc/softcrc.o
- .debug_line    0x000000000000c64a      0x18a out/BSP_Common/xz/xz_crc32.o
- .debug_line    0x000000000000c7d4     0x36dd out/BSP_Common/xz/xz_dec_lzma2.o
- .debug_line    0x000000000000feb1     0x1757 out/BSP_Common/xz/xz_dec_stream.o
- .debug_line    0x0000000000011608      0x283 out/BSP_Common/xz/xz_port.o
- .debug_line    0x000000000001188b      0x631 out/startup/system_bl602.o
- .debug_line    0x0000000000011ebc      0x36c out/startup/GCC/start_load.o
- .debug_line    0x0000000000012228      0x2d7 out/startup/interrupt.o
- .debug_line    0x00000000000124ff      0x15e out/startup/GCC/entry.o
- .debug_line    0x000000000001265d      0x6cc out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_common.o
- .debug_line    0x0000000000012d29     0x1ea5 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_uart.o
- .debug_line    0x0000000000014bce     0x2e24 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_glb.o
- .debug_line    0x00000000000179f2     0x2e4f out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_ef_ctrl.o
- .debug_line    0x000000000001a841     0x272d out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_hbn.o
- .debug_line    0x000000000001cf6e     0x704e out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sec_eng.o
- .debug_line    0x0000000000023fbc      0x36a out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sdu.o
- .debug_line    0x0000000000024326     0x1526 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_romapi.o
- .debug_line    0x000000000002584c     0x1337 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sflash_ext.o
- .debug_line    0x0000000000026b83      0x6f0 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sf_cfg_ext.o
- .debug_line    0x0000000000027273     0x1487 out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_device.o
- .debug_line    0x00000000000286fa      0x4fe out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_gpio.o
- .debug_line    0x0000000000028bf8      0x9c9 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(_udivdi3.o)
- .debug_line    0x00000000000295c1      0xa8f /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(_umoddi3.o)
- .debug_line    0x000000000002a050      0x2d9 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(_clz.o)
+ .debug_line    0x00000000000077d7     0x132f out/ChipTest/Eflash_Loader/bflb_spi_flash.o
+ .debug_line    0x0000000000008b06      0x515 out/ChipTest/Eflash_Loader/bflb_efuse.o
+ .debug_line    0x000000000000901b      0x4b7 out/ChipTest/Eflash_Loader/bflb_eflash_loader_cfg.o
+ .debug_line    0x00000000000094d2      0x4a8 out/ChipTest/Eflash_Loader/bflb_set_clock.o
+ .debug_line    0x000000000000997a      0xd1b out/ChipTest/Eflash_Loader/sdu.o
+ .debug_line    0x000000000000a695       0xf6 out/BSP_Common/libc/memcpy.o
+ .debug_line    0x000000000000a78b       0xe8 out/BSP_Common/libc/memset.o
+ .debug_line    0x000000000000a873      0x116 out/BSP_Common/libc/memcmp.o
+ .debug_line    0x000000000000a989     0x16cb out/BSP_Common/libc/vsnprintf.o
+ .debug_line    0x000000000000c054       0xd4 out/BSP_Common/libc/strlen.o
+ .debug_line    0x000000000000c128      0x552 out/BSP_Common/soft_crc/softcrc.o
+ .debug_line    0x000000000000c67a      0x18a out/BSP_Common/xz/xz_crc32.o
+ .debug_line    0x000000000000c804     0x36dd out/BSP_Common/xz/xz_dec_lzma2.o
+ .debug_line    0x000000000000fee1     0x1757 out/BSP_Common/xz/xz_dec_stream.o
+ .debug_line    0x0000000000011638      0x283 out/BSP_Common/xz/xz_port.o
+ .debug_line    0x00000000000118bb      0x631 out/startup/system_bl602.o
+ .debug_line    0x0000000000011eec      0x36c out/startup/GCC/start_load.o
+ .debug_line    0x0000000000012258      0x2d7 out/startup/interrupt.o
+ .debug_line    0x000000000001252f      0x15e out/startup/GCC/entry.o
+ .debug_line    0x000000000001268d      0x6cc out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_common.o
+ .debug_line    0x0000000000012d59     0x1ea5 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_uart.o
+ .debug_line    0x0000000000014bfe     0x2e24 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_glb.o
+ .debug_line    0x0000000000017a22     0x2e4f out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_ef_ctrl.o
+ .debug_line    0x000000000001a871     0x272d out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_hbn.o
+ .debug_line    0x000000000001cf9e     0x704e out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sec_eng.o
+ .debug_line    0x0000000000023fec      0x36a out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sdu.o
+ .debug_line    0x0000000000024356     0x1526 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_romapi.o
+ .debug_line    0x000000000002587c     0x1337 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sflash_ext.o
+ .debug_line    0x0000000000026bb3      0x6f0 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sf_cfg_ext.o
+ .debug_line    0x00000000000272a3     0x1487 out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_device.o
+ .debug_line    0x000000000002872a      0x4fe out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_gpio.o
+ .debug_line    0x0000000000028c28      0x9c9 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(_udivdi3.o)
+ .debug_line    0x00000000000295f1      0xa8f /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(_umoddi3.o)
+ .debug_line    0x000000000002a080      0x2d9 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(_clz.o)
 
 .debug_str      0x0000000000000000    0x9ea93
  .debug_str     0x0000000000000000    0x854a8 out/ChipTest/Eflash_Loader/main.o
@@ -9642,7 +9589,7 @@ OUTPUT(out/ChipTest/Eflash_Loader/chiptest_eflash_loader.elf elf32-littleriscv)
  .debug_frame   0x0000000000003c00      0x34c out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_device.o
  .debug_frame   0x0000000000003f4c       0x48 out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_gpio.o
 
-.debug_loc      0x0000000000000000    0x1811b
+.debug_loc      0x0000000000000000    0x18146
  .debug_loc     0x0000000000000000     0x1745 out/ChipTest/Eflash_Loader/bflb_eflash_loader_cmds.o
  .debug_loc     0x0000000000001745      0x282 out/ChipTest/Eflash_Loader/bflb_eflash_loader_gpio.o
  .debug_loc     0x00000000000019c7      0x4d4 out/ChipTest/Eflash_Loader/bflb_eflash_loader_interface.o
@@ -9650,36 +9597,36 @@ OUTPUT(out/ChipTest/Eflash_Loader/chiptest_eflash_loader.elf elf32-littleriscv)
  .debug_loc     0x00000000000020b7      0x35c out/ChipTest/Eflash_Loader/bflb_eflash_loader_uart.o
  .debug_loc     0x0000000000002413      0x172 out/ChipTest/Eflash_Loader/bflb_eflash_loader_sdio.o
  .debug_loc     0x0000000000002585      0x3ee out/ChipTest/Eflash_Loader/bflb_eflash_loader_boot.o
- .debug_loc     0x0000000000002973      0x7b3 out/ChipTest/Eflash_Loader/bflb_spi_flash.o
- .debug_loc     0x0000000000003126      0x151 out/ChipTest/Eflash_Loader/bflb_efuse.o
- .debug_loc     0x0000000000003277       0x63 out/ChipTest/Eflash_Loader/bflb_set_clock.o
- .debug_loc     0x00000000000032da      0x27c out/ChipTest/Eflash_Loader/sdu.o
- .debug_loc     0x0000000000003556       0x6f out/BSP_Common/libc/memcpy.o
- .debug_loc     0x00000000000035c5       0x9a out/BSP_Common/libc/memset.o
- .debug_loc     0x000000000000365f       0xb1 out/BSP_Common/libc/memcmp.o
- .debug_loc     0x0000000000003710     0x183c out/BSP_Common/libc/vsnprintf.o
- .debug_loc     0x0000000000004f4c       0x71 out/BSP_Common/libc/strlen.o
- .debug_loc     0x0000000000004fbd      0x1f5 out/BSP_Common/soft_crc/softcrc.o
- .debug_loc     0x00000000000051b2       0x8c out/BSP_Common/xz/xz_crc32.o
- .debug_loc     0x000000000000523e     0x173e out/BSP_Common/xz/xz_dec_lzma2.o
- .debug_loc     0x000000000000697c      0x769 out/BSP_Common/xz/xz_dec_stream.o
- .debug_loc     0x00000000000070e5       0x58 out/BSP_Common/xz/xz_port.o
- .debug_loc     0x000000000000713d       0x5f out/startup/system_bl602.o
- .debug_loc     0x000000000000719c       0x73 out/startup/GCC/start_load.o
- .debug_loc     0x000000000000720f      0x122 out/startup/interrupt.o
- .debug_loc     0x0000000000007331      0x290 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_common.o
- .debug_loc     0x00000000000075c1     0x12f3 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_uart.o
- .debug_loc     0x00000000000088b4     0x18fb out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_glb.o
- .debug_loc     0x000000000000a1af     0x22a9 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_ef_ctrl.o
- .debug_loc     0x000000000000c458     0x143d out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_hbn.o
- .debug_loc     0x000000000000d895     0x638e out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sec_eng.o
- .debug_loc     0x0000000000013c23       0x79 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sdu.o
- .debug_loc     0x0000000000013c9c     0x1cbf out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_romapi.o
- .debug_loc     0x000000000001595b      0x8fd out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sflash_ext.o
- .debug_loc     0x0000000000016258      0x233 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sf_cfg_ext.o
- .debug_loc     0x000000000001648b      0x757 out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_device.o
- .debug_loc     0x0000000000016be2      0xbd0 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(_udivdi3.o)
- .debug_loc     0x00000000000177b2      0x969 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(_umoddi3.o)
+ .debug_loc     0x0000000000002973      0x7de out/ChipTest/Eflash_Loader/bflb_spi_flash.o
+ .debug_loc     0x0000000000003151      0x151 out/ChipTest/Eflash_Loader/bflb_efuse.o
+ .debug_loc     0x00000000000032a2       0x63 out/ChipTest/Eflash_Loader/bflb_set_clock.o
+ .debug_loc     0x0000000000003305      0x27c out/ChipTest/Eflash_Loader/sdu.o
+ .debug_loc     0x0000000000003581       0x6f out/BSP_Common/libc/memcpy.o
+ .debug_loc     0x00000000000035f0       0x9a out/BSP_Common/libc/memset.o
+ .debug_loc     0x000000000000368a       0xb1 out/BSP_Common/libc/memcmp.o
+ .debug_loc     0x000000000000373b     0x183c out/BSP_Common/libc/vsnprintf.o
+ .debug_loc     0x0000000000004f77       0x71 out/BSP_Common/libc/strlen.o
+ .debug_loc     0x0000000000004fe8      0x1f5 out/BSP_Common/soft_crc/softcrc.o
+ .debug_loc     0x00000000000051dd       0x8c out/BSP_Common/xz/xz_crc32.o
+ .debug_loc     0x0000000000005269     0x173e out/BSP_Common/xz/xz_dec_lzma2.o
+ .debug_loc     0x00000000000069a7      0x769 out/BSP_Common/xz/xz_dec_stream.o
+ .debug_loc     0x0000000000007110       0x58 out/BSP_Common/xz/xz_port.o
+ .debug_loc     0x0000000000007168       0x5f out/startup/system_bl602.o
+ .debug_loc     0x00000000000071c7       0x73 out/startup/GCC/start_load.o
+ .debug_loc     0x000000000000723a      0x122 out/startup/interrupt.o
+ .debug_loc     0x000000000000735c      0x290 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_common.o
+ .debug_loc     0x00000000000075ec     0x12f3 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_uart.o
+ .debug_loc     0x00000000000088df     0x18fb out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_glb.o
+ .debug_loc     0x000000000000a1da     0x22a9 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_ef_ctrl.o
+ .debug_loc     0x000000000000c483     0x143d out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_hbn.o
+ .debug_loc     0x000000000000d8c0     0x638e out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sec_eng.o
+ .debug_loc     0x0000000000013c4e       0x79 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sdu.o
+ .debug_loc     0x0000000000013cc7     0x1cbf out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_romapi.o
+ .debug_loc     0x0000000000015986      0x8fd out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sflash_ext.o
+ .debug_loc     0x0000000000016283      0x233 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sf_cfg_ext.o
+ .debug_loc     0x00000000000164b6      0x757 out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_device.o
+ .debug_loc     0x0000000000016c0d      0xbd0 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(_udivdi3.o)
+ .debug_loc     0x00000000000177dd      0x969 /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(_umoddi3.o)
 
 Cross Reference Table
 
@@ -10715,7 +10662,6 @@ __Vectors                                         out/startup/interrupt.o
                                                   out/ChipTest/Eflash_Loader/main.o
 __adddf3                                          /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(adddf3.o)
                                                   out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
-                                                  out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
                                                   out/BSP_Common/libc/atof.o
 __assert_func                                     out/BSP_Common/libc/common.o
 __bss_end__                                       out/startup/GCC/start_load.o
@@ -10725,10 +10671,8 @@ __clz_tab                                         /home/cbpeng/toolchain/riscv64
                                                   /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(_udivdi3.o)
                                                   /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(_clzsi2.o)
 __clzsi2                                          /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(_clzsi2.o)
-                                                  /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(extendsfdf2.o)
                                                   /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(floatunsidf.o)
                                                   /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(floatsidf.o)
-                                                  /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(subdf3.o)
                                                   /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(muldf3.o)
                                                   /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(divdf3.o)
                                                   /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(adddf3.o)
@@ -10747,19 +10691,15 @@ __ctypes                                          out/BSP_Common/libc/ctypes.o
                                                   out/BSP_Common/libc/ctype_isalpha.o
                                                   out/BSP_Common/libc/ctype_isalnum.o
 __divdf3                                          /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(divdf3.o)
-                                                  out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
                                                   out/BSP_Common/libc/atof.o
                                                   out/ChipTest/Eflash_Loader/bflb_eflash_loader_uart.o
 __dtcm_load_addr                                  out/startup/GCC/start_load.o
-__extendsfdf2                                     /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(extendsfdf2.o)
-                                                  out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
 __fixdfsi                                         /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(fixdfsi.o)
                                                   out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
 __fixunsdfsi                                      /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(fixunsdfsi.o)
                                                   out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
                                                   out/ChipTest/Eflash_Loader/bflb_eflash_loader_uart.o
 __floatsidf                                       /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(floatsidf.o)
-                                                  out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
                                                   out/BSP_Common/libc/atof.o
 __floatunsidf                                     /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(floatunsidf.o)
                                                   out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
@@ -10771,7 +10711,6 @@ __metal_after_main                                out/startup/GCC/entry.o
 __metal_chicken_bit                               out/startup/GCC/entry.o
 __muldf3                                          /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(muldf3.o)
                                                   out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
-                                                  out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
                                                   out/BSP_Common/libc/atof.o
                                                   out/ChipTest/Eflash_Loader/bflb_eflash_loader_uart.o
 __ram_data_end__                                  out/startup/GCC/start_load.o
@@ -10786,8 +10725,6 @@ __strxspn                                         out/BSP_Common/libc/strxspn.o
                                                   out/BSP_Common/libc/strpbrk.o
                                                   out/BSP_Common/libc/strspn.o
                                                   out/BSP_Common/libc/strcspn.o
-__subdf3                                          /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(subdf3.o)
-                                                  out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
 __system_ram_data_end__                           out/startup/GCC/start_load.o
 __system_ram_data_start__                         out/startup/GCC/start_load.o
 __system_ram_load_addr                            out/startup/GCC/start_load.o
@@ -10795,8 +10732,6 @@ __tcm_code_end__                                  out/startup/GCC/start_load.o
 __tcm_code_start__                                out/startup/GCC/start_load.o
 __tcm_data_end__                                  out/startup/GCC/start_load.o
 __tcm_data_start__                                out/startup/GCC/start_load.o
-__truncdfsf2                                      /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(truncdfsf2.o)
-                                                  out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
 __udivdi3                                         /home/cbpeng/toolchain/riscv64-elf-x86_64-20210120/bin/../lib/gcc/riscv64-unknown-elf/8.4.0/rv32imafc/ilp32f/libgcc.a(_udivdi3.o)
                                                   out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_device.o
                                                   out/BSP_Common/libc/vsnprintf.o

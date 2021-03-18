@@ -2163,12 +2163,12 @@ class BflbEflashLoader(object):
                         flash_clk_delay = int(clk_delay_cfg, 16)
                     else:
                         flash_clk_delay = int(clk_delay_cfg, 10)
-            # 0x040100 is default set: flash_io_mode=4, flash_clock_cfg=1, flash_pin=0
+            # 0x010100 is default set: flash_io_mode=1, flash_clock_cfg=1, flash_pin=0
             flash_set = (flash_pin << 0) +\
                         (flash_clock_cfg << 8) +\
                         (flash_io_mode << 16) +\
                         (flash_clk_delay << 24)
-            if (flash_set != 0x040100 and self._chip_type != "bl60x")\
+            if (flash_set != 0x010100 and self._chip_type != "bl60x")\
                 or (flash_pin != 0 and self._chip_type == "bl60x")\
                 or load_function == 2:
                 bflb_utils.printf("set flash cfg: %X" % (flash_set))
@@ -2281,7 +2281,8 @@ class BflbEflashLoader(object):
                                                   flash_file[i].replace("\\", "/"), " to 0x", address[i])
                                 flash_para_file = cfg.get("FLASH_CFG", "flash_para")
                                 ret = bflb_flash_select.flash_bootheader_config_check(self._chip_name,
-                                    self._chip_type, read_flash_id, flash_file[i].replace("\\", "/"))
+                                    self._chip_type, read_flash_id, flash_file[i].replace("\\", "/"),
+                                    flash_para_file)
                                 if ret is False:
                                     self.error_code_print("0040")
                                     return False, flash_burn_retry

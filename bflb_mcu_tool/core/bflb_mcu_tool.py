@@ -57,7 +57,7 @@ class BflbMcuTool(object):
         self.eflash_loader_cfg = os.path.join(app_path, chipname, "eflash_loader/eflash_loader_cfg.conf")
         self.eflash_loader_cfg_tmp = os.path.join(app_path, chipname, "eflash_loader/eflash_loader_cfg.ini")
         self.eflash_loader_bin = os.path.join(app_path, chipname, "eflash_loader/eflash_loader_40m.bin")
-        self.img_create_path = os.path.join(app_path, chipname, "img_create_mcu")
+        self.img_create_path = chipname + "/img_create_mcu"
         self.efuse_bh_path = os.path.join(app_path, chipname, "efuse_bootheader")
         self.efuse_bh_default_cfg = os.path.join(app_path, chipname, "efuse_bootheader") + "/efuse_bootheader_cfg.conf"
         self.efuse_bh_default_cfg_dp = os.path.join(app_path, chipname, "efuse_bootheader") + "/efuse_bootheader_cfg_dp.conf"
@@ -826,9 +826,10 @@ class BflbMcuTool(object):
                             dts_bytearray = bflb_utils.hexstr_to_bytearray(dts_hex)
                         except Exception as e:
                             dts_bytearray = None
-                        tlv_bin = self.img_create_path + "/tlv.bin"
-                        with open(tlv_bin, "wb") as fp:
-                            fp.write(dts_bytearray)
+                        if dts_bytearray:
+                            tlv_bin = self.img_create_path + "/tlv.bin"
+                            with open(tlv_bin, "wb") as fp:
+                                fp.write(dts_bytearray)
                         img_org = values["img_file"]
                         if parse_rfpa(img_org) == b'BLRFPARA' and dts_bytearray:
                             length = len(dts_bytearray)

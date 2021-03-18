@@ -20,6 +20,7 @@ bflb_mcu_tool/bl562/device_tree/bl_factory_params_IoTKitA_38.4M.dts
 bflb_mcu_tool/bl562/device_tree/bl_factory_params_IoTKitA_40M.dts
 bflb_mcu_tool/bl562/device_tree/bl_factory_params_IoTKitA_None.dts
 bflb_mcu_tool/bl562/device_tree/bl_factory_params_IoTKitA_RC32M.dts
+bflb_mcu_tool/bl562/eflash_loader/eflash_loader.elf
 bflb_mcu_tool/bl562/eflash_loader/eflash_loader.map
 bflb_mcu_tool/bl562/eflash_loader/eflash_loader_24m.bin
 bflb_mcu_tool/bl562/eflash_loader/eflash_loader_26m.bin
@@ -37,6 +38,7 @@ bflb_mcu_tool/bl562/img_create_iot/img_create_cfg_mfg.conf
 bflb_mcu_tool/bl562/img_create_mcu/img_create_cfg.conf
 bflb_mcu_tool/bl562/img_create_mcu/img_create_cfg_boot2.conf
 bflb_mcu_tool/bl562/img_create_mcu/img_create_cfg_mfg.conf
+bflb_mcu_tool/bl562/partition/partition_cfg_1M.toml
 bflb_mcu_tool/bl562/partition/partition_cfg_2M.toml
 bflb_mcu_tool/bl56x/conf/ota.toml
 bflb_mcu_tool/bl56x/device_tree/bl_factory_params_avb_26M.dts
@@ -106,6 +108,7 @@ bflb_mcu_tool/bl602/device_tree/bl_factory_params_IoTKitA_38.4M.dts
 bflb_mcu_tool/bl602/device_tree/bl_factory_params_IoTKitA_40M.dts
 bflb_mcu_tool/bl602/device_tree/bl_factory_params_IoTKitA_None.dts
 bflb_mcu_tool/bl602/device_tree/bl_factory_params_IoTKitA_RC32M.dts
+bflb_mcu_tool/bl602/eflash_loader/eflash_loader.elf
 bflb_mcu_tool/bl602/eflash_loader/eflash_loader.map
 bflb_mcu_tool/bl602/eflash_loader/eflash_loader_24m.bin
 bflb_mcu_tool/bl602/eflash_loader/eflash_loader_26m.bin
@@ -126,6 +129,7 @@ bflb_mcu_tool/bl602/img_create_iot/img_create_cfg_mfg.conf
 bflb_mcu_tool/bl602/img_create_mcu/img_create_cfg.conf
 bflb_mcu_tool/bl602/img_create_mcu/img_create_cfg_boot2.conf
 bflb_mcu_tool/bl602/img_create_mcu/img_create_cfg_mfg.conf
+bflb_mcu_tool/bl602/partition/partition_cfg_1M.toml
 bflb_mcu_tool/bl602/partition/partition_cfg_2M.toml
 bflb_mcu_tool/bl60x/builtin_imgs/blsp_boot2.bin
 bflb_mcu_tool/bl60x/builtin_imgs/mfg/bl606_bl608_mfg_gu_26m.bin

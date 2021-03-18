@@ -63,8 +63,8 @@ class BflbJLinkPort(object):
                 self._jlink = pylink.JLink(lib=obj_dll)
             else:
                 self._jlink = pylink.JLink()
-            if device is not None and device.lower().find("com") == -1 and device.lower().find(
-                    "tty") == -1:
+            if device is not None and device is not "" and device.lower().find("com") == -1\
+                and device.lower().find("tty") == -1:
                 bflb_utils.printf(device)
                 self._jlink.open(serial_no=int(device))
             else:
@@ -100,7 +100,7 @@ class BflbJLinkPort(object):
         if self._jlink.halted() is False:
             self._jlink.halt()
         if self._jlink.halted():
-            if self._chiptype == "bl602":
+            if self._chiptype == "bl602" or self._chiptype == "bl702":
                 jlink_script = "jlink.cmd"
                 fp = open(jlink_script, 'w+')
                 cmd = "h\r\nSetPC " + str(self._jlink_run_addr) + "\r\nexit"

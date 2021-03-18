@@ -93,11 +93,16 @@ def update_flash_cfg_data_do(chipname, chiptype, flash_id):
     return update_data_from_cfg(sub_module.bootheader_cfg_keys.bootheader_cfg_keys, cfg_dir + conf_name)
 
 
-def flash_bootheader_config_check(chipname, chiptype, flashid, file):
+def flash_bootheader_config_check(chipname, chiptype, flashid, file, parafile):
     magic_code = 0x504e4642
     flash_magic_code = 0x47464346
     offset, flashCfgLen, data, flashCrcOffset, crcOffset =\
         update_flash_cfg_data_do(chipname, chiptype, flashid)
+
+    if parafile != "":
+        fp = open(parafile, 'wb')
+        fp.write(data)
+        fp.close()
 
     fp = open(file, 'rb')
     rdata = bytearray(fp.read())
@@ -126,9 +131,10 @@ def update_flash_cfg_data(chipname, chiptype, flash_id, cfg, bh_cfg_file, cfg_ke
     offset, flashCfgLen, data, flashCrcOffset, crcOffset = update_flash_cfg_data_do(chipname, chiptype, flash_id)
 
     para_file = cfg.get("FLASH_CFG", "flash_para")
-    fp = open(para_file, 'wb')
-    fp.write(data)
-    fp.close()
+    if para_file != "":
+        fp = open(para_file, 'wb')
+        fp.write(data)
+        fp.close()
 
     flash_file = re.compile('\s+').split(cfg.get("FLASH_CFG", "file"))
     for f in flash_file:
