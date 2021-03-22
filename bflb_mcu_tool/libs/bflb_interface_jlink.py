@@ -19,7 +19,7 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #  SOFTWARE.
 
-
+import re
 import os
 import sys
 import time
@@ -35,9 +35,9 @@ from libs.bflb_utils import app_path
 python_version = struct.calcsize("P") * 8
 
 if python_version == 64:
-    path_dll = os.path.join(app_path, "JLinkARM_64.dll")
+    path_dll = os.path.join(app_path, "JLink_x64.dll")
 else:
-    path_dll = os.path.join(app_path, "JLinkARM_32.dll")
+    path_dll = os.path.join(app_path, "JLinkARM.dll")
 
 
 class BflbJLinkPort(object):
@@ -63,8 +63,8 @@ class BflbJLinkPort(object):
                 self._jlink = pylink.JLink(lib=obj_dll)
             else:
                 self._jlink = pylink.JLink()
-            if device is not None and device is not "" and device.lower().find("com") == -1\
-                and device.lower().find("tty") == -1:
+            match = re.search("\d{8,10}", device, re.I)
+            if match is not None:
                 bflb_utils.printf(device)
                 self._jlink.open(serial_no=int(device))
             else:
@@ -111,6 +111,7 @@ class BflbJLinkPort(object):
                 jlink_cmd = 'JLink.exe -device RISC-V -Speed ' + str(
                     self._speed
                 ) + ' -IF JTAG -jtagconf -1,-1 -autoconnect 1 -CommanderScript jlink.cmd'
+                bflb_utils.printf(jlink_cmd)
                 p = subprocess.Popen(jlink_cmd,
                                      shell=True,
                                      stdin=subprocess.PIPE,
@@ -175,9 +176,10 @@ class BflbJLinkPort(object):
         start_time = (time.time() * 1000)
         while True:
             ready = self._jlink.memory_read(int(self._jlink_shake_hand_addr, 16), 1, nbits=32)
-            # bflb_utils.printf("receiving",ready)
-            if ready[0] == int("4B434153", 16):
-                break
+            if len(ready) >= 1:
+                # bflb_utils.printf("receiving ", ready)
+                if ready[0] == int("4B434153", 16):
+                    break
             elapsed = (time.time() * 1000) - start_time
             # time out judgment
             if elapsed >= self._rx_timeout:

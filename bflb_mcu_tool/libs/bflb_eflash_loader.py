@@ -69,6 +69,7 @@ chip_dict = {
 
 FLASH_LOAD_SHAKE_HAND = "Flash load shake hand"
 FLASH_ERASE_SHAKE_HAND = "Flash erase shake hand"
+NUM_ERR = 5
 
 
 class BflbEflashLoader(object):
@@ -322,6 +323,8 @@ class BflbEflashLoader(object):
             # msp.reverse()
             self._bflb_com_if.set_pc_msp(binascii.hexlify(pc),
                                          binascii.hexlify(msp).decode('utf-8'))
+            time.sleep(0.01)
+            self._bflb_com_if.if_close()
             return True, None
         elif interface == "openocd":
             bflb_utils.printf("Load eflash_loader.bin via openocd")
@@ -1437,7 +1440,7 @@ class BflbEflashLoader(object):
         except Exception as e:
             bflb_utils.printf(e)
             self.error_code_print("0006")
-            traceback.print_exc(limit=5, file=sys.stdout)
+            traceback.print_exc(limit=NUM_ERR, file=sys.stdout)
             return False, None
         return True, readdata
 
@@ -1500,7 +1503,7 @@ class BflbEflashLoader(object):
                             (bflb_utils.bytearray_to_int(ptdata[addr_start + 3 + 8:addr_start + 4 + 8]) << 24)
         except Exception as e:
             bflb_utils.printf(e)
-            traceback.print_exc(limit=5, file=sys.stdout)
+            traceback.print_exc(limit=NUM_ERR, file=sys.stdout)
             return False, 0, 0
         return True, fwaddr, maxlen
 
@@ -1780,7 +1783,7 @@ class BflbEflashLoader(object):
         except Exception as e:
             bflb_utils.printf("efuse_flash_loader fail")
             bflb_utils.printf(e)
-            traceback.print_exc(limit=5, file=sys.stdout)
+            traceback.print_exc(limit=NUM_ERR, file=sys.stdout)
             if self._csv_data and self._csv_file:
                 lock_file = open("lock.txt", 'w+')
                 portalocker.lock(lock_file, portalocker.LOCK_EX)
@@ -2298,7 +2301,7 @@ class BflbEflashLoader(object):
                             bflb_utils.printf("Program Finished")
                         except Exception as e:
                             bflb_utils.printf(e)
-                            traceback.print_exc(limit=5, file=sys.stdout)
+                            traceback.print_exc(limit=NUM_ERR, file=sys.stdout)
                             return False, flash_burn_retry
                     else:
                         bflb_utils.printf("No input file to program to flash")

@@ -47,12 +47,20 @@ try:
     from PySide2 import QtCore
 except ImportError:
     qt_sign = False
-
+    
 # Get app path
 if getattr(sys, "frozen", False):
     app_path = os.path.dirname(sys.executable)
 else:
     app_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ 
+    
+python_version = struct.calcsize("P") * 8
+
+if python_version == 64:
+    path_dll = os.path.join(app_path, "JLink_x64.dll")
+else:
+    path_dll = os.path.join(app_path, "JLinkARM.dll")
 
 try:
     import changeconf as cgc
@@ -675,7 +683,6 @@ def serial_enumerate():
 
 
 def pylink_enumerate():
-    path_dll = os.path.join(app_path, "JLinkARM_32.dll")
     obj_dll = pylink.Library(dllpath=path_dll)
     obj = pylink.JLink(lib=obj_dll)
     return obj.connected_emulators()

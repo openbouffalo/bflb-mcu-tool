@@ -232,7 +232,7 @@ class BflbUartPort(object):
             # clean buffer before start
             bflb_utils.printf("clean buf")
             self._ser.timeout = 0.1
-            success, ack = self.if_read(1000)
+            success, ack = self.if_read(100000)
             # change tiemout value when shake hand
             if self._602a0_dln_fix:
                 self._ser.timeout = 0.5
