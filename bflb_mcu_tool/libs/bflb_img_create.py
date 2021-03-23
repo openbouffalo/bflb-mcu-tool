@@ -33,7 +33,7 @@ except ImportError:
     from libs import bflb_path
 from libs import bflb_utils
 from libs import bflb_efuse_boothd_create
-from libs.bflb_utils import app_path, set_error_code
+from libs.bflb_utils import app_path, set_error_code, convert_path
 from libs.bflb_configobj import BFConfigParser
 
 
@@ -54,7 +54,7 @@ def check_pt_file(file, addr):
         i = 0
         L = []
         while i < len(file):
-            L.append([file[i].replace("\\", "/"), int(addr[i], 16)])
+            L.append([convert_path(file[i]), int(addr[i], 16)])
             i += 1
         L.sort(key=take_second)
         i = 0
@@ -96,11 +96,11 @@ def compress_dir(chipname, zippath, efuse_load=False):
         i = 0
         try:
             while i < len(flash_file):
-                relpath = os.path.relpath(flash_file[i].replace("\\", "/"), app_path)
+                relpath = os.path.relpath(os.path.join(app_path, convert_path(flash_file[i])), app_path)
                 dir = os.path.join(app_path, chipname, relpath)
                 if os.path.isdir(os.path.dirname(dir)) is False:
                     os.makedirs(os.path.dirname(dir))
-                shutil.copy(os.path.join(app_path, flash_file[i].replace("\\", "/")), dir)
+                shutil.copy(os.path.join(app_path, convert_path(flash_file[i])), dir)
                 i += 1
             verfile = os.path.join(app_path, chipname, chipname, "version.txt")
             with open(verfile, mode="w") as f:

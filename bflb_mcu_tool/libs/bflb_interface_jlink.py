@@ -38,6 +38,8 @@ if python_version == 64:
     path_dll = os.path.join(app_path, "JLink_x64.dll")
 else:
     path_dll = os.path.join(app_path, "JLinkARM.dll")
+    
+jlink_path = os.path.join(app_path, "JLink.exe")
 
 
 class BflbJLinkPort(object):
@@ -108,7 +110,7 @@ class BflbJLinkPort(object):
                 fp.write(cmd)
                 fp.close()
                 # jlink_cmd=r'C:/Keil_v5/ARM/Segger/JLink.exe -device Cortex-M4 -Speed 4000 -IF SWD  -JTAGConf -1,-1 -CommanderScript jlink.cmd'
-                jlink_cmd = 'JLink.exe -device RISC-V -Speed ' + str(
+                jlink_cmd = jlink_path + ' -device RISC-V -Speed ' + str(
                     self._speed
                 ) + ' -IF JTAG -jtagconf -1,-1 -autoconnect 1 -CommanderScript jlink.cmd'
                 bflb_utils.printf(jlink_cmd)

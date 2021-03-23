@@ -49,7 +49,7 @@ from libs import bflb_img_loader
 from libs import bflb_flash_select
 from libs import bflb_utils
 from libs import bflb_ecdh
-from libs.bflb_utils import app_path, open_file, eflash_loader_parser_init
+from libs.bflb_utils import app_path, open_file, eflash_loader_parser_init, convert_path
 from libs.bflb_configobj import BFConfigParser
 
 try:
@@ -2281,15 +2281,15 @@ class BflbEflashLoader(object):
                             while i < len(flash_file):
                                 bflb_utils.printf("Dealing Index ", i)
                                 bflb_utils.printf("========= programming ",
-                                                  flash_file[i].replace("\\", "/"), " to 0x", address[i])
+                                                  convert_path(flash_file[i]), " to 0x", address[i])
                                 flash_para_file = cfg.get("FLASH_CFG", "flash_para")
                                 ret = bflb_flash_select.flash_bootheader_config_check(self._chip_name,
-                                    self._chip_type, read_flash_id, flash_file[i].replace("\\", "/"),
+                                    self._chip_type, read_flash_id, convert_path(flash_file[i]),
                                     flash_para_file)
                                 if ret is False:
                                     self.error_code_print("0040")
                                     return False, flash_burn_retry
-                                ret = self.flash_load_specified(flash_file[i].replace("\\", "/"),
+                                ret = self.flash_load_specified(convert_path(flash_file[i]),
                                                                 int(address[i], 16), erase, verify,
                                                                 self._need_shake_hand, callback)
                                 if ret is False:

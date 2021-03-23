@@ -17,7 +17,7 @@ from libs import bflb_img_create
 from libs import bflb_img_loader
 from libs import bflb_flash_select
 from libs import bflb_utils
-from libs.bflb_utils import verify_hex_num, get_eflash_loader, get_serial_ports
+from libs.bflb_utils import verify_hex_num, get_eflash_loader, get_serial_ports, convert_path
 from libs.bflb_configobj import BFConfigParser
 import libs.bflb_ro_params_device_tree as bl_ro_device_tree
 import globalvar as gol
@@ -57,7 +57,7 @@ class BflbMcuTool(object):
         self.eflash_loader_cfg = os.path.join(app_path, chipname, "eflash_loader/eflash_loader_cfg.conf")
         self.eflash_loader_cfg_tmp = os.path.join(app_path, chipname, "eflash_loader/eflash_loader_cfg.ini")
         self.eflash_loader_bin = os.path.join(app_path, chipname, "eflash_loader/eflash_loader_40m.bin")
-        self.img_create_path = chipname + "/img_create_mcu"
+        self.img_create_path = os.path.join(app_path, chipname, "img_create_mcu")
         self.efuse_bh_path = os.path.join(app_path, chipname, "efuse_bootheader")
         self.efuse_bh_default_cfg = os.path.join(app_path, chipname, "efuse_bootheader") + "/efuse_bootheader_cfg.conf"
         self.efuse_bh_default_cfg_dp = os.path.join(app_path, chipname, "efuse_bootheader") + "/efuse_bootheader_cfg_dp.conf"
@@ -1176,6 +1176,7 @@ class BflbMcuTool(object):
         bflb_utils.printf("========= eflash loader config =========")
         options = ""
         ret = None
+        create_output_path = os.path.relpath(self.img_create_path, app_path)
         try:
             if self.chiptype != "bl606p":
                 if values["img_file"] == "" and values["dl_chiperase"] == "True":
@@ -1204,21 +1205,21 @@ class BflbMcuTool(object):
                 else:
                     # decide file name
                     if values["img_type"] == "SingleCPU":
-                        bootinfo_file = self.img_create_path + "/bootinfo.bin"
-                        img_output_file = self.img_create_path + "/img.bin"
-                        whole_img_output_file = self.img_create_path + "/whole_img.bin"
+                        bootinfo_file = create_output_path + "/bootinfo.bin"
+                        img_output_file = create_output_path + "/img.bin"
+                        whole_img_output_file = create_output_path + "/whole_img.bin"
                     elif values["img_type"] == "BLSP_Boot2":
-                        bootinfo_file = self.img_create_path + "/bootinfo_blsp_boot2.bin"
-                        img_output_file = self.img_create_path + "/img_blsp_boot2.bin"
-                        whole_img_output_file = self.img_create_path + "/whole_img_blsp_boot2.bin"
+                        bootinfo_file = create_output_path + "/bootinfo_blsp_boot2.bin"
+                        img_output_file = create_output_path + "/img_blsp_boot2.bin"
+                        whole_img_output_file = create_output_path + "/whole_img_blsp_boot2.bin"
                     elif values["img_type"] == "CPU0":
-                        bootinfo_file = self.img_create_path + "/bootinfo_cpu0.bin"
-                        img_output_file = self.img_create_path + "/img_cpu0.bin"
-                        whole_img_output_file = self.img_create_path + "/whole_img_cpu0.bin"
+                        bootinfo_file = create_output_path + "/bootinfo_cpu0.bin"
+                        img_output_file = create_output_path + "/img_cpu0.bin"
+                        whole_img_output_file = create_output_path + "/whole_img_cpu0.bin"
                     elif values["img_type"] == "CPU1":
-                        bootinfo_file = self.img_create_path + "/bootinfo_cpu1.bin"
-                        img_output_file = self.img_create_path + "/img_cpu1.bin"
-                        whole_img_output_file = self.img_create_path + "/whole_img_cpu1.bin"
+                        bootinfo_file = create_output_path + "/bootinfo_cpu1.bin"
+                        img_output_file = create_output_path + "/img_cpu1.bin"
+                        whole_img_output_file = create_output_path + "/whole_img_cpu1.bin"
                     # uart download
                     if values["boot_src"] == "UART/SDIO" or values["boot_src"] == "UART/USB":
                         cfg = BFConfigParser()
@@ -1269,20 +1270,20 @@ class BflbMcuTool(object):
                         bind_bootinfo = True
                         if bind_bootinfo is True:
                             img_addr = int(values["img_addr"].replace("0x", ""), 16)
-                            whole_img_len = img_addr + os.path.getsize(img_output_file)
+                            whole_img_len = img_addr + os.path.getsize(os.path.join(app_path, img_output_file))
                             whole_img_data = self.bl_create_flash_default_data(whole_img_len)
                             filedata = self.bl_get_file_data([bootinfo_file])[0]
                             whole_img_data[0:len(filedata)] = filedata
                             filedata = self.bl_get_file_data([img_output_file])[0]
                             whole_img_data[img_addr:img_addr + len(filedata)] = filedata
-                            fp = open(whole_img_output_file, 'wb+')
+                            fp = open(os.path.join(app_path, whole_img_output_file), 'wb+')
                             fp.write(whole_img_data)
                             fp.close()
-                            # bflb_utils.update_cfg(cfg, "FLASH_CFG", "file", whole_img_output_file)
+                            # bflb_utils.update_cfg(cfg, "FLASH_CFG", "file", convert_path(whole_img_output_file))
                             # bflb_utils.update_cfg(cfg, "FLASH_CFG", "address", values["bootinfo_addr"].replace("0x", ""))
     
                         bflb_utils.update_cfg(cfg, "FLASH_CFG", "file",
-                                              bootinfo_file + " " + img_output_file)
+                                              convert_path(bootinfo_file) + " " + convert_path(img_output_file))
                         bflb_utils.update_cfg(cfg, "FLASH_CFG", "address",
                                               values["bootinfo_addr"].replace("0x", "") + " " + values["img_addr"].replace("0x", ""))
                     cfg.write(self.eflash_loader_cfg_tmp, "w+")
@@ -1301,11 +1302,11 @@ class BflbMcuTool(object):
             else:
                 group0_used = False
                 group1_used = False
-                group0_bootinfo_file = self.img_create_path + "/bootinfo_group0.bin"
-                group0_img_output_file = self.img_create_path + "/img_group0.bin"
-                group1_bootinfo_file = self.img_create_path + "/bootinfo_group1.bin"
-                group1_img_output_file = self.img_create_path + "/img_group1.bin"
-                whole_img_output_file = self.img_create_path + "/whole_img.bin"
+                group0_bootinfo_file = create_output_path + "/bootinfo_group0.bin"
+                group0_img_output_file = create_output_path + "/img_group0.bin"
+                group1_bootinfo_file = create_output_path + "/bootinfo_group1.bin"
+                group1_img_output_file = create_output_path + "/img_group1.bin"
+                whole_img_output_file = create_output_path + "/whole_img.bin"
                 if values["img1_group"] == "group0" or\
                    values["img2_group"] == "group0" or\
                    values["img3_group"] == "group0" or\
@@ -1412,22 +1413,26 @@ class BflbMcuTool(object):
                                               (group1_img_len, len(filedata)))
                         whole_img_data[group1_img_offset:group1_img_offset + len(filedata)] = filedata
     
-                        fp = open(whole_img_output_file, 'wb+')
+                        fp = open(os.path.join(app_path, whole_img_output_file), 'wb+')
                         fp.write(whole_img_data)
                         fp.close()
-                        # bflb_utils.update_cfg(cfg, "FLASH_CFG", "file", whole_img_output_file)
+                        # bflb_utils.update_cfg(cfg, "FLASH_CFG", "file", convert_path(whole_img_output_file))
                         # bflb_utils.update_cfg(cfg, "FLASH_CFG", "address", "00000000")
                     file_list = ""
                     addr_list = ""
                     if group0_used is True and group1_used is False:
-                        file_list = group0_bootinfo_file + " " + group0_img_output_file
+                        file_list = convert_path(group0_bootinfo_file) + " "\
+                                  + convert_path(group0_img_output_file)
                         addr_list = "00000000 %x" % (group0_img_offset)
                     elif group0_used is False and group1_used is True:
-                        file_list = group1_bootinfo_file + " " + group1_img_output_file
+                        file_list = convert_path(group1_bootinfo_file.replace) + " "\
+                                  + convert_path(group1_img_output_file)
                         addr_list = "00001000 %x" % (group1_img_offset)
                     elif group0_used is True and group1_used is True:
-                        file_list = group0_bootinfo_file + " " + group1_bootinfo_file + " "\
-                                  + group0_img_output_file + " " + group1_img_output_file
+                        file_list = convert_path(group0_bootinfo_file) + " "\
+                                  + convert_path(group1_bootinfo_file) + " "\
+                                  + convert_path(group0_img_output_file) + " "\
+                                  + convert_path(group1_img_output_file)
                         addr_list = "00000000 00001000 %x %x" % (group0_img_offset, group1_img_offset)
                     bflb_utils.update_cfg(cfg, "FLASH_CFG", "file", file_list)
                     bflb_utils.update_cfg(cfg, "FLASH_CFG", "address", addr_list.replace("0x", ""))
@@ -1498,7 +1503,7 @@ def get_value(args):
     config.setdefault('public_key_cfg', '')
     config.setdefault('private_key_cfg', '')
     config.setdefault('bootinfo_addr', '0x0')  
-    config["dl_device"] = args.interface.capitalize()
+    config["dl_device"] = args.interface.lower()
     config["dl_comport"] = args.port
     config["dl_comspeed"] = str(args.baudrate)
     config["dl_jlinkspeed"] = str(args.baudrate)
@@ -1563,6 +1568,9 @@ def get_value(args):
     else:
         bflb_utils.printf("Chip type is not in bl60x/bl602/bl702")
         sys.exit(1)
+        
+    if config["dl_device"] == "jlink" and args.baudrate > 12000:
+        config["dl_jlinkspeed"] = "12000"
                 
     if args.erase:
         config["dl_chiperase"] = "True"

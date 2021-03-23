@@ -345,6 +345,10 @@ else:
     }
 
 
+def convert_path(path: str) -> str:
+    return path.replace(r'\/'.replace(os.sep, ''), os.sep)
+
+
 def printf(*args):
     data = ""
     for arg in args:

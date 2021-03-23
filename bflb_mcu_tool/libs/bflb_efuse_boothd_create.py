@@ -29,7 +29,7 @@ try:
 except ImportError:
     from libs import bflb_path
 from libs import bflb_utils
-from libs.bflb_utils import app_path
+from libs.bflb_utils import app_path, convert_path
 from libs.bflb_configobj import BFConfigParser
 
 
@@ -206,7 +206,7 @@ def efuse_create_process(chipname, chiptype, config_file, output_file=None):
     fp = open(filedir, 'wb+')
     fp.write(efuse_data)
     fp.close()
-    bflb_utils.update_cfg(cfg, "EFUSE_CFG", "file", os.path.relpath(filedir, app_path).replace("\\", "/"))
+    bflb_utils.update_cfg(cfg, "EFUSE_CFG", "file", convert_path(os.path.relpath(filedir, app_path)))
     if output_file is None:
         filedir = efuse_bootheader_path + "/efusedata_mask.bin"
     else:
@@ -214,7 +214,7 @@ def efuse_create_process(chipname, chiptype, config_file, output_file=None):
     fp = open(filedir, 'wb+')
     fp.write(mask)
     fp.close()
-    bflb_utils.update_cfg(cfg, "EFUSE_CFG", "maskfile", os.path.relpath(filedir, app_path).replace("\\", "/"))
+    bflb_utils.update_cfg(cfg, "EFUSE_CFG", "maskfile", convert_path(os.path.relpath(filedir, app_path)))
     cfg.write(cfgfile, "w+")
 
 
