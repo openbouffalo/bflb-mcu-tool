@@ -193,6 +193,10 @@ class BflbImgLoader(object):
         # in case data len change for some case
         tmp = bflb_utils.int_to_2bytearray_l(len(read_data))
         data = cmd_id + bytearray(1) + tmp + read_data
+
+        if self._chip_type == "bl702" and section == "run_image":
+            sub_module = __import__("libs." + self._chip_type, fromlist=[self._chip_type])
+            data = sub_module.chiptype_patch.img_load_create_predata_before_run_img()
         self.bflb_boot_if.if_write(data)
         if section == "get_boot_info" or section == "load_seg_header":
             res, data_read = self.bflb_boot_if.if_deal_response()

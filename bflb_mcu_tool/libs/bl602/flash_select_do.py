@@ -3,7 +3,7 @@
 
 import os
 from libs import bflb_utils
-from libs.bflb_utils import app_path
+from libs.bflb_utils import app_path, flash_dict
 from libs.bflb_configobj import BFConfigParser
 
 
@@ -27,7 +27,7 @@ def get_suitable_file_name(cfg_dir, flash_id):
 
 
 def update_flash_cfg_do(chipname, chiptype, flash_id, file=None, create=False, section=None):
-    cfg_dir = app_path + "/common/flash_config/" + chiptype + '/'
+    cfg_dir = app_path + "/utils/flash-conf/" + flash_dict[chipname] + '/'
     conf_name = get_suitable_file_name(cfg_dir, flash_id)
     value_key = []
     if os.path.isfile(cfg_dir + conf_name) is False:

@@ -35,6 +35,7 @@ import hashlib
 import argparse
 import traceback
 import platform
+import codecs
 from glob import glob
 
 import pylink
@@ -53,14 +54,13 @@ if getattr(sys, "frozen", False):
     app_path = os.path.dirname(sys.executable)
 else:
     app_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
- 
+chip_path = os.path.join(app_path, "chips")
     
 python_version = struct.calcsize("P") * 8
-
 if python_version == 64:
-    path_dll = os.path.join(app_path, "JLink_x64.dll")
+    path_dll = os.path.join(app_path, "utils/jlink", "JLink_x64.dll")
 else:
-    path_dll = os.path.join(app_path, "JLinkARM.dll")
+    path_dll = os.path.join(app_path, "utils/jlink", "JLinkARM.dll")
 
 try:
     import changeconf as cgc
@@ -77,6 +77,19 @@ udp_socket_server = None
 error_code_num = "FFFF"
 local_log_en = True
 local_log_data = ""
+
+
+if conf_sign:
+    flash_dict = {cgc.lower_name: cgc.lower_name}
+else:
+    flash_dict = {
+        "bl56x": "bl60x",
+        "bl60x": "bl60x",
+        "bl562": "bl602",
+        "bl602": "bl602",
+        "bl702": "bl702",
+        "bl606p": "bl606p",
+    }
 
 # all in hex mode
 if conf_sign:
@@ -178,6 +191,7 @@ if conf_sign:
         "003E": "FLASH LOAD VERIFY FAIL",
         "003F": "FLASH BOOT FAIL",
         "0040": "FLASH CFG NOT FIT WITH BOOTHEADER",
+        "0041": "FLASH LOAD ROMFS FAIL",
         "0050": "IMG LOAD SHAKEHAND FAIL",
         "0051": "IMG LOAD BOOT CHECK FAIL",
         "0060": "IMG CREATE FAIL",
@@ -310,6 +324,7 @@ else:
         "003E": "BFLB FLASH LOAD VERIFY FAIL",
         "003F": "BFLB FLASH BOOT FAIL",
         "0040": "BFLB FLASH CFG NOT FIT WITH BOOTHEADER",
+        "0041": "BFLB FLASH LOAD ROMFS FAIL",
         "0050": "BFLB IMG LOAD SHAKEHAND FAIL",
         "0051": "BFLB IMG LOAD BOOT CHECK FAIL",
         "0060": "BFLB IMG CREATE FAIL",
@@ -404,9 +419,11 @@ def local_log_save(local_path="log", key_word=""):
             rq = time.strftime('%Y%m%d%H%M%S', time.localtime(time.time()))
             log_name = rq + '_' + key_word + '.log'
             log_path = os.path.join(log_dir, log_name)
-            fp = open(log_path, 'w')
-            fp.write(local_log_data)
-            fp.close()
+#             fp = open(log_path, 'w')
+#             fp.write(local_log_data)
+#             fp.close()
+            with codecs.open(log_path, "w", encoding="utf-8") as fp:
+                fp.write(local_log_data)
         except Exception as e:
             printf(e)
             traceback.print_exc(limit=5, file=sys.stdout)
@@ -730,6 +747,7 @@ def eflash_loader_parser_init():
     parser.add_argument("--loadstr", dest="loadstr", help="")
     parser.add_argument("--loadfile", dest="loadfile", help="")
     parser.add_argument("--userarea", dest="userarea", help="user area")
+    parser.add_argument("--romfs", dest="romfs", help="romfs data to write")
     parser.add_argument("--csvfile", dest="csvfile", help="csv file contains 3/5 tuples")
     parser.add_argument("--csvaddr", dest="csvaddr", help="address to write for csv file")
     parser.add_argument("--para", dest="para", help="efuse para")

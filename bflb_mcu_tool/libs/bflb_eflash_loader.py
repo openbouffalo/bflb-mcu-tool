@@ -49,7 +49,7 @@ from libs import bflb_img_loader
 from libs import bflb_flash_select
 from libs import bflb_utils
 from libs import bflb_ecdh
-from libs.bflb_utils import app_path, open_file, eflash_loader_parser_init, convert_path
+from libs.bflb_utils import app_path, chip_path, open_file, eflash_loader_parser_init, convert_path
 from libs.bflb_configobj import BFConfigParser
 
 try:
@@ -74,7 +74,7 @@ NUM_ERR = 5
 
 class BflbEflashLoader(object):
 
-    def __init__(self, chiptype="bl60x", chipname="bl60x"):
+    def __init__(self, chipname="bl60x", chiptype="bl60x"):
         self._bflb_auto_download = False
         # img loader class
         self._bflb_com_img_loader = None
@@ -345,16 +345,6 @@ class BflbEflashLoader(object):
             # msp.reverse()
             self._bflb_com_if.set_pc_msp(binascii.hexlify(pc),
                                          binascii.hexlify(msp).decode('utf-8'))
-            '''
-            p = subprocess.Popen("openocd.exe -f openocd/openocd-usb-sipeed.cfg -f openocd/image-loader.cfg", shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            out, err = p.communicate()
-            bflb_utils.printf(out)
-            time.sleep(2)
-            bflb_utils.printf("Use uart interface communicate with helper_file")
-            '''
-            # if(bflb_socket_server.recv_expected_data("mcause=", "system clock=00000020", 0, 5)) is False:
-            #    bflb_utils.printf("Download fail")
-            #    return False, out
             return True, None
         elif interface == "uart":
             ret = True
@@ -520,7 +510,7 @@ class BflbEflashLoader(object):
 
     def get_ecdh_shared_key(self, shakehand=0):
         bflb_utils.printf("========= get ecdh shared key =========")
-        publickey_file = "common/pem/publickey_uecc.pem"
+        publickey_file = "utils/pem/publickey_uecc.pem"
         if shakehand != 0:
             bflb_utils.printf("Shake hand")
             ret = self.img_load_shake_hand()
@@ -554,7 +544,7 @@ class BflbEflashLoader(object):
                 signature = data_read[32:96]
                 signature_r = data_read[32:64]
                 signature_s = data_read[64:96]
-                vk = ecdsa.VerifyingKey.from_pem(open_file(r"common\pem\bl606p_publickey_uecc.pem").read())
+                vk = ecdsa.VerifyingKey.from_pem(open_file(r"utils\pem\bl606p_publickey_uecc.pem").read())
                 try:
                     ret = vk.verify(signature, self.ecdh_decrypt_data(encrypted_data), hashfunc=hashlib.sha256, sigdecode=ecdsa.util.sigdecode_string)
                 except Exception as err:
@@ -1101,7 +1091,7 @@ class BflbEflashLoader(object):
         if shakehand != 0:
             bflb_utils.printf(FLASH_LOAD_SHAKE_HAND)
             if self.img_load_shake_hand() is False:
-                return False
+                return False, None
         start_time = (time.time() * 1000)
         log = ""
         while i < flash_data_len:
@@ -1507,6 +1497,37 @@ class BflbEflashLoader(object):
             return False, 0, 0
         return True, fwaddr, maxlen
 
+    def load_romfs_data(self, data, addr, verify, shakehand=1, callback=None):
+        romfs_path = os.path.join(chip_path, self._chip_name, "romfs")
+        dst_img_name = os.path.join(chip_path, self._chip_name, "img_create_iot/media.bin")
+        if not os.path.exists(romfs_path):
+            os.makedirs(romfs_path)
+        private_key_file = os.path.join(romfs_path, "private_key")
+        f = open(private_key_file, 'w+')
+        f.write(data)
+        f.close()
+        exe = None
+        if os.name == 'nt':
+            exe = os.path.join(app_path, 'utils/genromfs', 'genromfs.exe')
+        elif os.name == 'posix':
+            machine = os.uname().machine
+            if machine == 'x86_64':
+                exe = os.path.join(app_path, 'utils/genromfs', 'genromfs_amd64')
+            elif machine == 'armv7l':
+                exe = os.path.join(app_path, 'utils/genromfs', 'genromfs_armel')
+        if exe is None:
+            bflb_utils.printf('NO supported genromfs exe for your platform!')
+            return -1
+        dir = os.path.abspath(romfs_path)
+        dst = os.path.abspath(dst_img_name)
+        # bflb_utils.printf('Generating romfs image %s using directory %s ... ' % (dst, dir))
+        CREATE_NO_WINDOW = 0x08000000
+        subprocess.call([exe, '-d', dir, '-f', dst], creationflags=CREATE_NO_WINDOW)
+        bflb_utils.printf("========= programming romfs ", dst_img_name, " to ", hex(addr))
+        ret = self.flash_load_specified(dst_img_name, addr, 1, verify, 0, callback)
+        return ret
+
+
     def load_firmware_bin(self, file, verify, shakehand=1, callback=None):
         entry_name = ""
         sub_module = __import__("libs." + self._chip_type, fromlist=[self._chip_type])
@@ -1678,9 +1699,9 @@ class BflbEflashLoader(object):
 
     def is_conf_exist(self, flash_id):
         if conf_sign:
-            cfg_dir = app_path + "/common/flash_config/" + cgc.lower_name + '/'
+            cfg_dir = app_path + "/utils/flash-conf/" + cgc.lower_name + '/'
         else:
-            cfg_dir = app_path + "/common/flash_config/" + self._chip_type + '/'
+            cfg_dir = app_path + "/utils/flash-conf/" + self._chip_type + '/'
         conf_name = self.get_suitable_conf_name(cfg_dir, flash_id)
         if os.path.isfile(cfg_dir + conf_name) is False:
             return False
@@ -1862,6 +1883,7 @@ class BflbEflashLoader(object):
             xtal_type = ""
             load_file = ""
             macaddr = ""
+            romfs_data = ""
             csvfile = ""
             csvaddr = ""
             efuse_para = ""
@@ -1905,6 +1927,8 @@ class BflbEflashLoader(object):
                 load_file = args.loadfile
             if args.mac:
                 macaddr = args.mac
+            if args.romfs:
+                romfs_data = args.romfs
             if args.csvfile:
                 csvfile = args.csvfile
             if args.csvaddr:
@@ -2226,7 +2250,19 @@ class BflbEflashLoader(object):
             bflb_utils.printf("Program operation")
             # get program type
             if args.flash:
-                if fwbin:
+                if romfs_data != "":
+                    if address == "":
+                        bflb_utils.printf("Please set romfs load address")
+                        self.error_code_print("0041")
+                        return False, flash_burn_retry
+                    bflb_utils.printf("load romfs ", romfs_data)
+                    ret = self.load_romfs_data(romfs_data, int(address, 16), verify, self._need_shake_hand, callback)
+                    if ret is False:
+                        self.error_code_print("0041")
+                        return False, flash_burn_retry
+                    self._need_shake_hand = False
+                    bflb_utils.printf("Program romfs Finished")
+                elif fwbin:
                     bflb_utils.printf("load firmware bin ", fwbin)
                     fwbin = os.path.abspath(fwbin)
                     ret = self.load_firmware_bin(fwbin, verify, self._need_shake_hand, callback)
@@ -2412,8 +2448,10 @@ class BflbEflashLoader(object):
                 else:
                     start_addr = int(start, 16)
                     end_addr = int(end, 16)
-                    self.flash_read_main_process(start_addr, end_addr-start_addr+1,
-                                                 self._need_shake_hand, file, callback)
+                    ret, readdata = self.flash_read_main_process(start_addr, end_addr-start_addr+1,
+                                            self._need_shake_hand, file, callback)
+                    if ret is False:
+                        return False, flash_burn_retry
             if args.efuse:
                 start_addr = int(start, 16)
                 end_addr = int(end, 16)
@@ -2441,7 +2479,7 @@ def run():
     args = parser.parse_args()
     # args = parser.parse_args(["--chipname=bl602", "--write", "--flash", "--baudrate=2000000", "--config=eflash_loader_cfg.ini"])
     bflb_utils.printf("Chipname: %s" % args.chipname)
-    eflash_loader_obj = BflbEflashLoader(chip_dict[args.chipname], args.chipname)
+    eflash_loader_obj = BflbEflashLoader(args.chipname, chip_dict[args.chipname])
     while True:
         try:
             ret = eflash_loader_obj.efuse_flash_loader(args, None, None)

@@ -29,7 +29,7 @@ try:
 except ImportError:
     from libs import bflb_path
 from libs import bflb_utils
-from libs.bflb_utils import app_path, convert_path
+from libs.bflb_utils import app_path, chip_path, convert_path
 from libs.bflb_configobj import BFConfigParser
 
 
@@ -104,7 +104,7 @@ def update_data_from_cfg(config_keys, config_file, section):
 
 
 def bootheader_create_do(chipname, chiptype, config_file, section, output_file=None, if_img=False):
-    efuse_bootheader_path = os.path.join(app_path, chipname, "efuse_bootheader")
+    efuse_bootheader_path = os.path.join(chip_path, chipname, "efuse_bootheader")
     try:
         bflb_utils.printf("Create bootheader using ", config_file)
         sub_module = __import__("libs." + chiptype, fromlist=[chiptype])
@@ -187,8 +187,8 @@ def bootheader_create_process(chipname,
 
 
 def efuse_create_process(chipname, chiptype, config_file, output_file=None):
-    efuse_bootheader_path = os.path.join(app_path, chipname, "efuse_bootheader")
-    eflash_loader_path = os.path.join(app_path, chipname, "eflash_loader")
+    efuse_bootheader_path = os.path.join(chip_path, chipname, "efuse_bootheader")
+    eflash_loader_path = os.path.join(chip_path, chipname, "eflash_loader")
     filedir = ""
     bflb_utils.printf("Create efuse using ", config_file)
     cfgfile = eflash_loader_path + "/eflash_loader_cfg.ini"
@@ -234,7 +234,7 @@ def run():
     }
     chipname = sys.argv[1]
     chiptype = chip_dict[chipname]
-    img_create_path = os.path.join(app_path, chipname, "img_create_mcu")
+    img_create_path = os.path.join(chip_path, chipname, "img_create_mcu")
     bh_cfg_file = img_create_path + "/bootheader_cfg.ini"
     bh_file = img_create_path + "/bootheader.bin"
     bootheader_create_process(chipname, chiptype, bh_cfg_file, bh_file,

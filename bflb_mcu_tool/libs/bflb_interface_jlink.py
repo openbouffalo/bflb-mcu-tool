@@ -35,11 +35,11 @@ from libs.bflb_utils import app_path
 python_version = struct.calcsize("P") * 8
 
 if python_version == 64:
-    path_dll = os.path.join(app_path, "JLink_x64.dll")
+    path_dll = os.path.join(app_path, "utils/jlink", "JLink_x64.dll")
 else:
-    path_dll = os.path.join(app_path, "JLinkARM.dll")
+    path_dll = os.path.join(app_path, "utils/jlink", "JLinkARM.dll")
     
-jlink_path = os.path.join(app_path, "JLink.exe")
+jlink_path = os.path.join(app_path, "utils/jlink", "JLink.exe")
 
 
 class BflbJLinkPort(object):

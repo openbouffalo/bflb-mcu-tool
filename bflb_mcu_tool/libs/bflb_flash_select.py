@@ -23,7 +23,7 @@ import os
 import re
 
 from libs import bflb_utils
-from libs.bflb_utils import app_path
+from libs.bflb_utils import app_path, chip_path, flash_dict
 from libs.bflb_configobj import BFConfigParser
 
 
@@ -85,7 +85,7 @@ def update_data_from_cfg(config_keys, config_file):
 
 
 def update_flash_cfg_data_do(chipname, chiptype, flash_id):
-    cfg_dir = app_path + "/common/flash_config/" + chiptype + '/'
+    cfg_dir = app_path + "/utils/flash-conf/" + flash_dict[chipname] + '/'
     sub_module = __import__("libs." + chiptype, fromlist=[chiptype])
     conf_name = sub_module.flash_select_do.get_suitable_file_name(cfg_dir, flash_id)
     if os.path.isfile(cfg_dir + conf_name) == False:

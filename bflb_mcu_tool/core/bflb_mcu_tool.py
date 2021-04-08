@@ -31,6 +31,7 @@ if getattr(sys, "frozen", False):
 else:
     app_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(app_path)
+chip_path = os.path.join(app_path, "chips")
 
 chip_dict = {
     "bl56x": "bl60x",
@@ -54,16 +55,16 @@ class BflbMcuTool(object):
         self.chiptype = chiptype
         self.chipname = chipname
         self.efuse_load_en = False
-        self.eflash_loader_cfg = os.path.join(app_path, chipname, "eflash_loader/eflash_loader_cfg.conf")
-        self.eflash_loader_cfg_tmp = os.path.join(app_path, chipname, "eflash_loader/eflash_loader_cfg.ini")
-        self.eflash_loader_bin = os.path.join(app_path, chipname, "eflash_loader/eflash_loader_40m.bin")
-        self.img_create_path = os.path.join(app_path, chipname, "img_create_mcu")
-        self.efuse_bh_path = os.path.join(app_path, chipname, "efuse_bootheader")
-        self.efuse_bh_default_cfg = os.path.join(app_path, chipname, "efuse_bootheader") + "/efuse_bootheader_cfg.conf"
-        self.efuse_bh_default_cfg_dp = os.path.join(app_path, chipname, "efuse_bootheader") + "/efuse_bootheader_cfg_dp.conf"
-        self.img_create_cfg_org = os.path.join(app_path, chipname, "img_create_mcu") + "/img_create_cfg.conf"
-        self.img_create_cfg_dp_org = os.path.join(app_path, chipname, "img_create_mcu") + "/img_create_cfg_dp.conf"
-        self.img_create_cfg = os.path.join(app_path, chipname, "img_create_mcu") + "/img_create_cfg.ini"
+        self.eflash_loader_cfg = os.path.join(chip_path, chipname, "eflash_loader/eflash_loader_cfg.conf")
+        self.eflash_loader_cfg_tmp = os.path.join(chip_path, chipname, "eflash_loader/eflash_loader_cfg.ini")
+        self.eflash_loader_bin = os.path.join(chip_path, chipname, "eflash_loader/eflash_loader_40m.bin")
+        self.img_create_path = os.path.join(chip_path, chipname, "img_create_mcu")
+        self.efuse_bh_path = os.path.join(chip_path, chipname, "efuse_bootheader")
+        self.efuse_bh_default_cfg = os.path.join(chip_path, chipname, "efuse_bootheader") + "/efuse_bootheader_cfg.conf"
+        self.efuse_bh_default_cfg_dp = os.path.join(chip_path, chipname, "efuse_bootheader") + "/efuse_bootheader_cfg_dp.conf"
+        self.img_create_cfg_org = os.path.join(chip_path, chipname, "img_create_mcu") + "/img_create_cfg.conf"
+        self.img_create_cfg_dp_org = os.path.join(chip_path, chipname, "img_create_mcu") + "/img_create_cfg_dp.conf"
+        self.img_create_cfg = os.path.join(chip_path, chipname, "img_create_mcu") + "/img_create_cfg.ini"
         if not os.path.exists(self.img_create_path):
             os.makedirs(self.img_create_path)
         if os.path.isfile(self.eflash_loader_cfg_tmp) is False:
@@ -83,7 +84,7 @@ class BflbMcuTool(object):
         self.hash_ignore = gol.hash_ignore[chiptype]
         self.img_type = gol.img_type[chiptype]
         self.boot_src = gol.boot_src[chiptype]
-        self.eflash_loader_t = bflb_eflash_loader.BflbEflashLoader(chiptype, chipname)
+        self.eflash_loader_t = bflb_eflash_loader.BflbEflashLoader(chipname, chiptype)
 
     def bl_create_flash_default_data(self, length):
         datas = bytearray(length)
@@ -120,6 +121,7 @@ class BflbMcuTool(object):
     def eflash_loader_thread(self, args, eflash_loader_bin=None, callback=None, create_img_callback=None):
         ret = None
         try:
+            bflb_utils.set_error_code("FFFF")
             ret = self.eflash_loader_t.efuse_flash_loader(args, None, eflash_loader_bin, callback,
                                                      None, create_img_callback)
         except Exception as e:
@@ -162,7 +164,7 @@ class BflbMcuTool(object):
             cfg.write(self.eflash_loader_cfg_tmp, "w+")
             bflb_utils.printf("Save as efuse.bin")
             options = ["--read", "--efuse", "--start=0", "--end=255", "--file=efuse.bin", "-c", self.eflash_loader_cfg_tmp]
-            eflash_loader_bin = os.path.join(app_path, self.chipname,
+            eflash_loader_bin = os.path.join(chip_path, self.chipname,
                                              "eflash_loader/" + get_eflash_loader(values["dl_xtal"]))
             args = parser_eflash.parse_args(options)
             ret = self.eflash_loader_thread(args, eflash_loader_bin, callback)
@@ -217,7 +219,7 @@ class BflbMcuTool(object):
                 return ret
             bflb_utils.printf("Save as flash.bin")
             options = ["--read", "--flash", "--start="+start, "--end="+end, "--file=flash.bin", "-c", self.eflash_loader_cfg_tmp]
-            eflash_loader_bin = os.path.join(app_path, self.chipname, "eflash_loader/" + get_eflash_loader(values["dl_xtal"]))
+            eflash_loader_bin = os.path.join(chip_path, self.chipname, "eflash_loader/" + get_eflash_loader(values["dl_xtal"]))
             args = parser_eflash.parse_args(options)
             ret = self.eflash_loader_thread(args, eflash_loader_bin, callback)
         except Exception as e:
@@ -273,7 +275,7 @@ class BflbMcuTool(object):
                 options = ["--erase", "--flash", "--end=0", "-c", self.eflash_loader_cfg_tmp]
             else:
                 options = ["--erase", "--flash", "--start="+start, "--end="+end, "-c", self.eflash_loader_cfg_tmp]
-            eflash_loader_bin = os.path.join(app_path, self.chipname,
+            eflash_loader_bin = os.path.join(chip_path, self.chipname,
                                              "eflash_loader/" + get_eflash_loader(values["dl_xtal"]))
             args = parser_eflash.parse_args(options)
             ret = self.eflash_loader_thread(args, eflash_loader_bin, callback)
@@ -1191,7 +1193,7 @@ class BflbMcuTool(object):
                     bflb_utils.update_cfg(cfg, "LOAD_CFG", "speed_uart_load", values["dl_comspeed"])
                     bflb_utils.update_cfg(cfg, "LOAD_CFG", "speed_jlink", values["dl_jlinkspeed"])
                     bflb_utils.update_cfg(cfg, "LOAD_CFG", "erase", "2")
-                    eflash_loader_bin = os.path.join(app_path, self.chipname, "eflash_loader/" + get_eflash_loader(values["dl_xtal"]))
+                    eflash_loader_bin = os.path.join(chip_path, self.chipname, "eflash_loader/" + get_eflash_loader(values["dl_xtal"]))
                     if "dl_verify" in values.keys():
                         if values["dl_verify"] == "True":
                             bflb_utils.update_cfg(cfg, "LOAD_CFG", "verify", "1")
@@ -1257,7 +1259,7 @@ class BflbMcuTool(object):
                             bflb_utils.update_cfg(cfg, "LOAD_CFG", "verify", "0")
     
                     eflash_loader_bin = os.path.join(
-                        app_path, self.chipname, "eflash_loader/" + get_eflash_loader(values["dl_xtal"]))
+                        chip_path, self.chipname, "eflash_loader/" + get_eflash_loader(values["dl_xtal"]))
     
                     if cfg.has_option("LOAD_CFG", "xtal_type"):
                         bflb_utils.update_cfg(cfg, "LOAD_CFG", "xtal_type",
@@ -1366,7 +1368,7 @@ class BflbMcuTool(object):
                         bflb_utils.update_cfg(cfg, "LOAD_CFG", "verify", "0")
     
                 eflash_loader_bin = os.path.join(
-                    app_path, self.chipname, "eflash_loader/" + get_eflash_loader(values["dl_xtal"]))
+                    chip_path, self.chipname, "eflash_loader/" + get_eflash_loader(values["dl_xtal"]))
     
                 if cfg.has_option("LOAD_CFG", "xtal_type"):
                     bflb_utils.update_cfg(cfg, "LOAD_CFG", "xtal_type",
@@ -1619,7 +1621,7 @@ def run():
         obj_mcu.create_img(args.chipname, chip_dict[args.chipname], config)
         if args.build:
             obj_mcu.bind_img(config)
-            f_org = os.path.join(app_path, args.chipname, "img_create_mcu", "whole_img.bin")
+            f_org = os.path.join(chip_path, args.chipname, "img_create_mcu", "whole_img.bin")
             f = "firmware.bin"
             shutil.copy(f_org, f)
         else:

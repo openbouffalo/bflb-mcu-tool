@@ -30,7 +30,7 @@ import telnetlib
 from libs import bflb_utils
 from libs.bflb_utils import app_path
 
-path_dll = os.path.join(app_path, "JLinkARM_32.dll")
+openocd_path = os.path.join(app_path, "utils/openocd", "openocd.exe")
 
 
 class ThreadOpenocdServer(threading.Thread):
@@ -49,11 +49,11 @@ class ThreadOpenocdServer(threading.Thread):
         cmd = ""
         if self._device == "ft2232":
             if self._chiptype == "bl602":
-                cmd = "openocd.exe -f openocd/if_bflb_dbg.cfg -f openocd/tgt_602.cfg"
+                cmd = openocd_path + " -f utils/openocd/if_bflb_dbg.cfg -f utils/openocd/tgt_602.cfg"
             else:
-                cmd = "openocd.exe -f openocd/if_bflb_dbg.cfg -f openocd/tgt_702.cfg"
+                cmd = openocd_path + " -f utils/openocd/if_bflb_dbg.cfg -f utils/openocd/tgt_702.cfg"
         else:
-            cmd = "openocd.exe -f openocd/openocd-usb-sipeed.cfg"
+            cmd = openocd_path + " -f utils/openocd/openocd-usb-sipeed.cfg"
         p = subprocess.Popen(cmd,
                              shell=True,
                              stdin=subprocess.PIPE,

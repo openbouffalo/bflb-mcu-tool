@@ -232,7 +232,7 @@ class BflbUartPort(object):
             # clean buffer before start
             bflb_utils.printf("clean buf")
             self._ser.timeout = 0.1
-            success, ack = self.if_read(100000)
+            ack = self._ser.read_all()
             # change tiemout value when shake hand
             if self._602a0_dln_fix:
                 self._ser.timeout = 0.5
@@ -246,7 +246,7 @@ class BflbUartPort(object):
                 self._ser.write(self._if_get_sync_bytes(int(0.006 * self._baudrate / 10)))
             if self._602a0_dln_fix:
                 time.sleep(4)
-            success, ack = self.if_read(16)
+            success, ack = self.if_read(1000)
             bflb_utils.printf("ack is ", binascii.hexlify(ack))
             if ack.find(b'\x4F') != -1 or ack.find(b'\x4B') != -1:
                 self._ser.timeout = timeout

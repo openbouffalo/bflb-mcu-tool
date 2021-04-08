@@ -172,7 +172,7 @@ def eflash_loader_worker(client_addr, client_data):
     try:
         parser = eflash_loader_parser_init()
         args = parser.parse_args(request.split(" "))
-        eflash_loader_t = bflb_eflash_loader.BflbEflashLoader(chip_dict[args.chipname], args.chipname)
+        eflash_loader_t = bflb_eflash_loader.BflbEflashLoader(args.chipname, chip_dict[args.chipname])
         ret = eflash_loader_t.efuse_flash_loader(args, None, None)
     finally:
         udp_socket_result = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)

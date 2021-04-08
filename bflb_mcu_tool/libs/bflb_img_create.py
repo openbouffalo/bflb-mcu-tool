@@ -33,7 +33,7 @@ except ImportError:
     from libs import bflb_path
 from libs import bflb_utils
 from libs import bflb_efuse_boothd_create
-from libs.bflb_utils import app_path, set_error_code, convert_path
+from libs.bflb_utils import app_path, chip_path, set_error_code, convert_path
 from libs.bflb_configobj import BFConfigParser
 
 
@@ -76,9 +76,9 @@ def check_pt_file(file, addr):
 
 
 def compress_dir(chipname, zippath, efuse_load=False):
-    zip_file = os.path.join(app_path, chipname, zippath, "whole_img.pack")
-    dir_path = os.path.join(app_path, chipname, chipname)
-    cfg_file = os.path.join(app_path, chipname, "eflash_loader/eflash_loader_cfg.ini")
+    zip_file = os.path.join(chip_path, chipname, zippath, "whole_img.pack")
+    dir_path = os.path.join(chip_path, chipname, chipname)
+    cfg_file = os.path.join(chip_path, chipname, "eflash_loader/eflash_loader_cfg.ini")
     cfg = BFConfigParser()
     cfg.read(cfg_file)
     flash_file = re.compile('\s+').split(cfg.get("FLASH_CFG", "file"))
@@ -87,8 +87,8 @@ def compress_dir(chipname, zippath, efuse_load=False):
         bflb_utils.printf("PT Check Fail")
         set_error_code("0082")
         return False
-    factory_mode_set(os.path.join(app_path, chipname, "eflash_loader/eflash_loader_cfg.ini"), "true")
-    flash_file.append(os.path.join(app_path, chipname, "eflash_loader/eflash_loader_cfg.ini"))
+    factory_mode_set(os.path.join(chip_path, chipname, "eflash_loader/eflash_loader_cfg.ini"), "true")
+    flash_file.append(os.path.join(chip_path, chipname, "eflash_loader/eflash_loader_cfg.ini"))
     if efuse_load:
         flash_file.append(cfg.get("EFUSE_CFG", "file"))
         flash_file.append(cfg.get("EFUSE_CFG", "maskfile"))
@@ -96,13 +96,13 @@ def compress_dir(chipname, zippath, efuse_load=False):
         i = 0
         try:
             while i < len(flash_file):
-                relpath = os.path.relpath(os.path.join(app_path, convert_path(flash_file[i])), app_path)
-                dir = os.path.join(app_path, chipname, relpath)
+                relpath = os.path.relpath(os.path.join(app_path, convert_path(flash_file[i])), chip_path)
+                dir = os.path.join(chip_path, chipname, relpath)
                 if os.path.isdir(os.path.dirname(dir)) is False:
                     os.makedirs(os.path.dirname(dir))
                 shutil.copy(os.path.join(app_path, convert_path(flash_file[i])), dir)
                 i += 1
-            verfile = os.path.join(app_path, chipname, chipname, "version.txt")
+            verfile = os.path.join(chip_path, chipname, chipname, "version.txt")
             with open(verfile, mode="w") as f:
                 f.write(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
         except Exception as e:
@@ -118,7 +118,7 @@ def compress_dir(chipname, zippath, efuse_load=False):
                 # z.write(os.path.relpath(os.path.join(dirpath, file), os.path.join(app_path, chipname)))
                 z.write(
                     os.path.join(dirpath, file),
-                    os.path.relpath(os.path.join(dirpath, file), os.path.join(app_path, chipname)))
+                    os.path.relpath(os.path.join(dirpath, file), os.path.join(chip_path, chipname)))
         z.close()
         shutil.rmtree(dir_path)
     except Exception as e:
@@ -131,7 +131,7 @@ def compress_dir(chipname, zippath, efuse_load=False):
 
 def img_create(args, chipname="bl60x", chiptype="bl60x", img_dir=None, config_file=None):
     sub_module = __import__("libs." + chiptype, fromlist=[chiptype])
-    img_dir_path = os.path.join(app_path, chipname, "img_create_iot")
+    img_dir_path = os.path.join(chip_path, chipname, "img_create_iot")
     if img_dir is None:
         sub_module.img_create_do.img_create_do(args, img_dir_path, config_file)
     else:
@@ -164,8 +164,8 @@ def run():
         }
         chipname = args.chipname
         chiptype = chip_dict[chipname]
-        img_create_path = os.path.join(app_path, chipname, "img_create_mcu")
-        img_create_cfg = os.path.join(app_path, chipname, "img_create_mcu") + "/img_create_cfg.ini"
+        img_create_path = os.path.join(chip_path, chipname, "img_create_mcu")
+        img_create_cfg = os.path.join(chip_path, chipname, "img_create_mcu") + "/img_create_cfg.ini"
         bh_cfg_file = img_create_path + "/bootheader_cfg.ini"
         bh_file = img_create_path + "/bootheader.bin"
         if args.imgfile:
