@@ -74,7 +74,8 @@ def bl_dts2hex(dts):
     init_hex = little_endian(string_to_bytearray("k1bXkD6O").hex())
 
     if xtal_mode:
-        xtal_mode_hex = "01000200" + string_to_bytearray(xtal_mode[0]).hex()
+        length = '%02x' % len(xtal_mode[0])
+        xtal_mode_hex = "0100" + length + "00" + string_to_bytearray(xtal_mode[0]).hex()
     else:
         xtal_mode_hex = ""
     
@@ -87,7 +88,8 @@ def bl_dts2hex(dts):
         xtal_hex = ""
     
     if pwr_mode:
-        pwr_mode_hex = "03000200" + string_to_bytearray(pwr_mode[0]).hex()
+        length = '%02x' % len(pwr_mode[0])
+        pwr_mode_hex = "0300" + length + "00" + string_to_bytearray(pwr_mode[0]).hex()
     else:
         pwr_mode_hex = ""
     

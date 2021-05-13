@@ -20,6 +20,8 @@
 #  SOFTWARE.
 
 
+import os
+import sys
 import time
 import binascii
 import serial
@@ -33,6 +35,7 @@ from libs import bflb_utils
 class BflbUartPort(object):
 
     def __init__(self):
+        self._device = "COM1"
         self._baudrate = 115200
         self._ser = None
         self._shakehand_flag = False
@@ -41,7 +44,14 @@ class BflbUartPort(object):
     def if_init(self, device, rate, chiptype="bl602"):
         if self._ser is None:
             self._baudrate = rate
-            self._ser = serial.Serial(device,
+            
+            if " (" in device:
+                    dev = device[:device.find(" (")]
+            else:
+                dev = device
+            self._device = dev.upper()
+            
+            self._ser = serial.Serial(dev,
                                       rate,
                                       timeout=2.0,
                                       xonxoff=False,
@@ -108,6 +118,49 @@ class BflbUartPort(object):
             else:
                 self._ser.write(self._if_get_sync_bytes(int(0.006 * self._baudrate / 10)))
 
+    def bl_usb_serial_write(self, cutoff_time, reset_revert):
+        boot_revert = 0
+        bflb_utils.printf("usb serial port")
+        if cutoff_time != 0:
+            boot_revert = 0
+            if cutoff_time > 1000:
+                boot_revert = 1
+        data = bytearray()
+        specialstr = bflb_utils.string_to_bytearray("BOUFFALOLAB5555RESET")
+        for b in specialstr:
+                data.append(b)
+        data.append(boot_revert)
+        data.append(reset_revert)
+        self._ser.write(data)
+        time.sleep(0.05)
+
+    def check_bl_usb_serial(self, dev):
+        try:
+            # pylint: disable=import-outside-toplevel
+            from serial.tools.list_ports import comports
+        except ImportError:
+            raise exception.GetSerialPortsError(os.name)
+
+        if sys.platform.startswith("win"):
+            ports = []
+            for p, d, h in comports():
+                if "Virtual" in d or not p:
+                    continue 
+                if "PID=FFFF" in h.upper():
+                    if p.upper() == dev.upper():
+                        return True
+        elif sys.platform.startswith('linux') or sys.platform.startswith('darwin'):
+            ports = []
+            for p, d, h in comports():
+                if not p:
+                    continue
+                if "PID=FFFF" in h.upper():
+                    if p.upper() == dev.upper():
+                        return True
+        else:
+            return False
+        return False
+
     # this function return str type
     def if_shakehand(self,
                      do_reset=False,
@@ -116,8 +169,10 @@ class BflbUartPort(object):
                      reset_revert=True,
                      cutoff_time=0,
                      shake_hand_retry=2,
-                     boot2_load=0):
+                     boot2_load=0,
+                     boot_load=False):
         timeout = self._ser.timeout
+        blusbserialwriteflag = False
         if boot2_load > 0:
             wait_timeout = boot2_load
             self._ser.timeout = 0.1
@@ -137,9 +192,12 @@ class BflbUartPort(object):
             self._shakehand_flag = True
             self._ser.timeout = timeout
             return "FL"
+
+        if self.check_bl_usb_serial(self._device) and boot_load:
+            blusbserialwriteflag = True
         while shake_hand_retry > 0:
             # cut of tx rx power and rst
-            if cutoff_time != 0:
+            if cutoff_time != 0 and blusbserialwriteflag is not True:
                 cutoff_revert = False
                 if cutoff_time > 1000:
                     cutoff_revert = True
@@ -172,7 +230,7 @@ class BflbUartPort(object):
                     self._ser.setDTR(0)
                 bflb_utils.printf("power on tx and rx ")
                 time.sleep(0.1)
-            if do_reset is True:
+            if do_reset is True and blusbserialwriteflag is not True:
                 # MP_TOOL_V3 reset high to make boot pin high
                 self._ser.setRTS(0)
                 time.sleep(0.2)
@@ -229,6 +287,8 @@ class BflbUartPort(object):
                 bflb_utils.printf("reset cnt: " + str(reset_cnt) + ", reset hold: " +
                                   str(reset_hold_time / 1000.0) + ", shake hand delay: " +
                                   str(shake_hand_delay / 1000.0))
+            if blusbserialwriteflag:
+                self.bl_usb_serial_write(cutoff_time, reset_revert)
             # clean buffer before start
             bflb_utils.printf("clean buf")
             self._ser.timeout = 0.1
@@ -364,7 +424,12 @@ class CliInfUart(object):
             return False
         if self._ser is None:
             try:
-                self._ser = serial.Serial(dev_com,
+                if " (" in dev_com:
+                    dev = dev_com[:dev_com.find(" (")]
+                else:
+                    dev = dev_com
+                
+                self._ser = serial.Serial(dev,
                                           self._baudrate,
                                           timeout=5.0,
                                           xonxoff=False,
@@ -505,7 +570,11 @@ class CliInfUart(object):
             return False
         if self._ser is None:
             try:
-                self._ser = serial.Serial(dev_com,
+                if " (" in dev_com:
+                    dev = dev_com[:dev_com.find(" (")]
+                else:
+                    dev = dev_com
+                self._ser = serial.Serial(dev,
                                           baudrate,
                                           timeout=5.0,
                                           xonxoff=False,

@@ -100,7 +100,7 @@ def compress_dir(chipname, zippath, efuse_load=False):
                 dir = os.path.join(chip_path, chipname, relpath)
                 if os.path.isdir(os.path.dirname(dir)) is False:
                     os.makedirs(os.path.dirname(dir))
-                shutil.copy(os.path.join(app_path, convert_path(flash_file[i])), dir)
+                shutil.copyfile(os.path.join(app_path, convert_path(flash_file[i])), dir)
                 i += 1
             verfile = os.path.join(chip_path, chipname, chipname, "version.txt")
             with open(verfile, mode="w") as f:

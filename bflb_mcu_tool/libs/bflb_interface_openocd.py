@@ -27,6 +27,10 @@ import subprocess
 import threading
 import telnetlib
 
+try:
+    import bflb_path
+except ImportError:
+    from libs import bflb_path
 from libs import bflb_utils
 from libs.bflb_utils import app_path
 

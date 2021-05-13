@@ -14,16 +14,16 @@ except ImportError:
 
 
 class GlobalVar(object):
+    version = "1.4.3"
+    cfg = None
+    qt = False
+    values = {}
     if conf_sign:
         type_chip = (cgc.lower_name, "bl602")
     else:
         type_chip = ("bl602", "bl602")
-    values = {}
-    cfg = None
-    qt = False
-    version = "1.4.3"
-
-
+    
+    
 def _init():
     global _global_dict
     _global_dict = {}

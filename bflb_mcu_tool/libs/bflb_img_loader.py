@@ -35,16 +35,22 @@ except ImportError:
 from libs import bflb_utils
 from libs import bflb_img_create
 from libs import bflb_interface_uart
+from libs import bflb_interface_sdio
 
 
 class BflbImgLoader(object):
 
-    def __init__(self, chiptype="bl60x", createcfg=None):
-        self.bflb_boot_if = bflb_interface_uart.BflbUartPort()
+    def __init__(self, chiptype="bl60x", interface="uart", createcfg=None):
+        self.bflb_boot_if = None
         self._imge_fp = None
         self._segcnt = 0
         self._chip_type = chiptype
         self._create_cfg = createcfg
+
+        if interface == "uart":
+            self.bflb_boot_if = bflb_interface_uart.BflbUartPort()
+        elif interface == "sdio":
+            self.bflb_boot_if = bflb_interface_sdio.BflbSdioPort()
 
         self._bootrom_cmds = {
             "get_boot_info": {
@@ -318,7 +324,8 @@ class BflbImgLoader(object):
                             reset_revert=True,
                             cutoff_time=0,
                             shake_hand_retry=2,
-                            boot2_load=0):
+                            boot2_load=0,
+                            boot_load=True):
         self.bflb_boot_if.if_init(comnum, sh_baudrate, self._chip_type)
 
         self.boot_install_cmds_callback()
@@ -326,7 +333,7 @@ class BflbImgLoader(object):
             self.bflb_boot_if.if_set_602a0_download_fix(False)
         ret = self.bflb_boot_if.if_shakehand(do_reset, reset_hold_time, shake_hand_delay,
                                              reset_revert, cutoff_time, shake_hand_retry,
-                                             boot2_load)
+                                             boot2_load, boot_load)
         if self._chip_type == "bl602":
             self.bflb_boot_if.if_set_602a0_download_fix(False)
         if ret != "OK":
@@ -503,15 +510,12 @@ class BflbImgLoader(object):
                          reset_revert=True,
                          cutoff_time=0,
                          shake_hand_retry=2,
-                         boot2_load=0):
+                         boot2_load=0,
+                         boot_load=True):
         bflb_utils.printf("========= image get bootinfo =========")
         ret = self.img_load_shake_hand(comnum, sh_baudrate, wk_baudrate, do_reset, reset_hold_time,
                                        shake_hand_delay, reset_revert, cutoff_time,
-                                       shake_hand_retry, boot2_load)
-        # if ret == "shake hand fail" or ret=="change rate fail":
-        #    bflb_utils.printf("img load shake hande again")
-        # ret = self.img_load_shake_hand(comnum, sh_baudrate, wk_baudrate, do_reset, reset_hold_time, shake_hand_delay, reset_revert, cutoff_time)
-
+                                       shake_hand_retry, boot2_load, boot_load)
         if ret == "shake hand fail" or ret == "change rate fail":
             bflb_utils.printf("shake hand fail")
             self.bflb_boot_if.if_close()
@@ -539,15 +543,13 @@ class BflbImgLoader(object):
                          reset_revert=True,
                          cutoff_time=0,
                          shake_hand_retry=2,
-                         boot2_load=0):
+                         boot2_load=0,
+                         boot_load=True):
         bflb_utils.printf("========= image load =========")
         success = True
         ret = self.img_load_shake_hand(comnum, sh_baudrate, wk_baudrate, do_reset, reset_hold_time,
                                        shake_hand_delay, reset_revert, cutoff_time,
-                                       shake_hand_retry, boot2_load)
-        # if ret == "shake hand fail" or ret=="change rate fail":
-        #    bflb_utils.printf("img load shake hande again")
-        # ret = self.img_load_shake_hand(comnum, sh_baudrate, wk_baudrate, do_reset, reset_hold_time, shake_hand_delay, reset_revert, cutoff_time)
+                                       shake_hand_retry, boot2_load, boot_load)
         if ret == "shake hand fail" or ret == "change rate fail":
             bflb_utils.printf("shake hand fail")
             self.bflb_boot_if.if_close()

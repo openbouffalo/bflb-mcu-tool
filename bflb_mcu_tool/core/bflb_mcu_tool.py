@@ -33,15 +33,23 @@ else:
 sys.path.append(app_path)
 chip_path = os.path.join(app_path, "chips")
 
-chip_dict = {
-    "bl56x": "bl60x",
-    "bl60x": "bl60x",
-    "bl562": "bl602",
-    "bl602": "bl602",
-    "bl702": "bl702",
-    "bl606p": "bl606p",
-}
+try:
+    import changeconf as cgc
+    conf_sign = True
+except ImportError:
+    conf_sign = False
 
+if conf_sign:
+    chip_dict = {cgc.lower_name: "bl602"}
+else:
+    chip_dict = {
+        "bl56x": "bl60x",
+        "bl60x": "bl60x",
+        "bl562": "bl602",
+        "bl602": "bl602",
+        "bl702": "bl702",
+        "bl606p": "bl606p",
+    }
 
 def parse_rfpa(bin):
     with open(bin, "rb") as fp:
@@ -68,9 +76,9 @@ class BflbMcuTool(object):
         if not os.path.exists(self.img_create_path):
             os.makedirs(self.img_create_path)
         if os.path.isfile(self.eflash_loader_cfg_tmp) is False:
-            shutil.copy(self.eflash_loader_cfg, self.eflash_loader_cfg_tmp)
+            shutil.copyfile(self.eflash_loader_cfg, self.eflash_loader_cfg_tmp)
         if os.path.isfile(self.img_create_cfg) is False:
-            shutil.copy(self.img_create_cfg_org, self.img_create_cfg)
+            shutil.copyfile(self.img_create_cfg_org, self.img_create_cfg)
         
         self.xtal_type = gol.xtal_type[chiptype]
         self.xtal_type_ = gol.xtal_type_[chiptype]
@@ -150,7 +158,7 @@ class BflbMcuTool(object):
             # create eflash_loader_tmp.ini
             cfg = BFConfigParser()
             if os.path.isfile(self.eflash_loader_cfg_tmp) is False:
-                shutil.copy(self.eflash_loader_cfg, self.eflash_loader_cfg_tmp)
+                shutil.copyfile(self.eflash_loader_cfg, self.eflash_loader_cfg_tmp)
             cfg.read(self.eflash_loader_cfg_tmp)
             bflb_utils.update_cfg(cfg, "LOAD_CFG", "interface", values["dl_device"].lower())
             bflb_utils.update_cfg(cfg, "LOAD_CFG", "device", values["dl_comport"])
@@ -182,7 +190,7 @@ class BflbMcuTool(object):
             # create eflash_loader_tmp.ini
             cfg = BFConfigParser()
             if os.path.isfile(self.eflash_loader_cfg_tmp) is False:
-                shutil.copy(self.eflash_loader_cfg, self.eflash_loader_cfg_tmp)
+                shutil.copyfile(self.eflash_loader_cfg, self.eflash_loader_cfg_tmp)
             cfg.read(self.eflash_loader_cfg_tmp)
             bflb_utils.update_cfg(cfg, "LOAD_CFG", "interface", values["dl_device"].lower())
             bflb_utils.update_cfg(cfg, "LOAD_CFG", "device", values["dl_comport"])
@@ -236,7 +244,7 @@ class BflbMcuTool(object):
             # create eflash_loader_tmp.ini
             cfg = BFConfigParser()
             if os.path.isfile(self.eflash_loader_cfg_tmp) is False:
-                shutil.copy(self.eflash_loader_cfg, self.eflash_loader_cfg_tmp)
+                shutil.copyfile(self.eflash_loader_cfg, self.eflash_loader_cfg_tmp)
             cfg.read(self.eflash_loader_cfg_tmp)
             bflb_utils.update_cfg(cfg, "LOAD_CFG", "interface", values["dl_device"].lower())
             bflb_utils.update_cfg(cfg, "LOAD_CFG", "device", values["dl_comport"])
@@ -486,7 +494,7 @@ class BflbMcuTool(object):
         group1_img_create_section = "Img_Group1_Cfg"
         if os.path.isfile(bh_cfg_file) is False:
             bflb_utils.copyfile(self.efuse_bh_default_cfg, bh_cfg_file)
-        shutil.copy(self.img_create_cfg_org, self.img_create_cfg)
+        shutil.copyfile(self.img_create_cfg_org, self.img_create_cfg)
         # add flash cfg
         if os.path.exists(self.eflash_loader_cfg_tmp):
             cfg1 = BFConfigParser()
@@ -929,17 +937,17 @@ class BflbMcuTool(object):
                     return bflb_utils.errorcode_msg()
                 if values["img_type"] == "CPU0" or values["img_type"] == "CPU1":
                     bflb_utils.copyfile(self.efuse_bh_default_cfg_dp, bh_cfg_file)
-                    shutil.copy(self.img_create_cfg_dp_org, self.img_create_cfg)
+                    shutil.copyfile(self.img_create_cfg_dp_org, self.img_create_cfg)
                 elif values["img_type"] == "BLSP_Boot2":
                     if chiptype == "bl60x":
                         bflb_utils.copyfile(self.efuse_bh_default_cfg_dp, bh_cfg_file)
-                        shutil.copy(self.img_create_cfg_dp_org, self.img_create_cfg)
+                        shutil.copyfile(self.img_create_cfg_dp_org, self.img_create_cfg)
                     else:
                         bflb_utils.copyfile(self.efuse_bh_default_cfg, bh_cfg_file)
-                        shutil.copy(self.img_create_cfg_org, self.img_create_cfg)
+                        shutil.copyfile(self.img_create_cfg_org, self.img_create_cfg)
                 else:
                     bflb_utils.copyfile(self.efuse_bh_default_cfg, bh_cfg_file)
-                    shutil.copy(self.img_create_cfg_org, self.img_create_cfg)
+                    shutil.copyfile(self.img_create_cfg_org, self.img_create_cfg)
                 # add flash cfg
                 if os.path.exists(self.eflash_loader_cfg_tmp):
                     cfg1 = BFConfigParser()
@@ -999,8 +1007,8 @@ class BflbMcuTool(object):
                                           self.flash_clk_type.index(values["flash_clk_type"]))
                     bflb_utils.update_cfg(cfg, section, "flash_clk_div", "0")
                     if "xtal_type" in values.keys():
-                        if tmp == "XTAL" or tmp == "XCLK" or tmp == "48M" or tmp == "57P6M" or values[
-                                "xtal_type"] == "XTAL_None":
+                        if tmp == "XTAL" or tmp == "XCLK" or tmp == "48M"or tmp == "57P6M" or\
+                           tmp == "72M" or values["xtal_type"] == "XTAL_None":
                             # 1T
                             bflb_utils.update_cfg(cfg, section, "sfctrl_clk_delay", "1")
                             bflb_utils.update_cfg(cfg, section, "sfctrl_clk_invert", "0x01")
@@ -1009,7 +1017,8 @@ class BflbMcuTool(object):
                             bflb_utils.update_cfg(cfg, section, "sfctrl_clk_delay", "1")
                             bflb_utils.update_cfg(cfg, section, "sfctrl_clk_invert", "0x03")
                     else:
-                        if tmp == "XTAL" or tmp == "XCLK" or tmp == "48M" or tmp == "57P6M":
+                        if tmp == "XTAL" or tmp == "XCLK" or tmp == "48M" or\
+                           tmp == "57P6M" or tmp == "72M":
                             # 1T
                             bflb_utils.update_cfg(cfg, section, "sfctrl_clk_delay", "1")
                             bflb_utils.update_cfg(cfg, section, "sfctrl_clk_invert", "0x01")
@@ -1186,7 +1195,7 @@ class BflbMcuTool(object):
                     # program flash,create eflash_loader_cfg.ini
                     cfg = BFConfigParser()
                     if os.path.isfile(self.eflash_loader_cfg_tmp) is False:
-                        shutil.copy(self.eflash_loader_cfg, self.eflash_loader_cfg_tmp)
+                        shutil.copyfile(self.eflash_loader_cfg, self.eflash_loader_cfg_tmp)
                     cfg.read(self.eflash_loader_cfg_tmp)
                     bflb_utils.update_cfg(cfg, "LOAD_CFG", "interface", values["dl_device"].lower())
                     bflb_utils.update_cfg(cfg, "LOAD_CFG", "device", values["dl_comport"])
@@ -1226,7 +1235,7 @@ class BflbMcuTool(object):
                     if values["boot_src"] == "UART/SDIO" or values["boot_src"] == "UART/USB":
                         cfg = BFConfigParser()
                         if os.path.isfile(self.eflash_loader_cfg_tmp) is False:
-                            shutil.copy(self.eflash_loader_cfg, self.eflash_loader_cfg_tmp)
+                            shutil.copyfile(self.eflash_loader_cfg, self.eflash_loader_cfg_tmp)
                         cfg.read(self.eflash_loader_cfg_tmp)
                         boot_speed = int(cfg.get("LOAD_CFG", "speed_uart_boot"))
                         if values["img_type"] == "RAW":
@@ -1242,7 +1251,7 @@ class BflbMcuTool(object):
                     # program flash,create eflash_loader_cfg.ini
                     cfg = BFConfigParser()
                     if os.path.isfile(self.eflash_loader_cfg_tmp) is False:
-                        shutil.copy(self.eflash_loader_cfg, self.eflash_loader_cfg_tmp)
+                        shutil.copyfile(self.eflash_loader_cfg, self.eflash_loader_cfg_tmp)
                     cfg.read(self.eflash_loader_cfg_tmp)
                     bflb_utils.update_cfg(cfg, "LOAD_CFG", "interface", values["dl_device"].lower())
                     bflb_utils.update_cfg(cfg, "LOAD_CFG", "device", values["dl_comport"])
@@ -1325,7 +1334,7 @@ class BflbMcuTool(object):
                 if values["boot_src"] == "UART/USB":
                     cfg = BFConfigParser()
                     if os.path.isfile(self.eflash_loader_cfg_tmp) is False:
-                        shutil.copy(self.eflash_loader_cfg, self.eflash_loader_cfg_tmp)
+                        shutil.copyfile(self.eflash_loader_cfg, self.eflash_loader_cfg_tmp)
                     cfg.read(self.eflash_loader_cfg_tmp)
                     boot_speed = int(cfg.get("LOAD_CFG", "speed_uart_boot"))
                     if values["img_type"] == "RAW":
@@ -1351,7 +1360,7 @@ class BflbMcuTool(object):
                 # program flash, create eflash_loader_cfg.ini
                 cfg = BFConfigParser()
                 if os.path.isfile(self.eflash_loader_cfg_tmp) is False:
-                    shutil.copy(self.eflash_loader_cfg, self.eflash_loader_cfg_tmp)
+                    shutil.copyfile(self.eflash_loader_cfg, self.eflash_loader_cfg_tmp)
                 cfg.read(self.eflash_loader_cfg_tmp)
                 bflb_utils.update_cfg(cfg, "LOAD_CFG", "interface", values["dl_device"].lower())
                 bflb_utils.update_cfg(cfg, "LOAD_CFG", "device", values["dl_comport"])
@@ -1521,7 +1530,7 @@ def get_value(args):
         else:   
             config["dl_xtal"] = args.xtal 
             config["xtal_type"] = 'XTAL_' + args.xtal
-        if not args.xtal:
+        if not args.flashclk:
             config["flash_clk_type"] = "48M"
             bflb_utils.printf("Default flash clock is 48M")
         else:      
@@ -1539,7 +1548,7 @@ def get_value(args):
         else:   
             config["dl_xtal"] = args.xtal 
             config["xtal_type"] = 'XTAL_' + args.xtal
-        if not args.xtal:
+        if not args.flashclk:
             config["flash_clk_type"] = "72M"
             bflb_utils.printf("Default flash clock is 72M")
         else:      
@@ -1557,7 +1566,7 @@ def get_value(args):
             config["dl_xtal"] = args.xtal 
             config["xtal_type"] = 'XTAL_' + args.xtal
             bflb_utils.printf("Default xtal is 38.4M")
-        if not args.xtal:
+        if not args.flashclk:
             config["flash_clk_type"] = "80M"
         else:      
             config["flash_clk_type"] = args.flashclk
@@ -1568,7 +1577,7 @@ def get_value(args):
             config["pll_clk"] = args.pllclk
             bflb_utils.printf("Default pll clock is 160M")
     else:
-        bflb_utils.printf("Chip type is not in bl60x/bl602/bl702")
+        bflb_utils.printf("Chip type is not correct")
         sys.exit(1)
         
     if config["dl_device"] == "jlink" and args.baudrate > 12000:
@@ -1592,7 +1601,7 @@ def run():
         except Exception:
             port = sorted(ports)[0]
     firmware_default = os.path.join(app_path, "img/project.bin")
-    parser = argparse.ArgumentParser(description='bflb mcu tool')
+    parser = argparse.ArgumentParser(description='mcu-tool')
     parser.add_argument('--chipname', required=True, help='chip name')
     parser.add_argument("--interface", dest="interface", default="uart", help="interface to use") 
     parser.add_argument("--port", dest="port", default=port, help="serial port to use")
@@ -1623,7 +1632,7 @@ def run():
             obj_mcu.bind_img(config)
             f_org = os.path.join(chip_path, args.chipname, "img_create_mcu", "whole_img.bin")
             f = "firmware.bin"
-            shutil.copy(f_org, f)
+            shutil.copyfile(f_org, f)
         else:
             obj_mcu.program_img_thread(config)
     except Exception as e:

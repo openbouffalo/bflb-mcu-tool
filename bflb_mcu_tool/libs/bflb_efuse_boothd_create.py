@@ -193,7 +193,7 @@ def efuse_create_process(chipname, chiptype, config_file, output_file=None):
     bflb_utils.printf("Create efuse using ", config_file)
     cfgfile = eflash_loader_path + "/eflash_loader_cfg.ini"
     if os.path.isfile(cfgfile) is False:
-        shutil.copy(eflash_loader_path + "/eflash_loader_cfg.conf", cfgfile)
+        shutil.copyfile(eflash_loader_path + "/eflash_loader_cfg.conf", cfgfile)
     cfg = BFConfigParser()
     cfg.read(cfgfile)
     sub_module = __import__("libs." + chiptype, fromlist=[chiptype])

@@ -42,6 +42,7 @@ except ImportError:
     from libs import bflb_path
 from libs import bflb_version
 from libs import bflb_interface_uart
+from libs import bflb_interface_sdio
 from libs import bflb_interface_jlink
 from libs import bflb_interface_openocd
 from libs import bflb_efuse_boothd_create
@@ -346,14 +347,14 @@ class BflbEflashLoader(object):
             self._bflb_com_if.set_pc_msp(binascii.hexlify(pc),
                                          binascii.hexlify(msp).decode('utf-8'))
             return True, None
-        elif interface == "uart":
+        elif interface == "uart" or interface == "sdio":
             ret = True
-            bflb_utils.printf("Load eflash_loader.bin via uart")
+            bflb_utils.printf("Load eflash_loader.bin via %s" % interface)
             start_time = (time.time() * 1000)
             ret = self._bflb_com_img_loader.img_load_process(
                 self._bflb_com_device, self._bflb_boot_speed, self._bflb_boot_speed, helper_file,
                 "", None, do_reset, reset_hold_time, shake_hand_delay, reset_revert, cutoff_time,
-                shake_hand_retry, boot2_load)
+                shake_hand_retry, boot2_load, True)
             bflb_utils.printf("Load helper bin time cost(ms): ", (time.time() * 1000) - start_time)
             return ret, None
 
@@ -1320,7 +1321,7 @@ class BflbEflashLoader(object):
             log = ("Load " + str(i) + "/" + str(flash_data_len) + " {\"progress\":" + str(
                 (i * 100) // flash_data_len) + "}")
             bflb_utils.printf(log)
-            if callback is not None:
+            if callback is not None and flash_data_len > 200:
                 callback(i, flash_data_len, "APP_WR")
         bflb_utils.printf(log)
         if self.flash_write_check_main_process() is False:
@@ -2039,9 +2040,9 @@ class BflbEflashLoader(object):
         else:
             eflash_loader_file = os.path.join(app_path, eflash_loader_file)
         bflb_utils.printf("chiptype: ", self._chip_type)
-        if interface == "uart":
-            bflb_utils.printf("========= Interface is Uart =========")
-            self._bflb_com_img_loader = bflb_img_loader.BflbImgLoader(self._chip_type, create_cfg)
+        if interface == "uart" or interface == "sdio":
+            bflb_utils.printf("========= Interface is %s =========" % interface)
+            self._bflb_com_img_loader = bflb_img_loader.BflbImgLoader(self._chip_type, interface, create_cfg)
             self._bflb_com_if = self._bflb_com_img_loader.bflb_boot_if
             if load_speed:
                 self._bflb_com_speed = load_speed
@@ -2379,7 +2380,7 @@ class BflbEflashLoader(object):
                     cfgfile = self._chip_name.lower(
                     ) + "/efuse_bootheader/efuse_bootheader_cfg.ini"
                     if os.path.isfile(cfgfile) is False:
-                        shutil.copy(
+                        shutil.copyfile(
                             self._chip_name.lower() +
                             "/efuse_bootheader/efuse_bootheader_cfg.conf", cfgfile)
                     sub_module = __import__("libs." + self._chip_type, fromlist=[self._chip_type])

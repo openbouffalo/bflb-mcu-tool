@@ -22,11 +22,13 @@ bflb_mcu_tool/libs/bflb_eflash_loader_client.py
 bflb_mcu_tool/libs/bflb_eflash_loader_server.py
 bflb_mcu_tool/libs/bflb_efuse_boothd_create.py
 bflb_mcu_tool/libs/bflb_fdt.py
+bflb_mcu_tool/libs/bflb_file_serial.py
 bflb_mcu_tool/libs/bflb_flash_select.py
 bflb_mcu_tool/libs/bflb_img_create.py
 bflb_mcu_tool/libs/bflb_img_loader.py
 bflb_mcu_tool/libs/bflb_interface_jlink.py
 bflb_mcu_tool/libs/bflb_interface_openocd.py
+bflb_mcu_tool/libs/bflb_interface_sdio.py
 bflb_mcu_tool/libs/bflb_interface_uart.py
 bflb_mcu_tool/libs/bflb_path.py
 bflb_mcu_tool/libs/bflb_proto.py

@@ -43,12 +43,17 @@ from serial import Serial
 from Crypto.Util import Counter
 from Crypto.Cipher import AES
 
-import globalvar as gol
 try:
     from PySide2 import QtCore
+    qt_sign = True
 except ImportError:
     qt_sign = False
-    
+
+try:
+    from serial.tools.list_ports import comports
+except ImportError:
+    raise exception.GetSerialPortsError(os.name)
+
 # Get app path
 if getattr(sys, "frozen", False):
     app_path = os.path.dirname(sys.executable)
@@ -371,6 +376,9 @@ def printf(*args):
     # print(data.title())
     # print(data.capitalize())
     if data:
+        if conf_sign:
+            for key, value in cgc.replace_name_list.items():
+                data = data.replace(key, value)
         now_time = datetime.datetime.now().strftime('[%H:%M:%S.%f')[:-3] + '] - '
         data = now_time + data
 
@@ -391,8 +399,7 @@ def printf(*args):
             except Exception as e:
                 print(e)
         else:
-            qt_sign = gol.GlobalVar.qt
-            if qt_sign:
+            if qt_sign and QtCore.QThread.currentThread().objectName():
                 print("[Task%s]" % str(QtCore.QThread.currentThread().objectName()) + data.strip())
             else:
                 print(data.strip())
@@ -652,55 +659,67 @@ def get_serial_ports():
 
 
 def serial_enumerate():
+    prog_ports = []
+    sdio_ports = []
+    sdio_file_ser_dict = {}
+    uart_ports = []
+    file_dict = {}
     ports = []
     if sys.platform.startswith("win"):
+        ports = []
+        for p, d, h in comports():
+            if "Virtual" in d or not p:
+                continue 
+            if "PID=1D6B" in h.upper():
+                ser_value = h.split(" ")[2][4:]
+                if ser_value not in sdio_file_ser_dict:
+                    #sdio_ports.append(p+" (SDIO)")
+                    sdio_file_ser_dict[ser_value] = p
+                else:
+                    if "LOCATION" in h.upper():
+                        file_dict[sdio_file_ser_dict[ser_value]] = p
+                        sdio_ports.append(sdio_file_ser_dict[ser_value]+" (SDIO)")
+                    else:
+                        file_dict[p] = sdio_file_ser_dict[ser_value]
+                        sdio_ports.append(p+" (SDIO)")
+            else:
+                if "FACTORYAIOT_PROG" in h.upper():
+                    prog_ports.append(p+" (PROG)")
+                else:
+                    uart_ports.append(p)
         try:
-            from serial.tools.list_ports import comports
-        except ImportError:
-            raise exception.GetSerialPortsError(os.name)        
+            uart_ports = sorted(uart_ports, key=lambda x: int(re.match('COM(\d+)', x).group(1)))
+        except Exception:
+            uart_ports = sorted(uart_ports)                    
+        ports = sorted(prog_ports) + sorted(sdio_ports) + uart_ports
+    elif sys.platform.startswith('linux'):
         ports = []
         for p, d, h in comports():
             if not p:
-                continue
-            if "VID:PID" in h:
-                ports.append(p)
-        
-# Iterate through registry because WMI does not show virtual serial ports
-#         import winreg
-#         try:
-#             key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, r'HARDWARE\DEVICEMAP\SERIALCOMM')
-#         except WindowsError:
-#             return []
-#         i = 0
-#         while True:
-#             try:
-#                 # ports.append([winreg.EnumValue(key, i)[0], winreg.EnumValue(key, i)[1]])
-#                 ports.append(winreg.EnumValue(key, i)[1])
-#                 i = i + 1
-#             except WindowsError:
-#                 break
-    elif sys.platform.startswith('linux'):
-        if os.path.exists('/dev/serial/by-id'):
-            entries = os.listdir('/dev/serial/by-id')
-            dirs = [os.readlink(os.path.join('/dev/serial/by-id', x)) for x in entries]
-            ports.extend([os.path.normpath(os.path.join('/dev/serial/by-id', x)) for x in dirs])
-        if os.path.exists('/dev/serial/by-path'):
-            entries = os.listdir('/dev/serial/by-path')
-            dirs = [os.readlink(os.path.join('/dev/serial/by-path', x)) for x in entries]
-            ports.extend([os.path.normpath(os.path.join('/dev/serial/by-path', x)) for x in dirs])
-        for dev in glob('/dev/ttyS*'):
-            try:
-                port = Serial(dev)
-            except Exception:
-                pass
+                continue        
+            if "PID=1D6B" in h.upper():
+                ser_value = h.split(" ")[2][4:]
+                if ser_value not in sdio_file_ser_dict:
+                    sdio_file_ser_dict[ser_value] = p
+                else:
+                    if sdio_file_ser_dict[ser_value]>p:
+                        file_dict[p] = sdio_file_ser_dict[ser_value]
+                        sdio_ports.append(p+" (SDIO)")
+                    else:
+                        file_dict[sdio_file_ser_dict[ser_value]] = p
+                        sdio_ports.append(sdio_file_ser_dict[ser_value]+" (SDIO)")
             else:
-                ports.append(dev)
+                if "FACTORYAIOT PROG" in h.upper():
+                    prog_ports.append(p+" (PROG)")
+                else:
+                    uart_ports.append(p)
+        ports = sorted(prog_ports) + sorted(sdio_ports) + sorted(uart_ports)
     elif sys.platform.startswith('darwin'):
-        for dev in glob('/dev/tty.usbserial-*'):
+        for dev in glob('/dev/tty.usb*'):
             ports.append(dev)
-    else:
-        return []
-    return list(set(ports))
+    else:  
+        ports = []
+    return ports
 
 
 def pylink_enumerate():
