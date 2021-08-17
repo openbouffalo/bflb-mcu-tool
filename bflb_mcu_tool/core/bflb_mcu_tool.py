@@ -48,7 +48,7 @@ else:
         "bl562": "bl602",
         "bl602": "bl602",
         "bl702": "bl702",
-        "bl606p": "bl606p",
+        "bl808": "bl808",
     }
 
 def parse_rfpa(bin):
@@ -132,6 +132,7 @@ class BflbMcuTool(object):
             bflb_utils.set_error_code("FFFF")
             ret = self.eflash_loader_t.efuse_flash_loader(args, None, eflash_loader_bin, callback,
                                                      None, create_img_callback)
+            self.eflash_loader_t.object_status_clear()
         except Exception as e:
             traceback.print_exc(limit=5, file=sys.stdout)
             ret = str(e)
@@ -175,6 +176,8 @@ class BflbMcuTool(object):
             eflash_loader_bin = os.path.join(chip_path, self.chipname,
                                              "eflash_loader/" + get_eflash_loader(values["dl_xtal"]))
             args = parser_eflash.parse_args(options)
+            bh_cfg_file = self.img_create_path + "/efuse_bootheader_cfg.ini"
+            self.eflash_loader_t.set_config_file(bh_cfg_file, self.img_create_cfg)
             ret = self.eflash_loader_thread(args, eflash_loader_bin, callback)
         except Exception as e:
             ret = str(e)
@@ -229,6 +232,8 @@ class BflbMcuTool(object):
             options = ["--read", "--flash", "--start="+start, "--end="+end, "--file=flash.bin", "-c", self.eflash_loader_cfg_tmp]
             eflash_loader_bin = os.path.join(chip_path, self.chipname, "eflash_loader/" + get_eflash_loader(values["dl_xtal"]))
             args = parser_eflash.parse_args(options)
+            bh_cfg_file = self.img_create_path + "/efuse_bootheader_cfg.ini"
+            self.eflash_loader_t.set_config_file(bh_cfg_file, self.img_create_cfg)
             ret = self.eflash_loader_thread(args, eflash_loader_bin, callback)
         except Exception as e:
             ret = str(e)
@@ -286,6 +291,8 @@ class BflbMcuTool(object):
             eflash_loader_bin = os.path.join(chip_path, self.chipname,
                                              "eflash_loader/" + get_eflash_loader(values["dl_xtal"]))
             args = parser_eflash.parse_args(options)
+            bh_cfg_file = self.img_create_path + "/efuse_bootheader_cfg.ini"
+            self.eflash_loader_t.set_config_file(bh_cfg_file, self.img_create_cfg)
             ret = self.eflash_loader_thread(args, eflash_loader_bin, callback)
         except Exception as e:
             ret = str(e)
@@ -296,7 +303,7 @@ class BflbMcuTool(object):
         error = None
         # decide file name
         try:
-            if self.chiptype != "bl606p":
+            if self.chiptype != "bl808":
                 if values["img_type"] == "SingleCPU":
                     bootinfo_file = self.img_create_path + "/bootinfo.bin"
                     img_file = self.img_create_path + "/img.bin"
@@ -375,22 +382,20 @@ class BflbMcuTool(object):
             error = str(e)
         return error
         
-    def create_img_606p(self, chipname, chiptype, values):
+    def create_bl808_img(self, chipname, chiptype, values):
         # basic check
         error = True
         group0_img_start = "0xFFFFFFFF"
         group1_img_start = "0xFFFFFFFF"
         group0_img = ""
         group1_img = ""
-        cpu_list = ["m0", "m1", "d0", "d1", "lp"]
-        img_addr_offset = ["0x0", "0x0", "0x0", "0x0", "0x0", "0x0", "0x0", "0x0", "0x0", "0x0"]
+        cpu_list = ["m0", "d0", "lp"]
+        img_addr_offset = ["0x0", "0x0", "0x0", "0x0", "0x0", "0x0"]
         segheader_file = [
-            "/segheader_group0_m0.bin", "/segheader_group0_m1.bin", "/segheader_group0_d0.bin",
-            "/segheader_group0_d1.bin", "/segheader_group0_lp.bin", "/segheader_group1_m0.bin",
-            "/segheader_group1_m1.bin", "/segheader_group1_d0.bin", "/segheader_group1_d1.bin",
-            "/segheader_group1_lp.bin"
+            "/segheader_group0_m0.bin", "/segheader_group0_d0.bin", "/segheader_group0_lp.bin",
+            "/segheader_group1_m0.bin", "/segheader_group1_d0.bin", "/segheader_group1_lp.bin"
         ]
-        for index in range(5):
+        for index in range(3):
             num = str(index+1)
             if values["img%s_group" % num] != "unused":
                 if values["img%s_file" % num] == "":
@@ -413,7 +418,7 @@ class BflbMcuTool(object):
                 elif values["img%s_group" % num] == "group1":
                     group0_img += "UNUSED"
                     group1_img += values["img%s_file" % num]
-                    img_addr_offset[index+5] = values["img%s_addr" % num]
+                    img_addr_offset[index+3] = values["img%s_addr" % num]
                     if int(group1_img_start.replace("0x", ""), 16) > img_start:
                         group1_img_start = values["img%s_addr" % num]
             else:
@@ -481,7 +486,7 @@ class BflbMcuTool(object):
                     return bflb_utils.errorcode_msg()
         group0_section = "BOOTHEADER_GROUP0_CFG"
         group1_section = "BOOTHEADER_GROUP1_CFG"
-        bh_cfg_file = self.efuse_bh_path + "/efuse_bootheader_cfg.ini"
+        bh_cfg_file = self.img_create_path + "/efuse_bootheader_cfg.ini"
         group0_bh_file = self.img_create_path + "/bootheader_group0.bin"
         group1_bh_file = self.img_create_path + "/bootheader_group1.bin"
         efuse_file = self.img_create_path + "/efusedata.bin"
@@ -568,8 +573,9 @@ class BflbMcuTool(object):
                                   self.sign_type.index(values["sign_type-group0"]))
         if "encrypt_type-group0" in values.keys():
             tmp = self.encrypt_type.index(values["encrypt_type-group0"])
-            if tmp == 4:
-                bflb_utils.update_cfg(cfg, group0_section, "encrypt_type", "1")
+            if tmp == 4 or tmp == 5 or tmp == 6:
+                # XTS 128/256/192
+                bflb_utils.update_cfg(cfg, group0_section, "encrypt_type", tmp-3)
                 bflb_utils.update_cfg(cfg, group0_section, "xts_mode", "1")
             else:
                 bflb_utils.update_cfg(cfg, group0_section, "encrypt_type", tmp)
@@ -579,21 +585,17 @@ class BflbMcuTool(object):
                 bflb_utils.printf(error)
                 bflb_utils.set_error_code("0071")
                 return bflb_utils.errorcode_msg()
-            if tmp == 2 and len(values["encrypt_key-group0"]) != 64:
-                error = "group0 key length error"
-                bflb_utils.printf(error)
-                bflb_utils.set_error_code("0071")
-                return bflb_utils.errorcode_msg()
             if tmp == 3 and len(values["encrypt_key-group0"]) != 48:
                 error = "group0 key length error"
                 bflb_utils.printf(error)
                 bflb_utils.set_error_code("0071")
                 return bflb_utils.errorcode_msg()
-            if tmp == 4 and len(values["encrypt_key-group0"]) != 64:
-                error = "group0 key length error"
-                bflb_utils.printf(error)
-                bflb_utils.set_error_code("0071")
-                return bflb_utils.errorcode_msg()
+            if tmp == 2 or tmp == 4 or tmp == 5 or tmp == 6:
+                if len(values["encrypt_key-group0"]) != 64:
+                    error = "group0 key length error"
+                    bflb_utils.printf(error)
+                    bflb_utils.set_error_code("0071")
+                    return bflb_utils.errorcode_msg()
             if tmp != 0:
                 if len(values["aes_iv-group0"]) != 32:
                     error = "group0 AES IV length error"
@@ -619,8 +621,9 @@ class BflbMcuTool(object):
                                   self.sign_type.index(values["sign_type-group1"]))
         if "encrypt_type-group1" in values.keys():
             tmp = self.encrypt_type.index(values["encrypt_type-group1"])
-            if tmp == 4:
-                bflb_utils.update_cfg(cfg, group1_section, "encrypt_type", "1")
+            if tmp == 4 or tmp == 5 or tmp == 6:
+                # XTS 128/256/192
+                bflb_utils.update_cfg(cfg, group1_section, "encrypt_type", tmp-3)
                 bflb_utils.update_cfg(cfg, group1_section, "xts_mode", "1")
             else:
                 bflb_utils.update_cfg(cfg, group1_section, "encrypt_type", tmp)
@@ -630,21 +633,17 @@ class BflbMcuTool(object):
                 bflb_utils.printf(error)
                 bflb_utils.set_error_code("0071")
                 return bflb_utils.errorcode_msg()
-            if tmp == 2 and len(values["encrypt_key-group1"]) != 64:
-                error = "group1 key length error"
-                bflb_utils.printf(error)
-                bflb_utils.set_error_code("0071")
-                return bflb_utils.errorcode_msg()
             if tmp == 3 and len(values["encrypt_key-group1"]) != 48:
                 error = "group1 key length error"
                 bflb_utils.printf(error)
                 bflb_utils.set_error_code("0071")
                 return bflb_utils.errorcode_msg()
-            if tmp == 4 and len(values["encrypt_key-group1"]) != 64:
-                error = "group1 key length error"
-                bflb_utils.printf(error)
-                bflb_utils.set_error_code("0071")
-                return bflb_utils.errorcode_msg()
+            if tmp == 2 or tmp == 4 or tmp == 5 or tmp == 6:
+                if len(values["encrypt_key-group1"]) != 64:
+                    error = "group1 key length error"
+                    bflb_utils.printf(error)
+                    bflb_utils.set_error_code("0071")
+                    return bflb_utils.errorcode_msg()
             if tmp != 0:
                 if len(values["aes_iv-group1"]) != 32:
                     error = "group1 AES IV length error"
@@ -665,7 +664,7 @@ class BflbMcuTool(object):
         if "hash_ignore-group1" in values.keys():
             bflb_utils.update_cfg(cfg, group1_section, "hash_ignore",
                                   self.hash_ignore.index(values["hash_ignore-group1"]))
-        for index in range(5):
+        for index in range(3):
             num = str(index+1)
             if values["img%s_group" % num] == "unused":
                 bflb_utils.update_cfg(cfg, group0_section, "%s_config_enable" % cpu_list[index], "1")
@@ -685,7 +684,7 @@ class BflbMcuTool(object):
     
         bflb_utils.update_cfg(cfg, group0_section, "img_len_cnt", "0x100")
         bflb_utils.update_cfg(cfg, group1_section, "img_len_cnt", "0x100")
-        for index in range(5):
+        for index in range(3):
             if int(img_addr_offset[index].replace("0x", ""), 16) > 0:
                 offset = int(img_addr_offset[index].replace("0x", ""), 16) - int(
                     group0_img_start.replace("0x", ""), 16)
@@ -693,20 +692,20 @@ class BflbMcuTool(object):
                                     "0x%X" % (offset))
                 bflb_utils.update_cfg(cfg, group0_section, "%s_boot_entry" % cpu_list[index],
                                     "0x%X" % (int(img_addr_offset[index].replace("0x", ""), 16)))
-            if int(img_addr_offset[index+5].replace("0x", ""), 16) > 0:
-                offset = int(img_addr_offset[index+5].replace("0x", ""), 16) - int(
+            if int(img_addr_offset[index+3].replace("0x", ""), 16) > 0:
+                offset = int(img_addr_offset[index+3].replace("0x", ""), 16) - int(
                     group1_img_start.replace("0x", ""), 16)
                 bflb_utils.update_cfg(cfg, group1_section, "%s_image_address_offset" % cpu_list[index],
                                     "0x%X" % (offset))
                 bflb_utils.update_cfg(cfg, group1_section, "%s_boot_entry" % cpu_list[index],
-                                    "0x%X" % (int(img_addr_offset[index+5].replace("0x", ""), 16)))
+                                    "0x%X" % (int(img_addr_offset[index+3].replace("0x", ""), 16)))
     
         if values["boot_src"] == "UART/USB":
-            for index in range(5):
+            for index in range(3):
                 bflb_utils.update_cfg(cfg, group0_section, "%s_boot_entry" % cpu_list[index],
                                       self.img_addr_remap(img_addr_offset[index]))
                 bflb_utils.update_cfg(cfg, group1_section, "%s_boot_entry" % cpu_list[index],
-                                      self.img_addr_remap(img_addr_offset[index+5]))
+                                      self.img_addr_remap(img_addr_offset[index+3]))
         cfg.write(bh_cfg_file, "w+")
         if values["boot_src"] == "Flash":
             bflb_efuse_boothd_create.bootheader_create_process(
@@ -731,7 +730,7 @@ class BflbMcuTool(object):
         segheader_group0 = ""
         segheader_group1 = ""
         while i < len(segheader_file):
-            if i < 5:
+            if i < 3:
                 if segheader_group0 != "":
                     segheader_group0 += " "
                 segheader_group0 += self.img_create_path + segheader_file[i]
@@ -798,383 +797,416 @@ class BflbMcuTool(object):
             os.remove(self.img_create_path + "/bootheader_dummy.bin")
         return True
     
+    def create_default_img(self, chipname, chiptype, values):
+        if values["img_file"] == "":
+            if values["device_tree"]:
+                ro_params_d = values["device_tree"]
+                try:
+                    dts_hex = bl_ro_device_tree.bl_dts2hex(ro_params_d)
+                    dts_bytearray = bflb_utils.hexstr_to_bytearray(dts_hex)
+                except Exception as e:
+                    dts_bytearray = None
+                tlv_bin = self.img_create_path + "/tlv.bin"
+                with open(tlv_bin, "wb") as fp:
+                    fp.write(dts_bytearray)
+                error = "tvl bin created"
+                return error
+            if values["dl_chiperase"] == "True":
+                bflb_utils.printf("flash chiperase operation")
+                return True
+            else:
+                error = "Please select image file"
+                bflb_utils.printf(error)
+                bflb_utils.set_error_code("0061")
+                return bflb_utils.errorcode_msg()
+        else:
+            if values["device_tree"]:
+                ro_params_d = values["device_tree"]
+                try:
+                    dts_hex = bl_ro_device_tree.bl_dts2hex(ro_params_d)
+                    dts_bytearray = bflb_utils.hexstr_to_bytearray(dts_hex)
+                except Exception as e:
+                    dts_bytearray = None
+                if dts_bytearray:
+                    tlv_bin = self.img_create_path + "/tlv.bin"
+                    with open(tlv_bin, "wb") as fp:
+                        fp.write(dts_bytearray)
+                img_org = values["img_file"]
+                if parse_rfpa(img_org) == b'BLRFPARA' and dts_bytearray:
+                    length = len(dts_bytearray)
+                    with open(img_org, "rb") as fp:
+                        bin_byte = fp.read()
+                        bin_bytearray = bytearray(bin_byte)
+                        bin_bytearray[1032:1032+length] = dts_bytearray
+                    filedir, ext = os.path.splitext(img_org)
+                    img_new = filedir + "_rfpa" + ext
+                    with open(img_new, "wb") as fp:
+                        fp.write(bin_bytearray)
+                    values["img_file"] = img_new
+        if values["img_addr"] == "" or values["img_addr"] == "0x":
+            error = "Please set image address"
+            bflb_utils.printf(error)
+            bflb_utils.set_error_code("0062")
+            return bflb_utils.errorcode_msg()
+        if values["bootinfo_addr"] == "" or values["bootinfo_addr"] == "0x":
+            error = "Please set boot info address"
+            bflb_utils.printf(error)
+            bflb_utils.set_error_code("0063")
+            return bflb_utils.errorcode_msg()
+        if "encrypt_type" in values.keys():
+            if "encrypt_key" in values.keys():
+                if values["encrypt_type"] != "None" and values["encrypt_key"] == "":
+                    error = "Please set AES key"
+                    bflb_utils.printf(error)
+                    bflb_utils.set_error_code("0064")
+                    return bflb_utils.errorcode_msg()
+            if "aes_iv" in values.keys():
+                if values["encrypt_type"] != "None" and values["aes_iv"] == "":
+                    error = "Please set AES IV"
+                    bflb_utils.printf(error)
+                    bflb_utils.set_error_code("0065")
+                    return bflb_utils.errorcode_msg()
+        if "sign_type" in values.keys():
+            if "public_key_cfg" in values.keys():
+                if values["sign_type"] != "None" and values["public_key_cfg"] == "":
+                    error = "Please set public key"
+                    bflb_utils.printf(error)
+                    bflb_utils.set_error_code("0066")
+                    return bflb_utils.errorcode_msg()
+            if "private_key_cfg" in values.keys():
+                if values["sign_type"] != "None" and values["private_key_cfg"] == "":
+                    error = "Please set private key"
+                    bflb_utils.printf(error)
+                    bflb_utils.set_error_code("0067")
+                    return bflb_utils.errorcode_msg()
+        # create bootheader_boot2.ini
+        if values["img_type"] == "SingleCPU":
+            section = "BOOTHEADER_CFG"
+            bh_cfg_file = self.img_create_path + "/efuse_bootheader_cfg.ini"
+            bh_file = self.img_create_path + "/bootheader.bin"
+            efuse_file = self.img_create_path + "/efusedata.bin"
+            efuse_mask_file = self.img_create_path + "/efusedata_mask.bin"
+            bootinfo_file = self.img_create_path + "/bootinfo.bin"
+            img_output_file = self.img_create_path + "/img.bin"
+            img_create_section = "Img_Cfg"
+        elif values["img_type"] == "BLSP_Boot2":
+            if chiptype == "bl60x":
+                section = "BOOTHEADER_CPU0_CFG"
+            else:
+                section = "BOOTHEADER_CFG"
+            bh_cfg_file = self.img_create_path + "/bootheader_cfg_blsp_boot2.ini"
+            bh_file = self.img_create_path + "/bootheader_blsp_boot2.bin"
+            efuse_file = self.img_create_path + "/efusedata_blsp_boot2.bin"
+            efuse_mask_file = self.img_create_path + "/efusedata_mask_blsp_boot2.bin"
+            bootinfo_file = self.img_create_path + "/bootinfo_blsp_boot2.bin"
+            img_output_file = self.img_create_path + "/img_blsp_boot2.bin"
+            if chiptype == "bl60x":
+                img_create_section = "Img_CPU0_Cfg"
+            else:
+                img_create_section = "Img_Cfg"
+        elif values["img_type"] == "CPU0":
+            section = "BOOTHEADER_CPU0_CFG"
+            bh_cfg_file = self.img_create_path + "/bootheader_cfg_cpu0.ini"
+            bh_file = self.img_create_path + "/bootheader_cpu0.bin"
+            efuse_file = self.img_create_path + "/efusedata_cpu0.bin"
+            efuse_mask_file = self.img_create_path + "/efusedata_mask_cpu0.bin"
+            bootinfo_file = self.img_create_path + "/bootinfo_cpu0.bin"
+            img_output_file = self.img_create_path + "/img_cpu0.bin"
+            img_create_section = "Img_CPU0_Cfg"
+        elif values["img_type"] == "CPU1":
+            section = "BOOTHEADER_CPU1_CFG"
+            bh_cfg_file = self.img_create_path + "/bootheader_cfg_cpu1.ini"
+            bh_file = self.img_create_path + "/bootheader_cpu1.bin"
+            efuse_file = self.img_create_path + "/efusedata_cpu1.bin"
+            efuse_mask_file = self.img_create_path + "/efusedata_mask_cpu1.bin"
+            bootinfo_file = self.img_create_path + "/bootinfo_cpu1.bin"
+            img_output_file = self.img_create_path + "/img_cpu1.bin"
+            img_create_section = "Img_CPU1_Cfg"
+        elif values["img_type"] == "RAW":
+            bflb_utils.printf("raw data do not need create.")
+            bflb_utils.set_error_code("0068")
+            return True
+        if os.path.isfile(bh_cfg_file) is False:
+            bflb_utils.copyfile(self.efuse_bh_default_cfg, bh_cfg_file)
+        if values["img_type"] == "CPU0" or values["img_type"] == "CPU1":
+            bflb_utils.copyfile(self.img_create_cfg_dp_org, self.img_create_cfg)
+        elif values["img_type"] == "BLSP_Boot2":
+            if chiptype == "bl60x":
+                bflb_utils.copyfile(self.img_create_cfg_dp_org, self.img_create_cfg)
+            else:
+                bflb_utils.copyfile(self.img_create_cfg_org, self.img_create_cfg)
+        else:
+            bflb_utils.copyfile(self.img_create_cfg_org, self.img_create_cfg)
+        # add flash cfg
+        if os.path.exists(self.eflash_loader_cfg_tmp):
+            cfg1 = BFConfigParser()
+            cfg1.read(self.eflash_loader_cfg_tmp)
+            if cfg1.has_option("FLASH_CFG", "flash_id"):
+                flash_id = cfg1.get("FLASH_CFG", "flash_id")
+                self.eflash_loader_t.set_config_file(bh_cfg_file, self.img_create_cfg)
+                if bflb_flash_select.update_flash_cfg(chipname, chiptype, flash_id,
+                                                        bh_cfg_file, False, section) is False:
+                    error = "flash_id:" + flash_id + " do not support"
+                    bflb_utils.printf(error)
+                    bflb_utils.set_error_code("0069")
+                    return bflb_utils.errorcode_msg()
+            else:
+                error = "Do not find flash_id in eflash_loader_cfg.ini"
+                bflb_utils.printf(error)
+                bflb_utils.set_error_code("0070")
+                return bflb_utils.errorcode_msg()
+        else:
+            bflb_utils.printf("Config file not found")
+            bflb_utils.set_error_code("000B")
+            return bflb_utils.errorcode_msg()
+        # update config
+        cfg = BFConfigParser()
+        cfg.read(bh_cfg_file)
+        # if section == "BOOTHEADER_CFG":
+        #     cfg.update_section_name('BOOTHEADER_CPU0_CFG', section)
+        for itrs in cfg.sections():
+            bflb_utils.printf(itrs)
+            if itrs != section and itrs != "EFUSE_CFG":
+                cfg.delete_section(itrs)
+        cfg.write(bh_cfg_file, "w+")
+        cfg = BFConfigParser()
+        cfg.read(bh_cfg_file)
+        if chiptype == "bl702":
+            bflb_utils.update_cfg(cfg, section, "boot2_enable", "0")
+        if "xtal_type" in values.keys():
+            bflb_utils.update_cfg(cfg, section, "xtal_type",
+                                    self.xtal_type_.index(values["xtal_type"]))
+        if "pll_clk" in values.keys():
+            bflb_utils.update_cfg(cfg, section, "pll_clk", self.pll_clk.index(values["pll_clk"]))
+            if chiptype == "bl602":
+                i = self.pll_clk.index(values["pll_clk"])
+                if i == 3 or i == 4 or i == 5:
+                    bflb_utils.update_cfg(cfg, section, "bclk_div", "1")
+                else:
+                    bflb_utils.update_cfg(cfg, section, "bclk_div", "0")
+            elif chiptype == "bl702":
+                i = self.pll_clk.index(values["pll_clk"])
+                if i == 3 or i == 4:
+                    bflb_utils.update_cfg(cfg, section, "bclk_div", "1")
+                else:
+                    bflb_utils.update_cfg(cfg, section, "bclk_div", "0")
+
+        tmp = values["flash_clk_type"]
+        if tmp != "Manual":
+            bflb_utils.update_cfg(cfg, section, "flash_clk_type",
+                                    self.flash_clk_type.index(values["flash_clk_type"]))
+            bflb_utils.update_cfg(cfg, section, "flash_clk_div", "0")
+            if "xtal_type" in values.keys():
+                if tmp == "XTAL" or tmp == "XCLK" or tmp == "48M"or tmp == "57P6M" or\
+                    tmp == "72M" or values["xtal_type"] == "XTAL_None":
+                    # 1T
+                    bflb_utils.update_cfg(cfg, section, "sfctrl_clk_delay", "1")
+                    bflb_utils.update_cfg(cfg, section, "sfctrl_clk_invert", "0x01")
+                else:
+                    # 1.5T
+                    bflb_utils.update_cfg(cfg, section, "sfctrl_clk_delay", "1")
+                    bflb_utils.update_cfg(cfg, section, "sfctrl_clk_invert", "0x03")
+            else:
+                if tmp == "XTAL" or tmp == "XCLK" or tmp == "48M" or\
+                    tmp == "57P6M" or tmp == "72M":
+                    # 1T
+                    bflb_utils.update_cfg(cfg, section, "sfctrl_clk_delay", "1")
+                    bflb_utils.update_cfg(cfg, section, "sfctrl_clk_invert", "0x01")
+                else:
+                    # 1.5T
+                    bflb_utils.update_cfg(cfg, section, "sfctrl_clk_delay", "1")
+                    bflb_utils.update_cfg(cfg, section, "sfctrl_clk_invert", "0x03")
+
+        if "sign_type" in values.keys():
+            bflb_utils.update_cfg(cfg, section, "sign", self.sign_type.index(values["sign_type"]))
+        if "encrypt_type" in values.keys():
+            tmp = self.encrypt_type.index(values["encrypt_type"])
+            bflb_utils.update_cfg(cfg, section, "encrypt_type", tmp)
+            if tmp == 1 and len(values["encrypt_key"]) != 32:
+                error = "Key length error"
+                bflb_utils.printf(error)
+                bflb_utils.set_error_code("0071")
+                return bflb_utils.errorcode_msg()
+            if tmp == 2 and len(values["encrypt_key"]) != 64:
+                error = "Key length error"
+                bflb_utils.printf(error)
+                bflb_utils.set_error_code("0071")
+                return bflb_utils.errorcode_msg()
+            if tmp == 3 and len(values["encrypt_key"]) != 48:
+                error = "Key length error"
+                bflb_utils.printf(error)
+                bflb_utils.set_error_code("0071")
+                return bflb_utils.errorcode_msg()
+            if tmp != 0:
+                if len(values["aes_iv"]) != 32:
+                    error = "AES IV length error"
+                    bflb_utils.printf(error)
+                    bflb_utils.set_error_code("0072")
+                    return bflb_utils.errorcode_msg()
+                if values["aes_iv"].endswith("00000000") is False:
+                    error = "AES IV should endswith 4 bytes zero"
+                    bflb_utils.printf(error)
+                    bflb_utils.set_error_code("0073")
+                    return bflb_utils.errorcode_msg()
+        if "key_sel" in values.keys():
+            bflb_utils.update_cfg(cfg, section, "key_sel", self.key_sel.index(values["key_sel"]))
+        if "cache_way_disable" in values.keys():
+            bflb_utils.update_cfg(cfg, section, "cache_way_disable",
+                                    (1 << self.cache_way_disable.index(values["cache_way_disable"])) -
+                                    1)
+        if "crc_ignore" in values.keys():
+            bflb_utils.update_cfg(cfg, section, "crc_ignore",
+                                    self.crc_ignore.index(values["crc_ignore"]))
+        if "hash_ignore" in values.keys():
+            bflb_utils.update_cfg(cfg, section, "hash_ignore",
+                                    self.hash_ignore.index(values["hash_ignore"]))
+        if values["img_type"] == "CPU0":
+            bflb_utils.update_cfg(cfg, section, "halt_cpu1", "0")
+        elif chiptype != "bl602":
+            bflb_utils.update_cfg(cfg, section, "halt_cpu1", "1")
+        # any value except 0 is ok
+        bflb_utils.update_cfg(cfg, section, "img_len", "0x100")
+        bflb_utils.update_cfg(cfg, section, "img_start", values["img_addr"])
+        cfg.write(bh_cfg_file, "w+")
+        if values["img_type"] == "CPU1":
+            bflb_efuse_boothd_create.bootheader_create_process(
+                chipname, chiptype, bh_cfg_file, self.img_create_path + "/bootheader_dummy.bin",
+                bh_file)
+        elif values["boot_src"] == "UART/SDIO" or values["boot_src"] == "UART/USB":
+            bflb_efuse_boothd_create.bootheader_create_process(
+                chipname, chiptype, bh_cfg_file, bh_file,
+                self.img_create_path + "/bootheader_dummy.bin", True)
+        else:
+            bflb_efuse_boothd_create.bootheader_create_process(
+                chipname, chiptype, bh_cfg_file, bh_file,
+                self.img_create_path + "/bootheader_dummy.bin")
+        # create efuse data
+        if self.chiptype == "bl602" or self.chiptype == "bl702":
+            efuse_data = bytearray(128)
+        else:
+            efuse_data = bytearray(256)
+        fp = open(efuse_file, 'wb+')
+        fp.write(efuse_data)
+        fp.close()
+        fp = open(efuse_mask_file, 'wb+')
+        fp.write(efuse_data)
+        fp.close()
+        # create img_create_cfg.ini
+        cfg = BFConfigParser()
+        cfg.read(self.img_create_cfg)
+        bflb_utils.update_cfg(cfg, img_create_section, "boot_header_file", bh_file)
+        bflb_utils.update_cfg(cfg, img_create_section, "efuse_file", efuse_file)
+        bflb_utils.update_cfg(cfg, img_create_section, "efuse_mask_file", efuse_mask_file)
+        # create segheader
+        segheader = bytearray(12)
+        segheader[0:4] = bflb_utils.int_to_4bytearray_l(
+            int(values["img_addr"].replace("0x", ""), 16))
+        segfp = open(self.img_create_path + "/segheader_tmp.bin", 'wb+')
+        segfp.write(segheader)
+        segfp.close()
+        bflb_utils.update_cfg(cfg, img_create_section, "segheader_file",
+                                self. img_create_path + "/segheader_tmp.bin")
+        bflb_utils.update_cfg(cfg, img_create_section, "segdata_file", values["img_file"])
+
+        encryptEn = False
+        signEn = False
+        if "encrypt_key" in values.keys() and "aes_iv" in values.keys():
+            if values["encrypt_key"] != "" and values["aes_iv"]:
+                encryptEn = True
+        if "public_key_cfg" in values.keys() and "private_key_cfg" in values.keys():
+            if values["public_key_cfg"] != "" and values["private_key_cfg"]:
+                signEn = True
+        if "encrypt_key" in values.keys():
+            bflb_utils.update_cfg(cfg, img_create_section, "aes_key_org",
+                                    values["encrypt_key"])
+        if "aes_iv" in values.keys():
+            bflb_utils.update_cfg(cfg, img_create_section, "aes_iv", values["aes_iv"])
+        if "public_key_cfg" in values.keys():
+            bflb_utils.update_cfg(cfg, img_create_section, "publickey_file",
+                                    values["public_key_cfg"])
+        if "private_key_cfg" in values.keys():
+            bflb_utils.update_cfg(cfg, img_create_section, "privatekey_file_uecc",
+                                    values["private_key_cfg"])
+
+        bflb_utils.update_cfg(cfg, img_create_section, "bootinfo_file", bootinfo_file)
+        bflb_utils.update_cfg(cfg, img_create_section, "img_file", img_output_file)
+        bflb_utils.update_cfg(cfg, img_create_section, "whole_img_file",
+                                img_output_file.replace(".bin", "_if.bin"))
+        cfg.write(self.img_create_cfg, "w+")
+
+        # udate efuse data
+        if encryptEn or signEn:
+            img_cfg = BFConfigParser()
+            img_cfg.read(self.img_create_cfg)
+            if chiptype == "bl60x":
+                efusefile = img_cfg.get("Img_CPU0_Cfg", "efuse_file")
+                efusemaskfile = img_cfg.get("Img_CPU0_Cfg", "efuse_mask_file")
+            else:
+                efusefile = img_cfg.get("Img_Cfg", "efuse_file")
+                efusemaskfile = img_cfg.get("Img_Cfg", "efuse_mask_file")
+            cfg = BFConfigParser()
+            cfg.read(self.eflash_loader_cfg_tmp)
+            cfg.set('EFUSE_CFG', 'file', convert_path(os.path.relpath(efusefile, app_path)))
+            cfg.set('EFUSE_CFG', 'maskfile', convert_path(os.path.relpath(efusemaskfile, app_path)))
+            cfg.write(self.eflash_loader_cfg_tmp, 'w')
+            self.efuse_load_en = True
+        else:
+            self.efuse_load_en = False
+        # create img
+        if values["boot_src"] == "Flash":
+            if values["img_type"] == "SingleCPU":
+                # TODO: double sign
+                options = ["--image=media", "--signer=none"]
+                args = parser_image.parse_args(options)
+                bflb_img_create.img_create(args, chipname, chiptype, self.img_create_path, self.img_create_cfg)
+            elif values["img_type"] == "BLSP_Boot2":
+                if chiptype == "bl60x":
+                    options = ["--image=media", "--cpu=cpu0", "--signer=none"]
+                    args = parser_image.parse_args(options)
+                    bflb_img_create.img_create(args, chipname, chiptype, self.img_create_path, self.img_create_cfg)
+                else:
+                    options = ["--image=media", "--signer=none"]
+                    args = parser_image.parse_args(options)
+                    bflb_img_create.img_create(args, chipname, chiptype, self.img_create_path, self.img_create_cfg)
+            elif values["img_type"] == "CPU0":
+                options = ["--image=media", "--cpu=cpu0", "--signer=none"]
+                args = parser_image.parse_args(options)
+                bflb_img_create.img_create(args, chipname, chiptype, self.img_create_path, self.img_create_cfg)
+            elif values["img_type"] == "CPU1":
+                options = ["--image=media", "--cpu=cpu1", "--signer=none"]
+                args = parser_image.parse_args(options)
+                bflb_img_create.img_create(args, chipname, chiptype, self.img_create_path, self.img_create_cfg)
+                bflb_utils.set_error_code("0074")
+                return bflb_utils.errorcode_msg()
+        else:
+            if values["img_type"] == "SingleCPU":
+                options = ["--image=if", "--signer=none"]
+                args = parser_image.parse_args(options)
+                bflb_img_create.img_create(args, chipname, chiptype, self.img_create_path, self.img_create_cfg)
+            elif values["img_type"] == "CPU0":
+                options = ["--image=if", "--cpu=cpu0", "--signer=none"]
+                args = parser_image.parse_args(options)
+                bflb_img_create.img_create(args, chipname, chiptype, self.img_create_path, self.img_create_cfg)
+            elif values["img_type"] == "CPU1":
+                options = ["--image=if", "--cpu=cpu1", "--signer=none"]
+                args = parser_image.parse_args(options)
+                bflb_img_create.img_create(args, chipname, chiptype, self.img_create_path, self.img_create_cfg)
+        os.remove(self.img_create_path + "/segheader_tmp.bin")
+        if os.path.exists(self.img_create_path + '/bootheader_dummy.bin'):
+            os.remove(self.img_create_path + "/bootheader_dummy.bin")
+        return True
+
     def create_img(self, chipname, chiptype, values):
         # basic check
         gol.GlobalVar.values = values
         error = True
         try:
-            if chiptype == "bl606p":
-                error = self.create_img_606p(chipname, chiptype, values)
+            if chiptype == "bl808":
+                error = self.create_bl808_img(chipname, chiptype, values)
                 return error
             else:
-                if values["img_file"] == "":
-                    if values["device_tree"]:
-                        ro_params_d = values["device_tree"]
-                        try:
-                            dts_hex = bl_ro_device_tree.bl_dts2hex(ro_params_d)
-                            dts_bytearray = bflb_utils.hexstr_to_bytearray(dts_hex)
-                        except Exception as e:
-                            dts_bytearray = None
-                        tlv_bin = self.img_create_path + "/tlv.bin"
-                        with open(tlv_bin, "wb") as fp:
-                            fp.write(dts_bytearray)
-                        error = "tvl bin created"
-                        return error
-                    if values["dl_chiperase"] == "True":
-                        bflb_utils.printf("flash chiperase operation")
-                        return True
-                    else:
-                        error = "Please select image file"
-                        bflb_utils.printf(error)
-                        bflb_utils.set_error_code("0061")
-                        return bflb_utils.errorcode_msg()
-                else:
-                    if values["device_tree"]:
-                        ro_params_d = values["device_tree"]
-                        try:
-                            dts_hex = bl_ro_device_tree.bl_dts2hex(ro_params_d)
-                            dts_bytearray = bflb_utils.hexstr_to_bytearray(dts_hex)
-                        except Exception as e:
-                            dts_bytearray = None
-                        if dts_bytearray:
-                            tlv_bin = self.img_create_path + "/tlv.bin"
-                            with open(tlv_bin, "wb") as fp:
-                                fp.write(dts_bytearray)
-                        img_org = values["img_file"]
-                        if parse_rfpa(img_org) == b'BLRFPARA' and dts_bytearray:
-                            length = len(dts_bytearray)
-                            with open(img_org, "rb") as fp:
-                                bin_byte = fp.read()
-                                bin_bytearray = bytearray(bin_byte)
-                                bin_bytearray[1032:1032+length] = dts_bytearray
-                            filedir, ext = os.path.splitext(img_org)
-                            img_new = filedir + "_rfpa" + ext
-                            with open(img_new, "wb") as fp:
-                                fp.write(bin_bytearray)
-                            values["img_file"] = img_new
-                if values["img_addr"] == "" or values["img_addr"] == "0x":
-                    error = "Please set image address"
-                    bflb_utils.printf(error)
-                    bflb_utils.set_error_code("0062")
-                    return bflb_utils.errorcode_msg()
-                if values["bootinfo_addr"] == "" or values["bootinfo_addr"] == "0x":
-                    error = "Please set boot info address"
-                    bflb_utils.printf(error)
-                    bflb_utils.set_error_code("0063")
-                    return bflb_utils.errorcode_msg()
-                if "encrypt_type" in values.keys():
-                    if "encrypt_key" in values.keys():
-                        if values["encrypt_type"] != "None" and values["encrypt_key"] == "":
-                            error = "Please set AES key"
-                            bflb_utils.printf(error)
-                            bflb_utils.set_error_code("0064")
-                            return bflb_utils.errorcode_msg()
-                    if "aes_iv" in values.keys():
-                        if values["encrypt_type"] != "None" and values["aes_iv"] == "":
-                            error = "Please set AES IV"
-                            bflb_utils.printf(error)
-                            bflb_utils.set_error_code("0065")
-                            return bflb_utils.errorcode_msg()
-                if "sign_type" in values.keys():
-                    if "public_key_cfg" in values.keys():
-                        if values["sign_type"] != "None" and values["public_key_cfg"] == "":
-                            error = "Please set public key"
-                            bflb_utils.printf(error)
-                            bflb_utils.set_error_code("0066")
-                            return bflb_utils.errorcode_msg()
-                    if "private_key_cfg" in values.keys():
-                        if values["sign_type"] != "None" and values["private_key_cfg"] == "":
-                            error = "Please set private key"
-                            bflb_utils.printf(error)
-                            bflb_utils.set_error_code("0067")
-                            return bflb_utils.errorcode_msg()
-                # create bootheader_boot2.ini
-                if values["img_type"] == "SingleCPU":
-                    section = "BOOTHEADER_CFG"
-                    bh_cfg_file = self.img_create_path + "/bootheader_cfg.ini"
-                    bh_file = self.img_create_path + "/bootheader.bin"
-                    efuse_file = self.img_create_path + "/efusedata.bin"
-                    efuse_mask_file = self.img_create_path + "/efusedata_mask.bin"
-                    bootinfo_file = self.img_create_path + "/bootinfo.bin"
-                    img_output_file = self.img_create_path + "/img.bin"
-                    img_create_section = "Img_Cfg"
-                elif values["img_type"] == "BLSP_Boot2":
-                    if chiptype == "bl60x":
-                        section = "BOOTHEADER_CPU0_CFG"
-                    else:
-                        section = "BOOTHEADER_CFG"
-                    bh_cfg_file = self.img_create_path + "/bootheader_cfg_blsp_boot2.ini"
-                    bh_file = self.img_create_path + "/bootheader_blsp_boot2.bin"
-                    efuse_file = self.img_create_path + "/efusedata_blsp_boot2.bin"
-                    efuse_mask_file = self.img_create_path + "/efusedata_mask_blsp_boot2.bin"
-                    bootinfo_file = self.img_create_path + "/bootinfo_blsp_boot2.bin"
-                    img_output_file = self.img_create_path + "/img_blsp_boot2.bin"
-                    if chiptype == "bl60x":
-                        img_create_section = "Img_CPU0_Cfg"
-                    else:
-                        img_create_section = "Img_Cfg"
-                elif values["img_type"] == "CPU0":
-                    section = "BOOTHEADER_CPU0_CFG"
-                    bh_cfg_file = self.img_create_path + "/bootheader_cfg_cpu0.ini"
-                    bh_file = self.img_create_path + "/bootheader_cpu0.bin"
-                    efuse_file = self.img_create_path + "/efusedata_cpu0.bin"
-                    efuse_mask_file = self.img_create_path + "/efusedata_mask_cpu0.bin"
-                    bootinfo_file = self.img_create_path + "/bootinfo_cpu0.bin"
-                    img_output_file = self.img_create_path + "/img_cpu0.bin"
-                    img_create_section = "Img_CPU0_Cfg"
-                elif values["img_type"] == "CPU1":
-                    section = "BOOTHEADER_CPU1_CFG"
-                    bh_cfg_file = self.img_create_path + "/bootheader_cfg_cpu1.ini"
-                    bh_file = self.img_create_path + "/bootheader_cpu1.bin"
-                    efuse_file = self.img_create_path + "/efusedata_cpu1.bin"
-                    efuse_mask_file = self.img_create_path + "/efusedata_mask_cpu1.bin"
-                    bootinfo_file = self.img_create_path + "/bootinfo_cpu1.bin"
-                    img_output_file = self.img_create_path + "/img_cpu1.bin"
-                    img_create_section = "Img_CPU1_Cfg"
-                elif values["img_type"] == "RAW":
-                    bflb_utils.printf("raw data do not need create.")
-                    bflb_utils.set_error_code("0068")
-                    return bflb_utils.errorcode_msg()
-                if values["img_type"] == "CPU0" or values["img_type"] == "CPU1":
-                    bflb_utils.copyfile(self.efuse_bh_default_cfg_dp, bh_cfg_file)
-                    shutil.copyfile(self.img_create_cfg_dp_org, self.img_create_cfg)
-                elif values["img_type"] == "BLSP_Boot2":
-                    if chiptype == "bl60x":
-                        bflb_utils.copyfile(self.efuse_bh_default_cfg_dp, bh_cfg_file)
-                        shutil.copyfile(self.img_create_cfg_dp_org, self.img_create_cfg)
-                    else:
-                        bflb_utils.copyfile(self.efuse_bh_default_cfg, bh_cfg_file)
-                        shutil.copyfile(self.img_create_cfg_org, self.img_create_cfg)
-                else:
-                    bflb_utils.copyfile(self.efuse_bh_default_cfg, bh_cfg_file)
-                    shutil.copyfile(self.img_create_cfg_org, self.img_create_cfg)
-                # add flash cfg
-                if os.path.exists(self.eflash_loader_cfg_tmp):
-                    cfg1 = BFConfigParser()
-                    cfg1.read(self.eflash_loader_cfg_tmp)
-                    if cfg1.has_option("FLASH_CFG", "flash_id"):
-                        flash_id = cfg1.get("FLASH_CFG", "flash_id")
-                        if bflb_flash_select.update_flash_cfg(chipname, chiptype, flash_id,
-                                                              bh_cfg_file, False, section) is False:
-                            error = "flash_id:" + flash_id + " do not support"
-                            bflb_utils.printf(error)
-                            bflb_utils.set_error_code("0069")
-                            return bflb_utils.errorcode_msg()
-                    else:
-                        error = "Do not find flash_id in eflash_loader_cfg.ini"
-                        bflb_utils.printf(error)
-                        bflb_utils.set_error_code("0070")
-                        return bflb_utils.errorcode_msg()
-                else:
-                    bflb_utils.printf("Config file not found")
-                    bflb_utils.set_error_code("000B")
-                    return bflb_utils.errorcode_msg()
-                # update config
-                cfg = BFConfigParser()
-                cfg.read(bh_cfg_file)
-                # if section == "BOOTHEADER_CFG":
-                #     cfg.update_section_name('BOOTHEADER_CPU0_CFG', section)
-                for itrs in cfg.sections():
-                    bflb_utils.printf(itrs)
-                    if itrs != section and itrs != "EFUSE_CFG":
-                        cfg.delete_section(itrs)
-                cfg.write(bh_cfg_file, "w+")
-                cfg = BFConfigParser()
-                cfg.read(bh_cfg_file)
-                if chiptype == "bl702":
-                    bflb_utils.update_cfg(cfg, section, "boot2_enable", "0")
-                if "xtal_type" in values.keys():
-                    bflb_utils.update_cfg(cfg, section, "xtal_type",
-                                          self.xtal_type_.index(values["xtal_type"]))
-                if "pll_clk" in values.keys():
-                    bflb_utils.update_cfg(cfg, section, "pll_clk", self.pll_clk.index(values["pll_clk"]))
-                    if chiptype == "bl602":
-                        i = self.pll_clk.index(values["pll_clk"])
-                        if i == 3 or i == 4 or i == 5:
-                            bflb_utils.update_cfg(cfg, section, "bclk_div", "1")
-                        else:
-                            bflb_utils.update_cfg(cfg, section, "bclk_div", "0")
-                    elif chiptype == "bl702":
-                        i = self.pll_clk.index(values["pll_clk"])
-                        if i == 3 or i == 4:
-                            bflb_utils.update_cfg(cfg, section, "bclk_div", "1")
-                        else:
-                            bflb_utils.update_cfg(cfg, section, "bclk_div", "0")
-    
-                tmp = values["flash_clk_type"]
-                if tmp != "Manual":
-                    bflb_utils.update_cfg(cfg, section, "flash_clk_type",
-                                          self.flash_clk_type.index(values["flash_clk_type"]))
-                    bflb_utils.update_cfg(cfg, section, "flash_clk_div", "0")
-                    if "xtal_type" in values.keys():
-                        if tmp == "XTAL" or tmp == "XCLK" or tmp == "48M"or tmp == "57P6M" or\
-                           tmp == "72M" or values["xtal_type"] == "XTAL_None":
-                            # 1T
-                            bflb_utils.update_cfg(cfg, section, "sfctrl_clk_delay", "1")
-                            bflb_utils.update_cfg(cfg, section, "sfctrl_clk_invert", "0x01")
-                        else:
-                            # 1.5T
-                            bflb_utils.update_cfg(cfg, section, "sfctrl_clk_delay", "1")
-                            bflb_utils.update_cfg(cfg, section, "sfctrl_clk_invert", "0x03")
-                    else:
-                        if tmp == "XTAL" or tmp == "XCLK" or tmp == "48M" or\
-                           tmp == "57P6M" or tmp == "72M":
-                            # 1T
-                            bflb_utils.update_cfg(cfg, section, "sfctrl_clk_delay", "1")
-                            bflb_utils.update_cfg(cfg, section, "sfctrl_clk_invert", "0x01")
-                        else:
-                            # 1.5T
-                            bflb_utils.update_cfg(cfg, section, "sfctrl_clk_delay", "1")
-                            bflb_utils.update_cfg(cfg, section, "sfctrl_clk_invert", "0x03")
-    
-                if "sign_type" in values.keys():
-                    bflb_utils.update_cfg(cfg, section, "sign", self.sign_type.index(values["sign_type"]))
-                if "encrypt_type" in values.keys():
-                    tmp = self.encrypt_type.index(values["encrypt_type"])
-                    bflb_utils.update_cfg(cfg, section, "encrypt_type", tmp)
-                    if tmp == 1 and len(values["encrypt_key"]) != 32:
-                        error = "Key length error"
-                        bflb_utils.printf(error)
-                        bflb_utils.set_error_code("0071")
-                        return bflb_utils.errorcode_msg()
-                    if tmp == 2 and len(values["encrypt_key"]) != 64:
-                        error = "Key length error"
-                        bflb_utils.printf(error)
-                        bflb_utils.set_error_code("0071")
-                        return bflb_utils.errorcode_msg()
-                    if tmp == 3 and len(values["encrypt_key"]) != 48:
-                        error = "Key length error"
-                        bflb_utils.printf(error)
-                        bflb_utils.set_error_code("0071")
-                        return bflb_utils.errorcode_msg()
-                    if tmp != 0:
-                        if len(values["aes_iv"]) != 32:
-                            error = "AES IV length error"
-                            bflb_utils.printf(error)
-                            bflb_utils.set_error_code("0072")
-                            return bflb_utils.errorcode_msg()
-                        if values["aes_iv"].endswith("00000000") is False:
-                            error = "AES IV should endswith 4 bytes zero"
-                            bflb_utils.printf(error)
-                            bflb_utils.set_error_code("0073")
-                            return bflb_utils.errorcode_msg()
-                if "key_sel" in values.keys():
-                    bflb_utils.update_cfg(cfg, section, "key_sel", self.key_sel.index(values["key_sel"]))
-                if "cache_way_disable" in values.keys():
-                    bflb_utils.update_cfg(cfg, section, "cache_way_disable",
-                                          (1 << self.cache_way_disable.index(values["cache_way_disable"])) -
-                                          1)
-                if "crc_ignore" in values.keys():
-                    bflb_utils.update_cfg(cfg, section, "crc_ignore",
-                                          self.crc_ignore.index(values["crc_ignore"]))
-                if "hash_ignore" in values.keys():
-                    bflb_utils.update_cfg(cfg, section, "hash_ignore",
-                                          self.hash_ignore.index(values["hash_ignore"]))
-                if values["img_type"] == "CPU0":
-                    bflb_utils.update_cfg(cfg, section, "halt_cpu1", "0")
-                elif chiptype != "bl602":
-                    bflb_utils.update_cfg(cfg, section, "halt_cpu1", "1")
-                # any value except 0 is ok
-                bflb_utils.update_cfg(cfg, section, "img_len", "0x100")
-                bflb_utils.update_cfg(cfg, section, "img_start", values["img_addr"])
-                cfg.write(bh_cfg_file, "w+")
-                if values["img_type"] == "CPU1":
-                    bflb_efuse_boothd_create.bootheader_create_process(
-                        chipname, chiptype, bh_cfg_file, self.img_create_path + "/bootheader_dummy.bin",
-                        bh_file)
-                elif values["boot_src"] == "UART/SDIO" or values["boot_src"] == "UART/USB":
-                    bflb_efuse_boothd_create.bootheader_create_process(
-                        chipname, chiptype, bh_cfg_file, bh_file,
-                        self.img_create_path + "/bootheader_dummy.bin", True)
-                else:
-                    bflb_efuse_boothd_create.bootheader_create_process(
-                        chipname, chiptype, bh_cfg_file, bh_file,
-                        self.img_create_path + "/bootheader_dummy.bin")
-                # create efuse data
-                efuse_data = bytearray(256)
-                fp = open(efuse_file, 'wb+')
-                fp.write(efuse_data)
-                fp.close()
-                fp = open(efuse_mask_file, 'wb+')
-                fp.write(efuse_data)
-                fp.close()
-                # create img_create_cfg.ini
-                cfg = BFConfigParser()
-                cfg.read(self.img_create_cfg)
-                bflb_utils.update_cfg(cfg, img_create_section, "boot_header_file", bh_file)
-                bflb_utils.update_cfg(cfg, img_create_section, "efuse_file", efuse_file)
-                bflb_utils.update_cfg(cfg, img_create_section, "efuse_mask_file", efuse_mask_file)
-                # create segheader
-                segheader = bytearray(12)
-                segheader[0:4] = bflb_utils.int_to_4bytearray_l(
-                    int(values["img_addr"].replace("0x", ""), 16))
-                segfp = open(self.img_create_path + "/segheader_tmp.bin", 'wb+')
-                segfp.write(segheader)
-                segfp.close()
-                bflb_utils.update_cfg(cfg, img_create_section, "segheader_file",
-                                     self. img_create_path + "/segheader_tmp.bin")
-                bflb_utils.update_cfg(cfg, img_create_section, "segdata_file", values["img_file"])
-    
-                if "encrypt_key" in values.keys():
-                    bflb_utils.update_cfg(cfg, img_create_section, "aes_key_org",
-                                          values["encrypt_key"])
-                if "aes_iv" in values.keys():
-                    bflb_utils.update_cfg(cfg, img_create_section, "aes_iv", values["aes_iv"])
-                if "public_key_cfg" in values.keys():
-                    bflb_utils.update_cfg(cfg, img_create_section, "publickey_file",
-                                          values["public_key_cfg"])
-                if "private_key_cfg" in values.keys():
-                    bflb_utils.update_cfg(cfg, img_create_section, "privatekey_file_uecc",
-                                          values["private_key_cfg"])
-    
-                bflb_utils.update_cfg(cfg, img_create_section, "bootinfo_file", bootinfo_file)
-                bflb_utils.update_cfg(cfg, img_create_section, "img_file", img_output_file)
-                bflb_utils.update_cfg(cfg, img_create_section, "whole_img_file",
-                                      img_output_file.replace(".bin", "_if.bin"))
-                cfg.write(self.img_create_cfg, "w+")
-                # create img
-                if values["boot_src"] == "Flash":
-                    if values["img_type"] == "SingleCPU":
-                        # TODO: double sign
-                        options = ["--image=media", "--signer=none"]
-                        args = parser_image.parse_args(options)
-                        bflb_img_create.img_create(args, chipname, chiptype, self.img_create_path, self.img_create_cfg)
-                    elif values["img_type"] == "BLSP_Boot2":
-                        if chiptype == "bl60x":
-                            options = ["--image=media", "--cpu=cpu0", "--signer=none"]
-                            args = parser_image.parse_args(options)
-                            bflb_img_create.img_create(args, chipname, chiptype, self.img_create_path, self.img_create_cfg)
-                        else:
-                            options = ["--image=media", "--signer=none"]
-                            args = parser_image.parse_args(options)
-                            bflb_img_create.img_create(args, chipname, chiptype, self.img_create_path, self.img_create_cfg)
-                    elif values["img_type"] == "CPU0":
-                        options = ["--image=media", "--cpu=cpu0", "--signer=none"]
-                        args = parser_image.parse_args(options)
-                        bflb_img_create.img_create(args, chipname, chiptype, self.img_create_path, self.img_create_cfg)
-                    elif values["img_type"] == "CPU1":
-                        options = ["--image=media", "--cpu=cpu1", "--signer=none"]
-                        args = parser_image.parse_args(options)
-                        bflb_img_create.img_create(args, chipname, chiptype, self.img_create_path, self.img_create_cfg)
-                        bflb_utils.set_error_code("0074")
-                        return bflb_utils.errorcode_msg()
-                else:
-                    if values["img_type"] == "SingleCPU":
-                        options = ["--image=if", "--signer=none"]
-                        args = parser_image.parse_args(options)
-                        bflb_img_create.img_create(args, chipname, chiptype, self.img_create_path, self.img_create_cfg)
-                    elif values["img_type"] == "CPU0":
-                        options = ["--image=if", "--cpu=cpu0", "--signer=none"]
-                        args = parser_image.parse_args(options)
-                        bflb_img_create.img_create(args, chipname, chiptype, self.img_create_path, self.img_create_cfg)
-                    elif values["img_type"] == "CPU1":
-                        options = ["--image=if", "--cpu=cpu1", "--signer=none"]
-                        args = parser_image.parse_args(options)
-                        bflb_img_create.img_create(args, chipname, chiptype, self.img_create_path, self.img_create_cfg)
-                os.remove(self.img_create_path + "/segheader_tmp.bin")
-                if os.path.exists(self.img_create_path + '/bootheader_dummy.bin'):
-                    os.remove(self.img_create_path + "/bootheader_dummy.bin")
-                return True
+                error = self.create_default_img(chipname, chiptype, values)
+                return error
         except Exception as e:
             error = str(e)
             bflb_utils.printf(error)
@@ -1189,7 +1221,7 @@ class BflbMcuTool(object):
         ret = None
         create_output_path = os.path.relpath(self.img_create_path, app_path)
         try:
-            if self.chiptype != "bl606p":
+            if self.chiptype != "bl808":
                 if values["img_file"] == "" and values["dl_chiperase"] == "True":
                     bflb_utils.printf("Erase Flash")
                     # program flash,create eflash_loader_cfg.ini
@@ -1320,15 +1352,11 @@ class BflbMcuTool(object):
                 whole_img_output_file = create_output_path + "/whole_img.bin"
                 if values["img1_group"] == "group0" or\
                    values["img2_group"] == "group0" or\
-                   values["img3_group"] == "group0" or\
-                   values["img4_group"] == "group0" or\
-                   values["img5_group"] == "group0":
+                   values["img3_group"] == "group0":
                     group0_used = True
                 if values["img1_group"] == "group1" or\
                    values["img2_group"] == "group1" or\
-                   values["img3_group"] == "group1" or\
-                   values["img4_group"] == "group1" or\
-                   values["img5_group"] == "group1":
+                   values["img3_group"] == "group1":
                     group1_used = True
                 # uart download
                 if values["boot_src"] == "UART/USB":
@@ -1389,14 +1417,14 @@ class BflbMcuTool(object):
                 else:
                     read_data = self.bl_get_file_data([group0_bootinfo_file])[0]
                     group0_img_offset = bflb_utils.bytearray_to_int(
-                        bflb_utils.bytearray_reverse(read_data[128:132]))
+                        bflb_utils.bytearray_reverse(read_data[132:136]))
                     group0_img_len = bflb_utils.bytearray_to_int(
-                        bflb_utils.bytearray_reverse(read_data[136:140]))
+                        bflb_utils.bytearray_reverse(read_data[140:144]))
                     read_data = self.bl_get_file_data([group1_bootinfo_file])[0]
                     group1_img_offset = bflb_utils.bytearray_to_int(
-                        bflb_utils.bytearray_reverse(read_data[128:132]))
+                        bflb_utils.bytearray_reverse(read_data[132:136]))
                     group1_img_len = bflb_utils.bytearray_to_int(
-                        bflb_utils.bytearray_reverse(read_data[136:140]))
+                        bflb_utils.bytearray_reverse(read_data[140:144]))
                     bind_bootinfo = True
                     if bind_bootinfo is True:
                         whole_img_len = 0
@@ -1457,10 +1485,10 @@ class BflbMcuTool(object):
                     "encrypt_key-group1" in values.keys() and\
                     "aes_iv-group0" in values.keys() and\
                     "aes_iv-group1" in values.keys():
-                        if  values["encrypt_key-group0"] != "" and\
-                            values["encrypt_key-group1"] != "" and\
-                            values["aes_iv-group0"] != "" and\
-                            values["aes_iv-group1"] != "":
+                        if (values["encrypt_key-group0"] != "" and\
+                            values["aes_iv-group0"] != "") or\
+                           (values["encrypt_key-group1"] != "" and\
+                            values["aes_iv-group1"] != ""):
                                 options.extend(["--efuse",\
                                 "--createcfg=" + self.img_create_cfg])
                                 self.efuse_load_en = True
@@ -1603,7 +1631,8 @@ def run():
     firmware_default = os.path.join(app_path, "img/project.bin")
     parser = argparse.ArgumentParser(description='mcu-tool')
     parser.add_argument('--chipname', required=True, help='chip name')
-    parser.add_argument("--interface", dest="interface", default="uart", help="interface to use") 
+    parser.add_argument("--interface", dest="interface", default="uart", help="interface to use")
+    parser.add_argument("--bootsrc", dest="bootsrc", default="flash", help="boot source select")
     parser.add_argument("--port", dest="port", default=port, help="serial port to use")
     parser.add_argument("--baudrate", dest="baudrate", default=115200, type=int, help="the speed at which to communicate")
     parser.add_argument("--xtal", dest="xtal", help="xtal type")

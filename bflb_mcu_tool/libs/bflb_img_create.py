@@ -160,13 +160,13 @@ def run():
             "bl562": "bl602",
             "bl602": "bl602",
             "bl702": "bl702",
-            "bl606p": "bl606p",
+            "bl808": "bl808",
         }
         chipname = args.chipname
         chiptype = chip_dict[chipname]
         img_create_path = os.path.join(chip_path, chipname, "img_create_mcu")
         img_create_cfg = os.path.join(chip_path, chipname, "img_create_mcu") + "/img_create_cfg.ini"
-        bh_cfg_file = img_create_path + "/bootheader_cfg.ini"
+        bh_cfg_file = img_create_path + "/efuse_bootheader_cfg.ini"
         bh_file = img_create_path + "/bootheader.bin"
         if args.imgfile:
             imgbin = args.imgfile

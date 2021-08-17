@@ -26,9 +26,9 @@ try:
 except ImportError:
     conf_sign = False
 
-version_text = "(V_2.0.2)"
+version_text = "(V_2.2.0)"
 if conf_sign:
-    eflash_loader_version_text = "eflash_loader_v2.0.2"
+    eflash_loader_version_text = "eflash_loader_v2.2.0"
 else:
-    eflash_loader_version_text = "bflb_eflash_loader_v2.0.2"
+    eflash_loader_version_text = "bflb_eflash_loader_v2.2.0"
     

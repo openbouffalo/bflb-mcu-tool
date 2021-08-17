@@ -31,6 +31,7 @@ import traceback
 import shutil
 import lzma
 import csv
+import zipfile
 
 import portalocker
 import ecdsa
@@ -65,7 +66,7 @@ chip_dict = {
     "bl562": "bl602",
     "bl602": "bl602",
     "bl702": "bl702",
-    "bl606p": "bl606p",
+    "bl808": "bl808",
 }
 
 FLASH_LOAD_SHAKE_HAND = "Flash load shake hand"
@@ -100,9 +101,14 @@ class BflbEflashLoader(object):
         self._decompress_write = False
         self._chip_type = chiptype
         self._chip_name = chipname
+        self._efuse_bootheader_file = ""
+        self._img_create_file = ""
         self._csv_data = ""
         self._csv_file = ""
         self._loader_checksum_err_str = "FL0103"
+        self._iap_shakehand_timeout = 0
+        self._iap_en = False
+        self._macaddr_check_status = False
         self._efuse_data = bytearray(0)
         self._efuse_mask_data = bytearray(0)
         self._ecdh_shared_key = None
@@ -124,6 +130,11 @@ class BflbEflashLoader(object):
                 "data_len": "0000",
                 "callback": None
             },
+            "opt_finish": {
+                "cmd_id": "23",
+                "data_len": "0000",
+                "callback": None
+            },
             "flash_erase": {
                 "cmd_id": "30",
                 "data_len": "0000",
@@ -142,6 +153,11 @@ class BflbEflashLoader(object):
             "flash_boot": {
                 "cmd_id": "33",
                 "data_len": "0000",
+                "callback": None
+            },
+            "flash_xip_read": {
+                "cmd_id": "34",
+                "data_len": "0100",
                 "callback": None
             },
             "flash_read_jid": {
@@ -246,10 +262,21 @@ class BflbEflashLoader(object):
             },
         }
         self._resp_cmds = [
-            "flash_read", "efuse_read", "efuse_read_mac", "flash_readSha", "flash_xip_readSha",
-            "flash_read_jid", "flash_read_status_reg", "log_read", "ecdh_get_pk",
-            "ecdh_chanllenge", "efuse_security_read"
+            "flash_read", "flash_xip_read", "efuse_read", "efuse_read_mac", "flash_readSha",
+            "flash_xip_readSha", "flash_read_jid", "flash_read_status_reg", "log_read",
+            "ecdh_get_pk", "ecdh_chanllenge", "efuse_security_read"
         ]
+
+
+    def object_status_clear(self):
+        self._macaddr_check = bytearray(0)
+        self._macaddr_check_status = False
+
+
+    def set_config_file(self, bootheaderFile, imgCreateFile):
+        self._efuse_bootheader_file = bootheaderFile
+        self._img_create_file = imgCreateFile
+
 
     # command common process
     def com_process_one_cmd(self, section, cmd_id, data_send):
@@ -267,6 +294,7 @@ class BflbEflashLoader(object):
         else:
             res = self._bflb_com_if.if_deal_ack()
         return res, data_read
+
 
     # change interface rate
     def com_inf_change_rate(self, section, newrate):
@@ -293,6 +321,7 @@ class BflbEflashLoader(object):
         self._bflb_com_if.if_init(self._bflb_com_device, self._bflb_com_speed, self._chip_type)
         return self._bflb_com_if.if_deal_ack()
 
+
     # main process
     def load_helper_bin(self,
                         interface,
@@ -303,7 +332,7 @@ class BflbEflashLoader(object):
                         reset_revert=True,
                         cutoff_time=0,
                         shake_hand_retry=2,
-                        boot2_load=0):
+                        iap_timeout=0):
         bflb_utils.printf("========= load eflash_loader.bin =========")
         if interface == "jlink":
             bflb_utils.printf("Load eflash_loader.bin via jlink")
@@ -354,9 +383,10 @@ class BflbEflashLoader(object):
             ret = self._bflb_com_img_loader.img_load_process(
                 self._bflb_com_device, self._bflb_boot_speed, self._bflb_boot_speed, helper_file,
                 "", None, do_reset, reset_hold_time, shake_hand_delay, reset_revert, cutoff_time,
-                shake_hand_retry, boot2_load, True)
+                shake_hand_retry, iap_timeout, True)
             bflb_utils.printf("Load helper bin time cost(ms): ", (time.time() * 1000) - start_time)
             return ret, None
+
 
     def load_shake_hand(self,
                         interface,
@@ -366,7 +396,7 @@ class BflbEflashLoader(object):
                         reset_revert=True,
                         cutoff_time=0,
                         shake_hand_retry=2,
-                        boot2_load=0):
+                        iap_timeout=0):
         bflb_utils.printf("========= shakehand with bootrom =========")
         if interface == "jlink":
             bflb_utils.printf("shakehand via jlink")
@@ -384,8 +414,9 @@ class BflbEflashLoader(object):
                                                                 self._bflb_boot_speed, do_reset,
                                                                 reset_hold_time, shake_hand_delay,
                                                                 reset_revert, cutoff_time,
-                                                                shake_hand_retry, boot2_load)
+                                                                shake_hand_retry, iap_timeout)
             return ret, None
+
 
     def get_boot_info(self,
                       interface,
@@ -405,27 +436,67 @@ class BflbEflashLoader(object):
                 "", None, do_reset, reset_hold_time, shake_hand_delay, reset_revert, cutoff_time,
                 shake_hand_retry)
             bootinfo = bootinfo.decode("utf-8")
-            bflb_utils.printf(
-                "========= ChipID: ", bootinfo[34:36] + bootinfo[32:34] + bootinfo[30:32] +
-                bootinfo[28:30] + bootinfo[26:28] + bootinfo[24:26], " =========")
+            if self._chip_type == "bl702":
+                bflb_utils.printf(
+                    "========= ChipID: ", bootinfo[32:34] + bootinfo[34:36] + bootinfo[36:38] + 
+                    bootinfo[38:40] + bootinfo[40:42] + bootinfo[42:44] + bootinfo[44:46] + bootinfo[46:48], " =========")
+            else:
+                bflb_utils.printf(
+                    "========= ChipID: ", bootinfo[34:36] + bootinfo[32:34] + bootinfo[30:32] +
+                    bootinfo[28:30] + bootinfo[26:28] + bootinfo[24:26], " =========")
             bflb_utils.printf("Get bootinfo time cost(ms): ", (time.time() * 1000) - start_time)
             return ret
         else:
             bflb_utils.printf("interface not fit")
             return False
 
+
     def error_code_print(self, code):
         bflb_utils.set_error_code(code)
         bflb_utils.printf("{\"ErrorCode\": \"" + code + "\",\"ErrorMsg\":\"" +
                           bflb_utils.eflash_loader_error_code[code] + "\"}")
 
+
     def img_load_shake_hand(self):
+        iap_sh_time = 0
+        if self._chip_type == "bl702":
+            iap_sh_time = self._iap_shakehand_timeout
+        #print(self._bflb_com_device, self._bflb_com_speed, self._chip_type)
         self._bflb_com_if.if_init(self._bflb_com_device, self._bflb_com_speed, self._chip_type)
-        if self._bflb_com_if.if_shakehand() != "OK":
+        if self._bflb_com_if.if_shakehand(do_reset=False,
+                                          reset_hold_time=100,
+                                          shake_hand_delay=100,
+                                          reset_revert=True,
+                                          cutoff_time=0,
+                                          shake_hand_retry=2,
+                                          iap_timeout=iap_sh_time,
+                                          boot_load=False) != "OK":
             self.error_code_print("0001")
             return False
         self._need_shake_hand = False
         return True
+
+
+    def operate_finish(self, shakehand=0):
+        bflb_utils.printf("Boot from flash")
+        # shake hand
+        if shakehand != 0:
+            bflb_utils.printf(FLASH_ERASE_SHAKE_HAND)
+            if self.img_load_shake_hand() is False:
+                return False
+        else:
+            if self._bflb_com_if is not None:
+                self._bflb_com_if.if_close()
+            self._bflb_com_if.if_init(self._bflb_com_device, self._bflb_com_speed, self._chip_type)
+        # send command
+        cmd_id = bflb_utils.hexstr_to_bytearray(self._com_cmds.get("opt_finish")["cmd_id"])
+        ret, dmy = self.com_process_one_cmd("opt_finish", cmd_id, bytearray(0))
+        if ret.startswith("OK"):
+            return True
+        else:
+            self.error_code_print("000D")
+            return False
+
 
     def boot_from_flash(self, shakehand=0):
         bflb_utils.printf("Boot from flash")
@@ -447,6 +518,7 @@ class BflbEflashLoader(object):
             self.error_code_print("003F")
             return False
 
+
     def reset_cpu(self, shakehand=0):
         bflb_utils.printf("CPU Reset")
         # shake hand
@@ -462,6 +534,7 @@ class BflbEflashLoader(object):
         else:
             self.error_code_print("0004")
             return False
+
 
     def clock_pll_set(self, shakehand, irq_en, speed, clk_para):
         bflb_utils.printf("Clock PLL set")
@@ -496,6 +569,7 @@ class BflbEflashLoader(object):
         time.sleep(0.01)
         return True
 
+
     def close_port(self, shakehand=0):
         if self._bflb_com_if is not None:
             self._bflb_com_if.if_close()
@@ -503,11 +577,13 @@ class BflbEflashLoader(object):
     def efuse_compare(self, read_data, maskdata, write_data):
         i = 0
         for i in range(len(read_data)):
-            if (read_data[i] & maskdata[i]) != write_data[i]:
+            compare_data = read_data[i] & maskdata[i]
+            if (compare_data & write_data[i]) != write_data[i]:
                 bflb_utils.printf("compare fail: ", i)
                 bflb_utils.printf(read_data[i], write_data[i])
                 return False
         return True
+
 
     def get_ecdh_shared_key(self, shakehand=0):
         bflb_utils.printf("========= get ecdh shared key =========")
@@ -545,7 +621,7 @@ class BflbEflashLoader(object):
                 signature = data_read[32:96]
                 signature_r = data_read[32:64]
                 signature_s = data_read[64:96]
-                vk = ecdsa.VerifyingKey.from_pem(open_file(r"utils\pem\bl606p_publickey_uecc.pem").read())
+                vk = ecdsa.VerifyingKey.from_pem(open_file(r"utils\pem\bl808_publickey_uecc.pem").read())
                 try:
                     ret = vk.verify(signature, self.ecdh_decrypt_data(encrypted_data), hashfunc=hashlib.sha256, sigdecode=ecdsa.util.sigdecode_string)
                 except Exception as err:
@@ -562,18 +638,24 @@ class BflbEflashLoader(object):
             bflb_utils.printf("Get shared key fail")
             return False
 
+
     def ecdh_encrypt_data(self, data):
         cryptor = AES.new(bytearray.fromhex(self._ecdh_shared_key[0:32]), AES.MODE_CBC, bytearray(16))
         ciphertext = cryptor.encrypt(data)
         return ciphertext
+
 
     def ecdh_decrypt_data(self, data):
         cryptor = AES.new(bytearray.fromhex(self._ecdh_shared_key[0:32]), AES.MODE_CBC, bytearray(16))
         plaintext = cryptor.decrypt(data)
         return plaintext
 
+
     def efuse_read_mac_addr_process(self, shakehand=1, callback=None):
         readdata = bytearray(0)
+        macLen = 6
+        if self._chip_type == "bl702":
+            macLen = 8
         # shake hand
         if shakehand != 0:
             bflb_utils.printf(FLASH_LOAD_SHAKE_HAND)
@@ -586,13 +668,14 @@ class BflbEflashLoader(object):
             self.error_code_print("0023")
             return False, None
         readdata += data_read
-        crcarray = bflb_utils.get_crc32_bytearray(readdata[:6])
-        if crcarray != readdata[6:10]:
+        crcarray = bflb_utils.get_crc32_bytearray(readdata[:macLen])
+        if crcarray != readdata[macLen:macLen+4]:
             bflb_utils.printf(binascii.hexlify(crcarray))
-            bflb_utils.printf(binascii.hexlify(readdata[6:10]))
+            bflb_utils.printf(binascii.hexlify(readdata[macLen:macLen+4]))
             self.error_code_print("0025")
             return False, None
-        return True, readdata[:6]
+        return True, readdata[:macLen]
+
 
     def efuse_write_mac_addr_process(self, macaddr, shakehand=1, callback=None):
         # shake hand
@@ -607,6 +690,7 @@ class BflbEflashLoader(object):
             self.error_code_print("0024")
             return False, None
         return True, None
+
 
     def efuse_read_main_process(self,
                                 start_addr,
@@ -641,6 +725,7 @@ class BflbEflashLoader(object):
             fp.write(readdata)
             fp.close()
         return True, readdata
+
 
     def efuse_load_main_process(self,
                                 file,
@@ -784,6 +869,7 @@ class BflbEflashLoader(object):
         bflb_utils.printf("Finished")
         return True
 
+
     def efuse_load_specified(self,
                              file,
                              maskfile,
@@ -801,6 +887,7 @@ class BflbEflashLoader(object):
         ret = self.efuse_load_main_process(file, maskfile, efusedata, efusedatamask, verify,
                                            security_write)
         return ret
+
 
     def efuse_load_macaddr(self, macaddr, verify=0, shakehand=0, security_write=False):
         bflb_utils.printf("========= efuse macaddr load =========")
@@ -829,15 +916,19 @@ class BflbEflashLoader(object):
         if ret is False:
             return False
         efusedata = bytearray(efusedata)
-        if efusedata[20:26] == zeromac:
+        sub_module = __import__("libs." + self._chip_type, fromlist=[self._chip_type])
+        slot0_addr = sub_module.efuse_cfg_keys.efuse_mac_slot_offset["slot0"]
+        slot1_addr = sub_module.efuse_cfg_keys.efuse_mac_slot_offset["slot1"]
+        slot2_addr = sub_module.efuse_cfg_keys.efuse_mac_slot_offset["slot2"]
+        if efusedata[int(slot0_addr,10) : int(slot0_addr,10)+6] == zeromac:
             bflb_utils.printf("Efuse load mac slot 0")
-            efuseaddrstr = "20"
-        elif efusedata[108:114] == zeromac:
+            efuseaddrstr = slot0_addr
+        elif efusedata[int(slot1_addr,10) : int(slot1_addr,10)+6] == zeromac:
             bflb_utils.printf("Efuse load mac slot 1")
-            efuseaddrstr = "108"
-        elif efusedata[4:10] == zeromac:
+            efuseaddrstr = slot1_addr
+        elif efusedata[int(slot2_addr,10) : int(slot2_addr,10)+6] == zeromac:
             bflb_utils.printf("Efuse load mac slot 2")
-            efuseaddrstr = "4"
+            efuseaddrstr = slot2_addr
         else:
             bflb_utils.printf("Efuse mac slot 0/1/2 all not empty")
             return False
@@ -853,6 +944,7 @@ class BflbEflashLoader(object):
             return False
         return ret
 
+
     def efuse_load_aes_key(self, type, value, verify=0, shakehand=0, security_write=False):
         # value is like ["000102030405060708090A0B0C0D0E0F","110102030405060708090A0B0C0D0E0F"] or ["000102030405060708090A0B0C0D0E0F"]
         bflb_utils.printf("========= efuse key load =========")
@@ -866,6 +958,7 @@ class BflbEflashLoader(object):
         ret = self.efuse_load_main_process(None, None, efusedata, efusemaskdata, verify,
                                            security_write)
         return ret
+
 
     def efuse_load_data_process(self, data, addr, verify=0, shakehand=0, security_write=False):
         bflb_utils.printf("========= efuse data load =========")
@@ -926,6 +1019,7 @@ class BflbEflashLoader(object):
                 self.error_code_print("0022")
                 return False
 
+
     def flash_read_jedec_id_process(self, callback=None):
         bflb_utils.printf("========= flash read jedec ID =========")
         readdata = bytearray(0)
@@ -945,6 +1039,7 @@ class BflbEflashLoader(object):
         bflb_utils.printf(binascii.hexlify(readdata))
         bflb_utils.printf("Finished")
         return True, readdata[:4]
+
 
     def flash_read_status_reg_process(self, cmd, len, callback=None):
         bflb_utils.printf("========= flash read status register =========")
@@ -970,6 +1065,7 @@ class BflbEflashLoader(object):
         bflb_utils.printf("Finished")
         return True, readdata
 
+
     def flash_write_status_reg_process(self, cmd, len, write_data, callback=None):
         bflb_utils.printf("========= flash write status register =========")
         # shake hand
@@ -991,6 +1087,7 @@ class BflbEflashLoader(object):
             return False, "Write fail"
         bflb_utils.printf("Finished")
         return True, None
+
 
     def flash_erase_main_process(self, start_addr, end_addr, shakehand=0):
         bflb_utils.printf("========= flash erase =========")
@@ -1024,6 +1121,7 @@ class BflbEflashLoader(object):
         self._bflb_com_if.if_set_rx_timeout(2.0)
         return True
 
+
     def flash_chiperase_main_process(self, shakehand=0):
         bflb_utils.printf("Flash Chip Erase")
         # shake hand
@@ -1053,8 +1151,14 @@ class BflbEflashLoader(object):
         self._bflb_com_if.if_set_rx_timeout(2.0)
         return True
 
+
     def flash_set_para_main_process(self, flash_pin, flash_para, shakehand=0):
-        bflb_utils.printf("Set  flash  config ")
+        bflb_utils.printf("Set flash config ")
+        if flash_para != bytearray(0):
+            if flash_para[13:14] == b'\xff':
+                bflb_utils.printf("Skip set flash para due to flash id is 0xFF")
+                # manufacturer id is 0xff, do not need set flash para
+                return True
         # shake hand
         if shakehand != 0:
             bflb_utils.printf("Flash set para shake hand")
@@ -1077,6 +1181,7 @@ class BflbEflashLoader(object):
                 return False
         bflb_utils.printf("Set para time cost(ms): ", (time.time() * 1000) - start_time)
         return True
+
 
     def flash_read_main_process(self,
                                 start_addr,
@@ -1132,6 +1237,73 @@ class BflbEflashLoader(object):
             fp.close()
         return True, readdata
 
+
+    def flash_xip_read_main_process(self,
+                                start_addr,
+                                flash_data_len,
+                                shakehand=0,
+                                file=None,
+                                callback=None):
+        bflb_utils.printf("========= flash read =========")
+        i = 0
+        cur_len = 0
+        readdata = bytearray(0)
+        # shake hand
+        if shakehand != 0:
+            bflb_utils.printf(FLASH_LOAD_SHAKE_HAND)
+            if self.img_load_shake_hand() is False:
+                return False, None
+        start_time = (time.time() * 1000)
+        log = ""
+        cmd_id = bflb_utils.hexstr_to_bytearray(self._com_cmds.get("flash_xip_read_start")["cmd_id"])
+        ret, dmy = self.com_process_one_cmd("flash_xip_read_start", cmd_id, bytearray(0))
+        if ret.startswith("OK") is False:
+            self.error_code_print("0039")
+            return False, None
+        while i < flash_data_len:
+            cur_len = flash_data_len - i
+            if cur_len > self._bflb_com_tx_size - 8:
+                cur_len = self._bflb_com_tx_size - 8
+            cmd_id = bflb_utils.hexstr_to_bytearray(self._com_cmds.get("flash_xip_read")["cmd_id"])
+            data_send = bflb_utils.int_to_4bytearray_l(
+                i + start_addr) + bflb_utils.int_to_4bytearray_l(cur_len)
+            try_cnt = 0
+            while True:
+                ret, data_read = self.com_process_one_cmd("flash_xip_read", cmd_id, data_send)
+                if ret.startswith("OK"):
+                    break
+                if try_cnt < self._checksum_err_retry_limit:
+                    bflb_utils.printf("Retry")
+                    try_cnt += 1
+                else:
+                    self.error_code_print("0035")
+                    return False, None
+            i += cur_len
+            log += ("Read " + str(i) + "/" + str(flash_data_len))
+            if len(log) > 50:
+                bflb_utils.printf(log)
+                log = ""
+            else:
+                log += "\n"
+            if callback is not None:
+                callback(i, flash_data_len, "APP_VR")
+            readdata += data_read
+        cmd_id = bflb_utils.hexstr_to_bytearray(
+            self._com_cmds.get("flash_xip_read_finish")["cmd_id"])
+        ret, dmy = self.com_process_one_cmd("flash_xip_read_finish", cmd_id, bytearray(0))
+        if ret.startswith("OK") is False:
+            self.error_code_print("0039")
+            return False, None
+        bflb_utils.printf(log)
+        bflb_utils.printf("Flash read time cost(ms): ", (time.time() * 1000) - start_time)
+        bflb_utils.printf("Finished")
+        if file is not None:
+            fp = open_file(file, 'wb+')
+            fp.write(readdata)
+            fp.close()
+        return True, readdata
+
+
     def flash_read_sha_main_process(self,
                                    start_addr,
                                    flash_data_len,
@@ -1172,6 +1344,7 @@ class BflbEflashLoader(object):
             fp.write(readdata)
             fp.close()
         return True, readdata
+
 
     def flash_xip_read_sha_main_process(self,
                                        start_addr,
@@ -1233,6 +1406,7 @@ class BflbEflashLoader(object):
             return False, None
         return True, readdata
 
+
     def flash_write_check_main_process(self, shakehand=0):
         bflb_utils.printf("Write check")
         # shake hand
@@ -1258,6 +1432,7 @@ class BflbEflashLoader(object):
                 return False
         return True
 
+
     def flash_load_xz_compress(self, file):
         try:
             xz_filters = [
@@ -1275,6 +1450,7 @@ class BflbEflashLoader(object):
             bflb_utils.printf(e)
             return False, None, None
         return True, flash_data, flash_data_len
+
 
     def flash_load_main_process(self, file, start_addr, erase=1, callback=None):
         fp = open_file(file, 'rb')
@@ -1331,6 +1507,73 @@ class BflbEflashLoader(object):
         bflb_utils.printf("Finished")
         return True
 
+
+    def setOpenFile_zip(self, packet_file):
+        bflb_utils.printf("Unpack file")
+        filename = packet_file
+        try:
+            if filename:
+                efuse_burn = "false"
+                eflash_loader_file = ""
+                zip_file = zipfile.ZipFile(filename)
+                zip_list = zip_file.namelist()
+                for f in zip_list:
+                    if f.find("efusedata.bin") != -1:
+                        efuse_burn = "true"
+                    if f.find("eflash_loader_cfg") != -1:
+                        eflash_loader_file = os.path.join(app_path, 'chips', f)
+                    zip_file.extract(f, os.path.join(app_path, 'chips'))
+                zip_file.close()
+                cfg = BFConfigParser()
+                cfg.read(eflash_loader_file)
+                if cfg.has_option("EFUSE_CFG", "burn_en"):
+                    cfg.set("EFUSE_CFG", "burn_en", efuse_burn)
+                    cfg.write(eflash_loader_file, 'w')
+                # os.remove(latest_zip_file)
+                bflb_utils.printf("Unpack Success")
+        except Exception as err:
+            error = str(err)
+            bflb_utils.printf("Unpack fail: " + error)
+            self.error_code_print("000E")
+
+
+    def flash_cfg_option(self, read_flash_id, flash_para_file, flash_set, id_valid_flag, binfile, \
+                               cfgfile, cfg, create_img_callback=None, create_simple_callback=None):
+        ret = bflb_flash_select.flash_bootheader_config_check(self._chip_name,
+            self._chip_type, read_flash_id, convert_path(binfile), flash_para_file)
+        if ret is False:
+            bflb_utils.printf("flashcfg not match first")
+            # recreate bootinfo.bin
+            if self.is_conf_exist(read_flash_id) is True:
+                bflb_utils.update_cfg(cfg, "FLASH_CFG", "flash_id", read_flash_id)
+                if isinstance(cfgfile, BFConfigParser) == False:
+                    cfg.write(cfgfile, "w+")
+                if create_img_callback is not None:
+                    create_img_callback()
+                elif create_simple_callback is not None:
+                    create_simple_callback()
+            else:
+                self.error_code_print("003D")
+                return False
+            ret = bflb_flash_select.flash_bootheader_config_check(self._chip_name,
+                self._chip_type, read_flash_id, convert_path(binfile), flash_para_file)
+            if ret is False:
+                bflb_utils.printf("flashcfg not match again")
+                self.error_code_print("0040")
+                return False
+            # set flash config
+            if flash_para_file and id_valid_flag!='80':
+                bflb_utils.printf("flash para file: ", flash_para_file)
+                fp = open_file(flash_para_file, 'rb')
+                flash_para = bytearray(fp.read())
+                fp.close()
+                ret = self.flash_set_para_main_process(flash_set, flash_para,
+                                                    self._need_shake_hand)
+                self._need_shake_hand = False
+                if ret is False:
+                    return False
+
+
     def flash_load_tips(self):
         bflb_utils.printf(
             "########################################################################")
@@ -1340,6 +1583,7 @@ class BflbEflashLoader(object):
         bflb_utils.printf("Flash是否被写保护")
         bflb_utils.printf(
             "########################################################################")
+
 
     def flash_load_specified(self,
                              file,
@@ -1408,6 +1652,7 @@ class BflbEflashLoader(object):
                 ret = False
         return ret
 
+
     def log_read_process(self, shakehand=1, callback=None):
         readdata = bytearray(0)
         try:
@@ -1434,6 +1679,7 @@ class BflbEflashLoader(object):
             traceback.print_exc(limit=NUM_ERR, file=sys.stdout)
             return False, None
         return True, readdata
+
 
     def get_active_fwbin_addr(self, ptaddr1, ptaddr2, entry_name, shakehand=1, callback=None):
         fwaddr = 0
@@ -1547,6 +1793,7 @@ class BflbEflashLoader(object):
         ret = self.flash_load_specified(file, fwaddr, 1, verify, 0, callback)
         return ret
 
+
     def get_suitable_conf_name(self, cfg_dir, flash_id):
         conf_files = []
         for home, dirs, files in os.walk(cfg_dir):
@@ -1563,6 +1810,7 @@ class BflbEflashLoader(object):
             return conf_files[0]
         else:
             return ""
+
 
     def get_factory_config_info(self, file, output_file):
         version = 'ver0.0.1'
@@ -1619,6 +1867,34 @@ class BflbEflashLoader(object):
                     lock_file.close()
                     os.remove("lock.txt")
                     return False, csv_mac
+                else:
+                    ret, efusedata = self.efuse_read_main_process(0,
+                                                                128,
+                                                                self._need_shake_hand,
+                                                                file=None,
+                                                                security_read=False)
+                    if ret is False:
+                        return False, csv_mac
+                    efusedata = bytearray(efusedata)
+                    data_efuse = csv_mac[10:12] + csv_mac[8:10] + csv_mac[6:8] + csv_mac[4:6] + csv_mac[2:4] + csv_mac[0:2]
+                    mac_bytearray = bflb_utils.hexstr_to_bytearray(data_efuse)
+                    sub_module = __import__("libs." + self._chip_type, fromlist=[self._chip_type])
+                    slot0_addr = sub_module.efuse_cfg_keys.efuse_mac_slot_offset["slot0"]
+                    slot1_addr = sub_module.efuse_cfg_keys.efuse_mac_slot_offset["slot1"]
+                    slot2_addr = sub_module.efuse_cfg_keys.efuse_mac_slot_offset["slot2"]
+                    bflb_utils.printf(mac_bytearray)
+                    bflb_utils.printf(efusedata[int(slot0_addr, 10):int(slot0_addr, 10)+6])
+                    bflb_utils.printf(efusedata[int(slot1_addr, 10):int(slot1_addr, 10)+6])
+                    bflb_utils.printf(efusedata[int(slot2_addr, 10):int(slot2_addr, 10)+6])
+                    if efusedata[int(slot2_addr,10) : int(slot2_addr,10)+6] == mac_bytearray:
+                        bflb_utils.printf("DeviceName was already write at efuse mac slot 2")
+                        return False, csv_mac
+                    elif efusedata[int(slot1_addr,10) : int(slot1_addr,10)+6] == mac_bytearray:
+                        bflb_utils.printf("DeviceName was already write at efuse mac slot 1")
+                        return False, csv_mac
+                    elif efusedata[int(slot0_addr,10) : int(slot0_addr,10)+6] == mac_bytearray:
+                        bflb_utils.printf("DeviceName was already write at efuse mac slot 0")
+                        return False, csv_mac
             with open(file, 'w', newline='') as f:
                 headers = [
                     'ProductKey', 'DeviceName', 'DeviceSecret', 
@@ -1698,6 +1974,7 @@ class BflbEflashLoader(object):
             return False, csv_mac
         return True, csv_mac
 
+
     def is_conf_exist(self, flash_id):
         if conf_sign:
             cfg_dir = app_path + "/utils/flash-conf/" + cgc.lower_name + '/'
@@ -1709,6 +1986,7 @@ class BflbEflashLoader(object):
         else:
             return True
 
+
     def efuse_flash_loader(self,
                            args,
                            eflash_loader_cfg,
@@ -1716,7 +1994,8 @@ class BflbEflashLoader(object):
                            callback=None,
                            create_simple_callback=None,
                            create_img_callback=None,
-                           macaddr_callback=None):
+                           macaddr_callback=None,
+                           task_num=None):
         ret = None
         bflb_utils.local_log_enable(True)
         bflb_utils.printf("Version: ", bflb_version.eflash_loader_version_text)
@@ -1733,7 +2012,8 @@ class BflbEflashLoader(object):
                                                                    update_cutoff_time,
                                                                    create_simple_callback,
                                                                    create_img_callback,
-                                                                   macaddr_callback)
+                                                                   macaddr_callback,
+                                                                   task_num)
                 if retry == -1:
                     retry = flash_burn_retry
                 if ret is True:
@@ -1834,6 +2114,7 @@ class BflbEflashLoader(object):
                 self._bflb_com_if.if_close()
             return bflb_utils.errorcode_msg()
 
+
     def efuse_flash_loader2(self,
                             options,
                             eflash_loader_cfg,
@@ -1852,6 +2133,7 @@ class BflbEflashLoader(object):
         else:
             self.efuse_flash_loader(options, eflash_loader_cfg, eflash_loader_bin, callback)
 
+
     def efuse_flash_loader_do(self,
                               args,
                               eflash_loader_cfg,
@@ -1860,7 +2142,8 @@ class BflbEflashLoader(object):
                               update_cutoff_time=True,
                               create_simple_callback=None,
                               create_img_callback=None,
-                              macaddr_callback=None):
+                              macaddr_callback=None,
+                              task_num=None):
         bflb_utils.printf("========= eflash loader cmd arguments =========")
 #         for key, value in args.__dict__.items():
 #             print(str(key) + ':' + str(value))
@@ -1869,6 +2152,7 @@ class BflbEflashLoader(object):
         try:
             start = ""
             end = ""
+            packet_file = ""
             file = ""
             efusefile = ""
             massbin = ""
@@ -1889,7 +2173,9 @@ class BflbEflashLoader(object):
             csvaddr = ""
             efuse_para = ""
             create_cfg = ""
+            flash_set = 0
             read_flash_id = 0
+            id_valid_flag = '80'
             if args.config and config_file is None:
                 config_file = args.config
             if args.interface:
@@ -1906,6 +2192,8 @@ class BflbEflashLoader(object):
                 start = args.start
             if args.end:
                 end = args.end
+            if args.packet:
+                packet_file = args.packet
             if args.file:
                 file = args.file
             if args.efusefile:
@@ -1928,6 +2216,10 @@ class BflbEflashLoader(object):
                 load_file = args.loadfile
             if args.mac:
                 macaddr = args.mac
+            if args.iap:
+                self._iap_en = True
+            else:
+                self._iap_en = False
             if args.romfs:
                 romfs_data = args.romfs
             if args.csvfile:
@@ -1945,11 +2237,15 @@ class BflbEflashLoader(object):
             bflb_utils.printf(e)
             self.error_code_print("0002")
             return False, 0
+
+        if packet_file != "":
+            self.setOpenFile_zip(packet_file)
+            return True, 0
         if chip_type:
             self._chip_type = chip_type
         if config_file is None:
             if self._chip_name:
-                config_file = self._chip_name.lower() + "/eflash_loader/eflash_loader_cfg.ini"
+                config_file = "chips/" + self._chip_name.lower() + "/eflash_loader/eflash_loader_cfg.ini"
             else:
                 config_file = "eflash_loader_cfg.ini"
         if args.usage:
@@ -2031,7 +2327,7 @@ class BflbEflashLoader(object):
                 else:
                     self._bflb_auto_download = False
         if xtal_type:
-            eflash_loader_file = self._chip_name.lower(
+            eflash_loader_file = "chips/" + self._chip_name.lower(
             ) + "/eflash_loader/eflash_loader_" + xtal_type.replace('.', 'p').lower() + ".bin"
         if load_file and not eflash_loader_file:
             eflash_loader_file = load_file
@@ -2050,6 +2346,8 @@ class BflbEflashLoader(object):
                 self._bflb_com_speed = int(cfg.get("LOAD_CFG", "speed_uart_load"))
             bflb_utils.printf("com speed: ", self._bflb_com_speed)
             self._bflb_boot_speed = int(cfg.get("LOAD_CFG", "speed_uart_boot"))
+            if self._iap_en is True and self._chip_type == "bl602":
+                self._bflb_boot_speed = self._bflb_com_speed
             if cfg.has_option("LOAD_CFG", "reset_hold_time"):
                 reset_hold_time = int(cfg.get("LOAD_CFG", "reset_hold_time"))
             if cfg.has_option("LOAD_CFG", "shake_hand_delay"):
@@ -2082,7 +2380,12 @@ class BflbEflashLoader(object):
             bflb_utils.printf(interface + " is not supported ")
             return False, flash_burn_retry
         self._need_shake_hand = True
+        ram_load = False
         load_function = 1
+        if args.ram and args.file:
+            ram_load = True
+            eflash_loader_file = file
+
         bflb_utils.printf("Eflash load helper file: ", eflash_loader_file)
         try:
             if args.chipid:
@@ -2096,26 +2399,34 @@ class BflbEflashLoader(object):
 
             if cfg.has_option("LOAD_CFG", "load_function"):
                 load_function = int(cfg.get("LOAD_CFG", "load_function"))
+            if cfg.has_option("LOAD_CFG", "iap_shakehand_timeout"):
+                self._iap_shakehand_timeout = int(cfg.get("LOAD_CFG", "iap_shakehand_timeout"))
+            if self._iap_en is True:
+                if self._chip_type == "bl602" or self._chip_type == "bl702":
+                    if self._iap_shakehand_timeout == 0:
+                        self._iap_shakehand_timeout = 5
+                    if self._chip_type == "bl602":
+                        load_function = 1
+                    else:
+                        load_function = 0
+            if ram_load:
+                load_function = 1
             if load_function == 0:
-                bflb_utils.printf("Not load eflash_loader.bin")
+                bflb_utils.printf("No need load eflash_loader.bin")
             elif load_function == 1:
                 bflb_utils.printf("Eflash load helper file: ", eflash_loader_file)
-                boot2_loader_timeout = 0
-                if cfg.has_option("LOAD_CFG", "boot2_loader_timeout"):
-                    boot2_loader_timeout = int(cfg.get("LOAD_CFG", "boot2_loader_timeout"))
                 if self.load_helper_bin(interface, eflash_loader_file, do_reset, reset_hold_time,
                                         shake_hand_delay, reset_revert, cutoff_time,
-                                        shake_hand_retry, boot2_loader_timeout)[0] is False:
+                                        shake_hand_retry, self._iap_shakehand_timeout)[0] is False:
                     self.error_code_print("0003")
                     return False, flash_burn_retry
+                if ram_load:
+                    return True, flash_burn_retry
             elif load_function == 2:
                 bflb_utils.printf("Bootrom load")
-                boot2_loader_timeout = 0
-                if cfg.has_option("LOAD_CFG", "boot2_loader_timeout"):
-                    boot2_loader_timeout = int(cfg.get("LOAD_CFG", "boot2_loader_timeout"))
                 self.load_shake_hand(interface, do_reset, reset_hold_time, shake_hand_delay,
                                      reset_revert, cutoff_time, shake_hand_retry,
-                                     boot2_loader_timeout)
+                                     self._iap_shakehand_timeout)
                 self._need_shake_hand = False
                 if cfg.has_option("LOAD_CFG", "clock_para"):
                     clock_para_file = cfg.get("LOAD_CFG", "clock_para")
@@ -2144,6 +2455,7 @@ class BflbEflashLoader(object):
                 self.error_code_print("000A")
                 return False, flash_burn_retry
             self._need_shake_hand = False
+            self._macaddr_check_status = True
 
         # for mass_production tool
         if macaddr_callback is not None:
@@ -2163,7 +2475,7 @@ class BflbEflashLoader(object):
             flash_clk_delay = 0
             if cfg.has_option("FLASH_CFG", "decompress_write"):
                 self._decompress_write = (cfg.get("FLASH_CFG", "decompress_write") == "true")
-            if self._chip_type != "bl602" and self._chip_type != "bl606p":
+            if self._chip_type != "bl602" and self._chip_type != "bl808":
                 self._decompress_write = False
             flash_para_file = cfg.get("FLASH_CFG", "flash_para")
             if cfg.get("FLASH_CFG", "flash_pin"):
@@ -2172,7 +2484,7 @@ class BflbEflashLoader(object):
                     flash_pin = int(flash_pin_cfg, 16)
                 else:
                     flash_pin = int(flash_pin_cfg, 10)
-            if self._chip_type == "bl602" or self._chip_type == "bl702" or self._chip_type == "bl606p":
+            if self._chip_type == "bl602" or self._chip_type == "bl702" or self._chip_type == "bl808":
                 if cfg.has_option("FLASH_CFG", "flash_clock_cfg"):
                     clock_div_cfg = cfg.get("FLASH_CFG", "flash_clock_cfg")
                     if clock_div_cfg.startswith("0x"):
@@ -2212,34 +2524,11 @@ class BflbEflashLoader(object):
                 data = binascii.hexlify(data).decode('utf-8')
                 id_valid_flag = data[6:]
                 read_id = data[0:6]
-                flash_id = cfg.get("FLASH_CFG", "flash_id")
                 read_flash_id = read_id
-                if read_id != flash_id:
-                    if self.is_conf_exist(read_id) is True:
-                        bflb_utils.update_cfg(cfg, "FLASH_CFG", "flash_id", read_id)
-                        if isinstance(config_file, BFConfigParser) == False:
-                            cfg.write(config_file, "w+")
-                        if create_img_callback is not None:
-                            create_img_callback()
-                        elif create_simple_callback is not None:
-                            create_simple_callback()
-                    else:
-                        self.error_code_print("003D")
-                        return False, flash_burn_retry
             else:
                 self.error_code_print("0030")
                 return False, flash_burn_retry
-            # set flash config
-            if flash_para_file and id_valid_flag!='80':
-                bflb_utils.printf("flash para file: ", flash_para_file)
-                fp = open_file(flash_para_file, 'rb')
-                flash_para = bytearray(fp.read())
-                fp.close()
-                ret = self.flash_set_para_main_process(flash_set, flash_para,
-                                                       self._need_shake_hand)
-                self._need_shake_hand = False
-                if ret is False:
-                    return False, flash_burn_retry
+
         # '--none' for eflash loader environment init
         if args.none:
             return True, flash_burn_retry
@@ -2251,6 +2540,7 @@ class BflbEflashLoader(object):
             bflb_utils.printf("Program operation")
             # get program type
             if args.flash:
+                flash_para_file = cfg.get("FLASH_CFG", "flash_para")
                 if romfs_data != "":
                     if address == "":
                         bflb_utils.printf("Please set romfs load address")
@@ -2266,6 +2556,10 @@ class BflbEflashLoader(object):
                 elif fwbin:
                     bflb_utils.printf("load firmware bin ", fwbin)
                     fwbin = os.path.abspath(fwbin)
+                    ret = self.flash_cfg_option(read_flash_id, flash_para_file, flash_set, id_valid_flag, fwbin, \
+                                                config_file, cfg, create_img_callback, create_simple_callback)
+                    if ret is False:
+                        return False, flash_burn_retry
                     ret = self.load_firmware_bin(fwbin, verify, self._need_shake_hand, callback)
                     if ret is False:
                         self.error_code_print("003C")
@@ -2276,6 +2570,10 @@ class BflbEflashLoader(object):
                     bflb_utils.printf("load mass bin ", massbin)
                     bflb_utils.printf("========= programming mass ", massbin, " to ", hex(0))
                     massbin = os.path.abspath(massbin)
+                    ret = self.flash_cfg_option(read_flash_id, flash_para_file, flash_set, id_valid_flag, massbin, \
+                                                config_file, cfg, create_img_callback, create_simple_callback)
+                    if ret is False:
+                        return False, flash_burn_retry
                     ret = self.flash_load_specified(massbin, 0x0, 1, verify, self._need_shake_hand,
                                                     callback)
                     if ret is False:
@@ -2292,7 +2590,7 @@ class BflbEflashLoader(object):
                         address = re.compile('\s+').split(cfg.get("FLASH_CFG", "address"))
                     if csvfile and csvaddr:
                         bflb_utils.printf("factory info burn")
-                        csvbin = self._chip_name.lower() + "/img_create_iot/media.bin"
+                        csvbin = "chips/" + self._chip_name.lower() + "/img_create_iot/media.bin"
                         ret, csv_mac = self.get_factory_config_info(csvfile, csvbin)
                         if ret is not False:
                             flash_file.append(csvbin)
@@ -2316,15 +2614,17 @@ class BflbEflashLoader(object):
                         try:
                             ret = False
                             while i < len(flash_file):
+                                if task_num != None:
+                                    flash_file[i] = "task" + str(task_num) + "/" + flash_file[i]
                                 bflb_utils.printf("Dealing Index ", i)
-                                bflb_utils.printf("========= programming ",
-                                                  convert_path(flash_file[i]), " to 0x", address[i])
-                                flash_para_file = cfg.get("FLASH_CFG", "flash_para")
-                                ret = bflb_flash_select.flash_bootheader_config_check(self._chip_name,
-                                    self._chip_type, read_flash_id, convert_path(flash_file[i]),
-                                    flash_para_file)
+                                if self._iap_en is True:
+                                    bflb_utils.printf("========= programming ", convert_path(flash_file[i]))
+                                else:
+                                    bflb_utils.printf("========= programming ",
+                                                      convert_path(flash_file[i]), " to 0x", address[i])
+                                ret = self.flash_cfg_option(read_flash_id, flash_para_file, flash_set, id_valid_flag, flash_file[i], \
+                                                            config_file, cfg, create_img_callback, create_simple_callback)
                                 if ret is False:
-                                    self.error_code_print("0040")
                                     return False, flash_burn_retry
                                 ret = self.flash_load_specified(convert_path(flash_file[i]),
                                                                 int(address[i], 16), erase, verify,
@@ -2377,11 +2677,11 @@ class BflbEflashLoader(object):
                 if efuse_para:
                     loadflag = False
                     bflb_utils.printf("write efuse para")
-                    cfgfile = self._chip_name.lower(
-                    ) + "/efuse_bootheader/efuse_bootheader_cfg.ini"
+                    cfgfile = "chips/" + self._chip_name.lower(
+                    ) + "/img_create_iot/efuse_bootheader_cfg.ini"
                     if os.path.isfile(cfgfile) is False:
                         shutil.copyfile(
-                            self._chip_name.lower() +
+                            "chips/" + self._chip_name.lower() +
                             "/efuse_bootheader/efuse_bootheader_cfg.conf", cfgfile)
                     sub_module = __import__("libs." + self._chip_type, fromlist=[self._chip_type])
                     efuse_data, mask = bflb_efuse_boothd_create.update_data_from_cfg(
@@ -2408,6 +2708,8 @@ class BflbEflashLoader(object):
                     else:
                         efuse_file = cfg.get("EFUSE_CFG", "file")
                         mask_file = cfg.get("EFUSE_CFG", "maskfile")
+                    if task_num != None:
+                        efuse_file = "task" + str(task_num) + "/" + efuse_file
                     efuse_load = True
                     efuse_verify = 1
                     if cfg.has_option("EFUSE_CFG", "burn_en"):
@@ -2416,7 +2718,7 @@ class BflbEflashLoader(object):
                         if cfg.get("EFUSE_CFG", "factory_mode") != "true":
                             efuse_verify = 0
                     security_write = (cfg.get("EFUSE_CFG", "security_write") == "true")
-                    if efuse_load:
+                    if efuse_load and self._iap_en is False:
                         ret = self.efuse_load_specified(efuse_file, mask_file, bytearray(0),
                                                         bytearray(0), efuse_verify,
                                                         self._need_shake_hand, security_write)
@@ -2427,7 +2729,7 @@ class BflbEflashLoader(object):
                 self._need_shake_hand = False
         # erase
         if args.erase:
-            bflb_utils.printf("Erase flash operation\n")
+            bflb_utils.printf("Erase flash operation")
             if end == "0":
                 ret = self.flash_chiperase_main_process(self._need_shake_hand)
                 if ret is False:
@@ -2461,8 +2763,12 @@ class BflbEflashLoader(object):
                     return False, flash_burn_retry
         if cpu_reset:
             self.reset_cpu()
+        if self._iap_en is True and self._chip_type == "bl702":
+            self.reset_cpu()
         self._macaddr_check = mac_addr
+        self._macaddr_check_status = False
         return True, flash_burn_retry
+
 
     def usage(self):
         bflb_utils.printf("-e --start=00000000 --end=0000FFFF -c config.ini")

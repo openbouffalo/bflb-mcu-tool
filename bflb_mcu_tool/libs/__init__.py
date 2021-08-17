@@ -9,6 +9,7 @@ import ecdsa
 from . import bflb_version
 from . import bflb_interface_jlink
 from . import bflb_interface_uart
+from . import bflb_interface_sdio
 from . import bflb_interface_openocd
 from . import bflb_ecdh
 from . import bflb_eflash_loader

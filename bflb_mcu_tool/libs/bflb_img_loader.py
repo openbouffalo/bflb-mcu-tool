@@ -63,7 +63,7 @@ class BflbImgLoader(object):
                 "data_len": "00b0",
                 "callback": None
             },
-            "606p_load_boot_header": {
+            "808_load_boot_header": {
                 "cmd_id": "11",
                 "data_len": "0180",
                 "callback": None
@@ -173,7 +173,7 @@ class BflbImgLoader(object):
                 tmp = bflb_utils.bytearray_reverse(read_data[120:124])
                 self._segcnt = bflb_utils.bytearray_to_int(tmp)
                 bflb_utils.printf("segcnt is ", self._segcnt)
-            elif section == "606p_load_boot_header":
+            elif section == "808_load_boot_header":
                 tmp = bflb_utils.bytearray_reverse(read_data[136:140])
                 self._segcnt = bflb_utils.bytearray_to_int(tmp)
                 bflb_utils.printf("segcnt is ", self._segcnt)
@@ -255,7 +255,7 @@ class BflbImgLoader(object):
     def boot_install_cmds_callback(self):
         self._bootrom_cmds.get("get_boot_info")["callback"] = self.boot_process_load_cmd
         self._bootrom_cmds.get("load_boot_header")["callback"] = self.boot_process_load_cmd
-        self._bootrom_cmds.get("606p_load_boot_header")["callback"] = self.boot_process_load_cmd
+        self._bootrom_cmds.get("808_load_boot_header")["callback"] = self.boot_process_load_cmd
         self._bootrom_cmds.get("load_publick_key")["callback"] = self.boot_process_load_cmd
         self._bootrom_cmds.get("load_publick_key2")["callback"] = self.boot_process_load_cmd
         self._bootrom_cmds.get("load_signature")["callback"] = self.boot_process_load_cmd
@@ -324,7 +324,7 @@ class BflbImgLoader(object):
                             reset_revert=True,
                             cutoff_time=0,
                             shake_hand_retry=2,
-                            boot2_load=0,
+                            iap_timeout=0,
                             boot_load=True):
         self.bflb_boot_if.if_init(comnum, sh_baudrate, self._chip_type)
 
@@ -333,7 +333,7 @@ class BflbImgLoader(object):
             self.bflb_boot_if.if_set_602a0_download_fix(False)
         ret = self.bflb_boot_if.if_shakehand(do_reset, reset_hold_time, shake_hand_delay,
                                              reset_revert, cutoff_time, shake_hand_retry,
-                                             boot2_load, boot_load)
+                                             iap_timeout, boot_load)
         if self._chip_type == "bl602":
             self.bflb_boot_if.if_set_602a0_download_fix(False)
         if ret != "OK":
@@ -364,9 +364,14 @@ class BflbImgLoader(object):
         data_read = binascii.hexlify(data_read)
         bflb_utils.printf("data read is ", data_read)
         bootinfo = data_read.decode("utf-8")
-        bflb_utils.printf(
-            "========= ChipID: ", bootinfo[34:36] + bootinfo[32:34] + bootinfo[30:32] +
-            bootinfo[28:30] + bootinfo[26:28] + bootinfo[24:26], " =========")
+        if self._chip_type == "bl702":
+            bflb_utils.printf(
+                "========= ChipID: ", bootinfo[32:34] + bootinfo[34:36] + bootinfo[36:38] + 
+                bootinfo[38:40] + bootinfo[40:42] + bootinfo[42:44] + bootinfo[44:46] + bootinfo[46:48], " =========")
+        else:
+            bflb_utils.printf(
+                "========= ChipID: ", bootinfo[34:36] + bootinfo[32:34] + bootinfo[30:32] +
+                bootinfo[28:30] + bootinfo[26:28] + bootinfo[24:26], " =========")
         # bflb_utils.printf(int(data_read[10:12], 16))
         sign = 0
         encrypt = 0
@@ -376,7 +381,7 @@ class BflbImgLoader(object):
         elif self._chip_type == "bl602" or self._chip_type == "bl702":
             sign = int(data_read[8:10], 16)
             encrypt = int(data_read[10:12], 16)
-        elif self._chip_type == "bl606p":
+        elif self._chip_type == "bl808":
             if group == 0:
                 sign = int(data_read[8:10], 16)
                 encrypt = int(data_read[12:14], 16)
@@ -402,8 +407,8 @@ class BflbImgLoader(object):
             self._imge_fp = open(file, 'rb')
 
         # start to process load flow
-        if self._chip_type == "bl606p":
-            ret, dmy = self.boot_process_one_section("606p_load_boot_header", 0)
+        if self._chip_type == "bl808":
+            ret, dmy = self.boot_process_one_section("808_load_boot_header", 0)
         else:
             ret, dmy = self.boot_process_one_section("load_boot_header", 0)
         if ret.startswith("OK") is False:
@@ -412,14 +417,14 @@ class BflbImgLoader(object):
             ret, dmy = self.boot_process_one_section("load_publick_key", 0)
             if ret.startswith("OK") is False:
                 return ret
-            if self._chip_type == "bl60x" or self._chip_type == "bl606p":
+            if self._chip_type == "bl60x" or self._chip_type == "bl808":
                 ret, dmy = self.boot_process_one_section("load_publick_key2", 0)
                 if ret.startswith("OK") is False:
                     return ret
             ret, dmy = self.boot_process_one_section("load_signature", 0)
             if ret.startswith("OK") is False:
                 return ret
-            if self._chip_type == "bl60x" or self._chip_type == "bl606p":
+            if self._chip_type == "bl60x" or self._chip_type == "bl808":
                 ret, dmy = self.boot_process_one_section("load_signature2", 0)
                 if ret.startswith("OK") is False:
                     return ret
@@ -510,12 +515,12 @@ class BflbImgLoader(object):
                          reset_revert=True,
                          cutoff_time=0,
                          shake_hand_retry=2,
-                         boot2_load=0,
+                         iap_timeout=0,
                          boot_load=True):
         bflb_utils.printf("========= image get bootinfo =========")
         ret = self.img_load_shake_hand(comnum, sh_baudrate, wk_baudrate, do_reset, reset_hold_time,
                                        shake_hand_delay, reset_revert, cutoff_time,
-                                       shake_hand_retry, boot2_load, boot_load)
+                                       shake_hand_retry, iap_timeout, boot_load)
         if ret == "shake hand fail" or ret == "change rate fail":
             bflb_utils.printf("shake hand fail")
             self.bflb_boot_if.if_close()
@@ -543,13 +548,13 @@ class BflbImgLoader(object):
                          reset_revert=True,
                          cutoff_time=0,
                          shake_hand_retry=2,
-                         boot2_load=0,
+                         iap_timeout=0,
                          boot_load=True):
         bflb_utils.printf("========= image load =========")
         success = True
         ret = self.img_load_shake_hand(comnum, sh_baudrate, wk_baudrate, do_reset, reset_hold_time,
                                        shake_hand_delay, reset_revert, cutoff_time,
-                                       shake_hand_retry, boot2_load, boot_load)
+                                       shake_hand_retry, iap_timeout, boot_load)
         if ret == "shake hand fail" or ret == "change rate fail":
             bflb_utils.printf("shake hand fail")
             self.bflb_boot_if.if_close()

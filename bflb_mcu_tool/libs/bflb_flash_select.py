@@ -89,7 +89,7 @@ def update_flash_cfg_data_do(chipname, chiptype, flash_id):
     sub_module = __import__("libs." + chiptype, fromlist=[chiptype])
     conf_name = sub_module.flash_select_do.get_suitable_file_name(cfg_dir, flash_id)
     if os.path.isfile(cfg_dir + conf_name) == False:
-        return False
+        return None, None, None, None, None
     return update_data_from_cfg(sub_module.bootheader_cfg_keys.bootheader_cfg_keys, cfg_dir + conf_name)
 
 
@@ -98,8 +98,11 @@ def flash_bootheader_config_check(chipname, chiptype, flashid, file, parafile):
     flash_magic_code = 0x47464346
     offset, flashCfgLen, data, flashCrcOffset, crcOffset =\
         update_flash_cfg_data_do(chipname, chiptype, flashid)
+    if data is None:
+        offset = 12
+        flashCfgLen = 84
 
-    if parafile != "":
+    if parafile != "" and data != None:
         fp = open(os.path.join(app_path, parafile), 'wb')
         fp.write(data)
         fp.close()
@@ -109,13 +112,20 @@ def flash_bootheader_config_check(chipname, chiptype, flashid, file, parafile):
     fp.close()
     i = 0
     length = 128
+    flashCfg = bytearray(256)
     while i < length:
         if rdata[i:i + 4] == bflb_utils.int_to_4bytearray_l(magic_code):
             if rdata[i + 8:i + 12] == bflb_utils.int_to_4bytearray_l(flash_magic_code):
-                data[2:4] = rdata[i + 14:i + 16]
+                if data != None:
+                    data[2:4] = rdata[i + 14:i + 16]
                 flashCfg = rdata[i + offset:i + offset + flashCfgLen]
-                if data != flashCfg:
-                    return False
+                if data != None:
+                    if data != flashCfg:
+                        if flashCfg[13:14] != b'\xff':
+                            return False
+                else:
+                    if flashCfg[13:14] != b'\xff':
+                        return False
         i += 4
     return True
 
@@ -154,8 +164,21 @@ def update_flash_cfg_data(chipname, chiptype, flash_id, cfg, bh_cfg_file, cfg_ke
     return True
 
 
+def check_basic_flash_cfg(cfg_file, section):
+    if os.path.isfile(cfg_file) is False:
+        return False
+    cfg = BFConfigParser()
+    cfg.read(cfg_file)
+    if cfg.has_option(section, "mfg_id"):
+        if cfg.get(section, "mfg_id") == "0xff" or cfg.get(section, "mfg_id") == "0xFF":
+            return True
+    return False
+
+
 def update_flash_cfg(chipname, chiptype, flash_id, file=None, create=False, section=None):
     sub_module = __import__("libs." + chiptype, fromlist=[chiptype])
+    if check_basic_flash_cfg(file, section):
+        return True
     if sub_module.flash_select_do.update_flash_cfg_do(chipname, chiptype, flash_id, file, create, section) == False:
         return False
     return True

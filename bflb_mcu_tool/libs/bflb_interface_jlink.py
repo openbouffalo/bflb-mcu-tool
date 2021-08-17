@@ -24,11 +24,16 @@ import os
 import sys
 import time
 import binascii
+import traceback
 import struct
 import subprocess
 
 import pylink
 
+try:
+    import bflb_path
+except ImportError:
+    from libs import bflb_path
 from libs import bflb_utils
 from libs.bflb_utils import app_path
 
@@ -96,7 +101,10 @@ class BflbJLinkPort(object):
             return False
 
     def reset_cpu(self, ms=0, halt=True):
-        self._jlink.reset(ms, halt)
+        if self._chiptype != "bl60x":
+            self._jlink.set_reset_pin_low()
+            self._jlink.set_reset_pin_high()
+        return self._jlink.reset(ms, False)
 
     def set_pc_msp(self, pc, msp):
         if self._jlink.halted() is False:
@@ -238,7 +246,11 @@ class BflbJLinkPort(object):
                      do_reset=False,
                      reset_hold_time=100,
                      shake_hand_delay=100,
-                     reset_revert=True):
+                     reset_revert=True,
+                     cutoff_time=0,
+                     shake_hand_retry=2,
+                     iap_timeout=0,
+                     boot_load=False):
         self.if_write(bytearray(1))
         success, ack = self.if_read(2)
         bflb_utils.printf(binascii.hexlify(ack))
@@ -295,3 +307,15 @@ class BflbJLinkPort(object):
         bflb_utils.printf("Not ack OK")
         bflb_utils.printf(ack)
         return ack, None
+
+if __name__ == '__main__':
+    try:
+        eflash_loader_t = BflbJLinkPort()
+        eflash_loader_t.if_init("", 1000, "bl602")
+        bflb_utils.printf("reset test")
+        res = eflash_loader_t.reset_cpu(0, False)
+        bflb_utils.printf(res)
+    except Exception as e:
+            NUM_ERR = 5
+            bflb_utils.printf(e)
+            traceback.print_exc(limit=NUM_ERR, file=sys.stdout)

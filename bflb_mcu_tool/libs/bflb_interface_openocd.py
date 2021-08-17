@@ -39,7 +39,7 @@ openocd_path = os.path.join(app_path, "utils/openocd", "openocd.exe")
 
 class ThreadOpenocdServer(threading.Thread):
 
-    def __init__(self, chiptype="bl60x", device="ft2232"):
+    def __init__(self, chiptype="bl602", device="rv_dbg_plus"):
         threading.Thread.__init__(self)
         self.timeToQuit = threading.Event()
         self.timeToQuit.clear()
@@ -51,13 +51,27 @@ class ThreadOpenocdServer(threading.Thread):
 
     def run(self):
         cmd = ""
-        if self._device == "ft2232":
+        if self._device == "rv_dbg_plus":
             if self._chiptype == "bl602":
-                cmd = openocd_path + " -f utils/openocd/if_bflb_dbg.cfg -f utils/openocd/tgt_602.cfg"
+                cmd = openocd_path + " -f " + \
+                      app_path + "/utils/openocd/if_rv_dbg_plus.cfg -f " + \
+                      app_path + "/utils/openocd/tgt_602.cfg"
             else:
-                cmd = openocd_path + " -f utils/openocd/if_bflb_dbg.cfg -f utils/openocd/tgt_702.cfg"
+                cmd = openocd_path + " -f " + \
+                      app_path + "/utils/openocd/if_rv_dbg_plus.cfg -f " + \
+                      app_path + "/utils/openocd/tgt_702.cfg"
+        elif self._device == "ft2232hl":
+            if self._chiptype == "bl602":
+                cmd = openocd_path + " -f " + \
+                      app_path + "/utils/openocd/if_bflb_dbg.cfg -f " + \
+                      app_path + "/utils/openocd/tgt_602.cfg"
+            else:
+                cmd = openocd_path + " -f " + \
+                      app_path + "/utils/openocd/if_bflb_dbg.cfg -f " + \
+                      app_path + "/utils/openocd/tgt_702.cfg"
         else:
-            cmd = openocd_path + " -f utils/openocd/openocd-usb-sipeed.cfg"
+            cmd = openocd_path + " -f " + \
+                  app_path + "/utils/openocd/openocd-usb-sipeed.cfg"
         p = subprocess.Popen(cmd,
                              shell=True,
                              stdin=subprocess.PIPE,
@@ -99,12 +113,13 @@ class BflbOpenocdPort(object):
                 self.tn.open("127.0.0.1", port=4444, timeout=10)
                 # time.sleep(0.1)
                 # self.tn.write("set architecture riscv:rv32\r\n".encode('ascii'))
-                self.tn.write(("adapter_khz " + str(rate)).encode('ascii') + b"\n")
+                self.tn.write(("adapter speed " + str(rate)).encode('ascii') + b"\n")
                 self.tn.write("WaitCmd\n".encode('ascii'))
                 self.tn.read_until("\"WaitCmd\"".encode('ascii'), timeout=10)
             except Exception:
                 bflb_utils.printf('Failed to connect openocd server')
                 bflb_utils.set_error_code("0009")
+                self.if_close()
             return False
 
     def if_set_rx_timeout(self, val):
@@ -241,7 +256,11 @@ class BflbOpenocdPort(object):
                      do_reset=False,
                      reset_hold_time=100,
                      shake_hand_delay=100,
-                     reset_revert=True):
+                     reset_revert=True,
+                     cutoff_time=0,
+                     shake_hand_retry=2,
+                     iap_timeout=0,
+                     boot_load=False):
         self.if_clear_buff()
         self.if_write(bytearray(1))
         success, ack = self.if_read(2)
@@ -252,7 +271,11 @@ class BflbOpenocdPort(object):
         return "FL"
 
     def if_close(self):
+        if self.tn.get_socket():
+            self.tn.write("shutdown\n".encode('ascii'))
+            time.sleep(0.05)
         self.tn.close()
+        self._openocd_th.stop()
         self._inited = False
 
     def if_deal_ack(self):

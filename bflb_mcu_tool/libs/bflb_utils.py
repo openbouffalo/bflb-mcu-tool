@@ -93,7 +93,7 @@ else:
         "bl562": "bl602",
         "bl602": "bl602",
         "bl702": "bl702",
-        "bl606p": "bl606p",
+        "bl808": "bl808",
     }
 
 # all in hex mode
@@ -173,6 +173,8 @@ if conf_sign:
         "000A": "REPEAT BURN",
         "000B": "CONFIG FILE NOT FOUND",
         "000C": "SET CLOCK PLL FAIL",
+        "000D": "SET OPT FINISH FAIL",
+        "000E": "IMPORT PACKET FAIL",
         "0020": "EFUSE READ FAIL",
         "0021": "EFUSE WRITE FAIL",
         "0022": "EFUSE COMPARE FAIL",
@@ -306,6 +308,8 @@ else:
         "000A": "BFLB REPEAT BURN",
         "000B": "BFLB CONFIG FILE NOT FOUND",
         "000C": "BFLB SET CLOCK PLL FAIL",
+        "000D": "BFLB SET OPT FINISH FAIL",
+        "000E": "BFLB IMPORT PACKET FAIL",
         "0020": "BFLB EFUSE READ FAIL",
         "0021": "BFLB EFUSE WRITE FAIL",
         "0022": "BFLB EFUSE COMPARE FAIL",
@@ -606,6 +610,17 @@ def img_create_encrypt_data(data_bytearray, key_bytearray, iv_bytearray, flash_i
     return ciphertext
 
 
+def aes_decrypt_data(data, key_bytearray, iv_bytearray, flash_img):
+    if flash_img == 0:
+        cryptor = AES.new(key_bytearray, AES.MODE_CBC, iv_bytearray)
+        plaintext = cryptor.decrypt(data)
+    else:
+        iv = Counter.new(128, initial_value=int(binascii.hexlify(iv_bytearray), 16))
+        cryptor = AES.new(key_bytearray, AES.MODE_CTR, counter=iv)
+        plaintext = cryptor.decrypt(data)
+    return plaintext
+
+
 def open_file(file, mode='rb'):
     fp = open(os.path.join(app_path, file), mode)
     return fp
@@ -669,7 +684,8 @@ def serial_enumerate():
         ports = []
         for p, d, h in comports():
             if "Virtual" in d or not p:
-                continue 
+                if "STM" not in d:
+                    continue 
             if "PID=1D6B" in h.upper():
                 ser_value = h.split(" ")[2][4:]
                 if ser_value not in sdio_file_ser_dict:
@@ -746,6 +762,7 @@ def eflash_loader_parser_init():
     parser.add_argument("--usage", dest="usage", action="store_true", help="display usage")
     parser.add_argument("--flash", dest="flash", action="store_true", help="target is flash")
     parser.add_argument("--efuse", dest="efuse", action="store_true", help="target is efuse")
+    parser.add_argument("--ram", dest="ram", action="store_true", help="target is ram")
     parser.add_argument("-w", "--write", dest="write", action="store_true", help="write to flash/efuse")
     parser.add_argument("-e", "--erase", dest="erase", action="store_true", help="erase flash")
     parser.add_argument("-r", "--read", dest="read", action="store_true", help="read from flash/efuse")
@@ -760,6 +777,7 @@ def eflash_loader_parser_init():
     parser.add_argument("--addr", dest="addr", help="address to write")
     parser.add_argument("--mac", dest="mac", help="mac address to write")
     parser.add_argument("--file", dest="file", help="file to store read data or file to write")
+    parser.add_argument("--packet", dest="packet", help=" import packet to replace burn file")
     parser.add_argument("--efusefile", dest="efusefile", help="efuse file to write efuse")
     parser.add_argument("--data", dest="data", help="data to write")
     parser.add_argument("--mass", dest="mass", help="load mass bin")
@@ -770,6 +788,7 @@ def eflash_loader_parser_init():
     parser.add_argument("--csvfile", dest="csvfile", help="csv file contains 3/5 tuples")
     parser.add_argument("--csvaddr", dest="csvaddr", help="address to write for csv file")
     parser.add_argument("--para", dest="para", help="efuse para")
+    parser.add_argument("--iap", dest="iap", action="store_true", help="iap page config")
     parser.add_argument("--createcfg", dest="createcfg", help="img create cfg file")
     parser.add_argument("--key", dest="key", help="aes key for socket")
     parser.add_argument("--ecdh", dest="ecdh", action="store_true", help="open ecdh function")

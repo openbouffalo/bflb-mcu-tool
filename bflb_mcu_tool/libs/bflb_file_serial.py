@@ -7,7 +7,6 @@ import serial
 import hashlib
 from binascii import *
 from libs import bflb_utils
-from future.backports.http.client import OK
 
 try:
     from serial.tools.list_ports import comports

@@ -19,27 +19,55 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #  SOFTWARE.
 
-
 import os
 import sys
 import time
 import socket
 import signal
+import argparse
 import binascii
-
-from Crypto.Cipher import AES
+from ecdsa import ECDH, NIST256p
 
 try:
-    import bflb_path
-except ImportError:
-    from libs import bflb_path
-from libs import bflb_utils
-from libs import bflb_ecdh
-from libs.bflb_utils import eflash_loader_parser_init
+    #import Crypto.Util.Counter
+    from Cryptodome.Util import Counter
+    from Cryptodome.Cipher import AES
+    from Cryptodome.Hash import SHA256
+    import ecdsa
+except:
+    print("Import Crypto and ecdsa package error!!")
 
 ecdh_enable = False
 key = None
 
+
+class BLECDH:
+    def __init__(self, curve=NIST256p):
+        self.ecdh = ECDH(curve)
+        self.local_public_key = None
+        self.sharedsecret = ""
+
+    def create_public_key(self):
+        self.ecdh.generate_private_key()
+        self.local_public_key = self.ecdh.get_public_key()
+        ret = binascii.hexlify(self.local_public_key.to_string()).decode("utf-8")
+        return ret
+
+    def create_shared_key(self, peer_pk):
+        self.ecdh.load_received_public_key_bytes(binascii.unhexlify(peer_pk))
+        self.sharedsecret = self.ecdh.generate_sharedsecret_bytes()
+        ret = binascii.hexlify(self.sharedsecret).decode("utf-8")
+        print("secret key:")
+        print(ret)
+        return ret
+
+def eflash_loader_parser_init():
+    parser = argparse.ArgumentParser(description="bouffalolab eflash loader client command")
+    parser.add_argument("--usage", dest="usage", action="store_true", help="display usage")
+    parser.add_argument("-p", "--port", dest="port", help="specify UDP port")
+    parser.add_argument("--key", dest="key", help="aes key for socket")
+    parser.add_argument("--ecdh", dest="ecdh", action="store_true", help="open ecdh function")
+    return parser
 
 def create_encrypt_data(data_bytearray, key_bytearray, iv_bytearray):
     cryptor = AES.new(key_bytearray, AES.MODE_CBC, iv_bytearray)
@@ -75,7 +103,7 @@ def udp_socket_send_client(udp_socket_client, send_address, key=None):
         os.kill(os.getpid(), signal.SIGKILL)
     else:
         if ecdh_enable:
-            tmp_ecdh = bflb_ecdh.BflbEcdh()
+            tmp_ecdh = BLECDH()
             csk = tmp_ecdh.create_public_key()
             ecdh_private_key = binascii.hexlify(
                 tmp_ecdh.ecdh.private_key.to_string()).decode("utf-8")
@@ -139,7 +167,7 @@ if __name__ == '__main__':
         key = args.key
     if args.ecdh:
         ecdh_enable = True
-        bflb_utils.printf("ECDH Enable")
+        print("ECDH Enable")
     else:
         ecdh_enable = False
     if args.usage:

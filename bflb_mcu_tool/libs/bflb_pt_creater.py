@@ -52,7 +52,7 @@ class PtCreater(object):
                 bflb_utils.printf("Entry name is too long!")
                 return False
             entry_table[36 * entry_cnt + 3:36 * entry_cnt + 3 +
-                        len(entry_name)] = bytearray(entry_name, "utf-8") + bytearray(0)
+                        len(entry_name)] = bytearray(entry_name, "utf-8") + bytearray(0) 
             entry_table[36 * entry_cnt + 12:36 * entry_cnt +
                         16] = bflb_utils.int_to_4bytearray_l(entry_addr0)
             entry_table[36 * entry_cnt + 16:36 * entry_cnt +
@@ -61,6 +61,8 @@ class PtCreater(object):
                         24] = bflb_utils.int_to_4bytearray_l(entry_maxlen0)
             entry_table[36 * entry_cnt + 24:36 * entry_cnt +
                         28] = bflb_utils.int_to_4bytearray_l(entry_maxlen1)
+            entry_table[36 * entry_cnt + 28:36 * entry_cnt +
+                        32] = bflb_utils.int_to_4bytearray_l(entry_len)
             if "age" in item:
                 entry_age = item["age"]
                 entry_table[36 * entry_cnt + 32:36 * entry_cnt +

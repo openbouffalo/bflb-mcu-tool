@@ -42,8 +42,8 @@ def bootheader_update_flash_pll_crc(bootheader_data, chiptype):
     bootheader_data[flash_cfg_start + flash_cfg_len - 4:flash_cfg_start + flash_cfg_len] = crcarray
     pll_cfg_start = flash_cfg_start + flash_cfg_len
     pll_cfg_len = 4 + 8 + 4
-    if chiptype == "bl606p":
-        pll_cfg_len = 4 + 16 + 4
+    if chiptype == "bl808":
+        pll_cfg_len = 4 + 20 + 4
     # magic+......+CRC32
     pll_cfg = bootheader_data[pll_cfg_start + 4:pll_cfg_start + pll_cfg_len - 4]
     crcarray = bflb_utils.get_crc32_bytearray(pll_cfg)
@@ -134,7 +134,7 @@ def bootheader_create_do(chipname, chiptype, config_file, section, output_file=N
             bh_data[8:12] = bytearray(4)
             # clear clock magic
             bh_data[100:104] = bytearray(4)
-            if chiptype == "bl606p":
+            if chiptype == "bl808":
                 fp.write(bh_data[0:384])
             else:
                 fp.write(bh_data[0:176])
@@ -142,7 +142,7 @@ def bootheader_create_do(chipname, chiptype, config_file, section, output_file=N
             fp.write(bh_data)
         fp.close()
 
-        if chiptype == "bl606p":
+        if chiptype == "bl808":
             if section == "BOOTHEADER_GROUP0_CFG":
                 fp = open(efuse_bootheader_path + "/clock_para.bin", 'wb+')
                 fp.write(bh_data[100:100 + 24])
@@ -155,7 +155,7 @@ def bootheader_create_do(chipname, chiptype, config_file, section, output_file=N
             fp.write(bh_data[12:12 + 84])
             fp.close()
     except Exception as e:
-        bflb_utils.printf("bootheader_create_do  fail!!")
+        bflb_utils.printf("bootheader_create_do fail!!")
         bflb_utils.printf(e)
         traceback.print_exc(limit=5, file=sys.stdout)
 
@@ -230,12 +230,12 @@ def run():
         "bl562": "bl602",
         "bl602": "bl602",
         "bl702": "bl702",
-        "bl606p": "bl606p",
+        "bl808": "bl808",
     }
     chipname = sys.argv[1]
     chiptype = chip_dict[chipname]
     img_create_path = os.path.join(chip_path, chipname, "img_create_mcu")
-    bh_cfg_file = img_create_path + "/bootheader_cfg.ini"
+    bh_cfg_file = img_create_path + "/efuse_bootheader_cfg.ini"
     bh_file = img_create_path + "/bootheader.bin"
     bootheader_create_process(chipname, chiptype, bh_cfg_file, bh_file,
         img_create_path + "/bootheader_dummy.bin")

@@ -84,7 +84,11 @@ class BflbSdioPort(object):
                      do_reset=False,
                      reset_hold_time=100,
                      shake_hand_delay=100,
-                     reset_revert=True):
+                     reset_revert=True,
+                     cutoff_time=0,
+                     shake_hand_retry=2,
+                     iap_timeout=0,
+                     boot_load=False):
         self.if_write(bytearray(self._if_get_sync_bytes(8)))
         success, ack = self.if_read(2)
         bflb_utils.printf(binascii.hexlify(ack))

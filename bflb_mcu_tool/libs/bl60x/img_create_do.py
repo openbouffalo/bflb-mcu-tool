@@ -9,6 +9,7 @@ import ecdsa
 from libs import bflb_utils
 from libs.bflb_utils import open_file, img_create_sha256_data, img_create_encrypt_data
 from libs.bflb_configobj import BFConfigParser
+from libs.bl60x.bootheader_cfg_keys import bootheader_len as header_len
 
 
 keyslot0 = 28
@@ -490,8 +491,8 @@ def img_create_update_bootheader(bootheader_data, hash, seg_cnt):
         # do nothing
         bflb_utils.printf("Header crc ignored")
     else:
-        hd_crcarray = bflb_utils.get_crc32_bytearray(bootheader_data[0:176 - 4])
-        bootheader_data[176 - 4:176] = hd_crcarray
+        hd_crcarray = bflb_utils.get_crc32_bytearray(bootheader_data[0:header_len - 4])
+        bootheader_data[header_len - 4:header_len] = hd_crcarray
         bflb_utils.printf("Header crc: ", binascii.hexlify(hd_crcarray).decode('utf-8'))
     return bootheader_data
 
