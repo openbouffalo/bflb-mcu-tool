@@ -107,7 +107,18 @@ class BflbMcuTool(object):
                 data = fp.read()
             datas.append(data)
         return datas
-      
+
+    def bflb_set_file_ff(self, file):
+        fp = open(file, 'rb')
+        data = bytearray(fp.read()) + bytearray(0)
+        fp.close()
+        length = len(data)
+        for i in range(16):
+            data[i] = 0xff
+        fp = open(file, 'wb+')
+        fp.write(data)
+        fp.close()
+
     def img_addr_remap(self, addr):
         remap_list = {
             "C0": "00",
@@ -385,6 +396,8 @@ class BflbMcuTool(object):
     def create_bl808_img(self, chipname, chiptype, values):
         # basic check
         error = True
+        group0_enable = False
+        group1_enable = False
         group0_img_start = "0xFFFFFFFF"
         group1_img_start = "0xFFFFFFFF"
         group0_img = ""
@@ -410,12 +423,14 @@ class BflbMcuTool(object):
                     return bflb_utils.errorcode_msg()
                 img_start = int(values["img%s_addr" % num].replace("0x", ""), 16)
                 if values["img%s_group" % num] == "group0":
+                    group0_enable = True
                     group0_img += values["img%s_file" % num]
                     group1_img += "UNUSED"
                     img_addr_offset[index] = values["img%s_addr" % num]
                     if int(group0_img_start.replace("0x", ""), 16) > img_start:
                         group0_img_start = values["img%s_addr" % num]
                 elif values["img%s_group" % num] == "group1":
+                    group1_enable = True
                     group0_img += "UNUSED"
                     group1_img += values["img%s_file" % num]
                     img_addr_offset[index+3] = values["img%s_addr" % num]
@@ -712,6 +727,10 @@ class BflbMcuTool(object):
                 chipname, chiptype, bh_cfg_file, group0_bh_file, group1_bh_file,
                 self.img_create_path + "/bootheader_dummy.bin")
             bflb_efuse_boothd_create.efuse_create_process(chipname, chiptype, bh_cfg_file, efuse_file)
+            if group0_enable is not True:
+                self.bflb_set_file_ff(group0_bh_file)
+            if group1_enable is not True:
+                self.bflb_set_file_ff(group1_bh_file)
         else:
             bflb_efuse_boothd_create.bootheader_create_process(chipname, chiptype, bh_cfg_file,
                                                                group0_bh_file, group1_bh_file, True)
@@ -1306,7 +1325,9 @@ class BflbMcuTool(object):
                         bflb_utils.update_cfg(cfg, "LOAD_CFG", "xtal_type",
                                               self.xtal_type_.index(values["xtal_type"]))
                     if values["img_type"] == "RAW":
-                        bflb_utils.update_cfg(cfg, "FLASH_CFG", "file", values["img_file"])
+                        img_raw_tmp = os.path.join(self.img_create_path, 'img_raw_tmp.bin')
+                        shutil.copyfile(values["img_file"], img_raw_tmp)
+                        bflb_utils.update_cfg(cfg, "FLASH_CFG", "file", img_raw_tmp)
                         bflb_utils.update_cfg(cfg, "FLASH_CFG", "address",
                                               values["img_addr"].replace("0x", ""))
                     else:
@@ -1336,12 +1357,14 @@ class BflbMcuTool(object):
                     else:
                         options = ["--write", "--flash", "-c", self.eflash_loader_cfg_tmp]
                     if  "encrypt_key" in values.keys() and\
+                        "encrypt_type" in values.keys() and\
                         "aes_iv" in values.keys():
                         if  values["encrypt_key"] != "" and\
+                            values["encrypt_type"] != "" and\
                             values["aes_iv"] != "":
-                                options.extend(["--efuse",\
-                                "--createcfg=" + self.img_create_cfg])
-                                self.efuse_load_en = True
+                                if values["boot_src"] == "Flash":
+                                    options.extend(["--efuse", "--createcfg=" + self.img_create_cfg])
+                                    self.efuse_load_en = True
             else:
                 group0_used = False
                 group1_used = False
@@ -1481,17 +1504,21 @@ class BflbMcuTool(object):
                     options = ["--write", "--flash", "-p", values["dl_comport"], "-c", self.eflash_loader_cfg_tmp]
                 else:
                     options = ["--write", "--flash", "-c", self.eflash_loader_cfg_tmp]
-                if  "encrypt_key-group0" in values.keys() and\
-                    "encrypt_key-group1" in values.keys() and\
-                    "aes_iv-group0" in values.keys() and\
+                if  "encrypt_key-group0" in values.keys() or\
+                    "encrypt_key-group1" in values.keys() or\
+                    "encrypt_type-group0" in values.keys() or\
+                    "encrypt_type-group1" in values.keys() or\
+                    "aes_iv-group0" in values.keys() or\
                     "aes_iv-group1" in values.keys():
                         if (values["encrypt_key-group0"] != "" and\
+                            values["encrypt_type-group0"] != "" and\
                             values["aes_iv-group0"] != "") or\
                            (values["encrypt_key-group1"] != "" and\
+                            values["encrypt_type-group1"] != "" and\
                             values["aes_iv-group1"] != ""):
-                                options.extend(["--efuse",\
-                                "--createcfg=" + self.img_create_cfg])
-                                self.efuse_load_en = True
+                                if values["boot_src"] == "Flash":
+                                    options.extend(["--efuse", "--createcfg=" + self.img_create_cfg])
+                                    self.efuse_load_en = True
             ret = bflb_img_create.compress_dir(self.chipname, "img_create_mcu", self.efuse_load_en)
             if ret is not True:
                 return bflb_utils.errorcode_msg()

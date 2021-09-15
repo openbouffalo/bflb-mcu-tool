@@ -2245,7 +2245,7 @@ class BflbEflashLoader(object):
             self._chip_type = chip_type
         if config_file is None:
             if self._chip_name:
-                config_file = "chips/" + self._chip_name.lower() + "/eflash_loader/eflash_loader_cfg.ini"
+                config_file = os.path.join(app_path, "chips", self._chip_name.lower(), "eflash_loader", "eflash_loader_cfg.ini")
             else:
                 config_file = "eflash_loader_cfg.ini"
         if args.usage:
