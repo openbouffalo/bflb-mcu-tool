@@ -80,6 +80,20 @@ udp_send_log = False
 udp_log_local_echo = False
 udp_socket_server = None
 error_code_num = "FFFF"
+error_code_num_task = ["FFFF", "FFFF", "FFFF", "FFFF", "FFFF", \
+                       "FFFF", "FFFF", "FFFF", "FFFF", "FFFF", \
+                       "FFFF", "FFFF", "FFFF", "FFFF", "FFFF", \
+                       "FFFF", "FFFF", "FFFF", "FFFF", "FFFF", \
+                       "FFFF", "FFFF", "FFFF", "FFFF", "FFFF", \
+                       "FFFF", "FFFF", "FFFF", "FFFF", "FFFF", \
+                       "FFFF", "FFFF", "FFFF", "FFFF", "FFFF", \
+                       "FFFF", "FFFF", "FFFF", "FFFF", "FFFF", \
+                       "FFFF", "FFFF", "FFFF", "FFFF", "FFFF", \
+                       "FFFF", "FFFF", "FFFF", "FFFF", "FFFF", \
+                       "FFFF", "FFFF", "FFFF", "FFFF", "FFFF", \
+                       "FFFF", "FFFF", "FFFF", "FFFF", "FFFF", \
+                       "FFFF", "FFFF", "FFFF", "FFFF", "FFFF", \
+                       "FFFF"]
 local_log_en = True
 local_log_data = ""
 
@@ -94,6 +108,8 @@ else:
         "bl602": "bl602",
         "bl702": "bl702",
         "bl808": "bl808",
+        "bl616": "bl616",
+        "wb03" : "wb03",
     }
 
 # all in hex mode
@@ -199,6 +215,7 @@ if conf_sign:
         "003F": "FLASH BOOT FAIL",
         "0040": "FLASH CFG NOT FIT WITH BOOTHEADER",
         "0041": "FLASH LOAD ROMFS FAIL",
+        "0042": "FLASH SWITCH BANK FAIL",
         "0050": "IMG LOAD SHAKEHAND FAIL",
         "0051": "IMG LOAD BOOT CHECK FAIL",
         "0060": "IMG CREATE FAIL",
@@ -334,6 +351,7 @@ else:
         "003F": "BFLB FLASH BOOT FAIL",
         "0040": "BFLB FLASH CFG NOT FIT WITH BOOTHEADER",
         "0041": "BFLB FLASH LOAD ROMFS FAIL",
+        "0042": "BFLB FLASH SWITCH BANK FAIL",
         "0050": "BFLB IMG LOAD SHAKEHAND FAIL",
         "0051": "BFLB IMG LOAD BOOT CHECK FAIL",
         "0060": "BFLB IMG CREATE FAIL",
@@ -446,22 +464,38 @@ def get_bflb_error_code(code):
     return bflb_error_code[code]
 
 
-def set_error_code(num_str):
+def set_error_code(num_str, task=None):
     global error_code_num
-    if error_code_num == "FFFF":
-        error_code_num = num_str
-    if num_str == "FFFF":
-        error_code_num = num_str
+    global error_code_num_task
+    if task != None:
+        if len(error_code_num_task) == 0:
+            for i in range(66):
+                error_code_num_task.append("FFFF")
+        if error_code_num_task[task] == "FFFF":
+            error_code_num_task[task] = num_str
+        if num_str == "FFFF":
+            error_code_num_task[task] = num_str
+    else:
+        if error_code_num == "FFFF":
+            error_code_num = num_str
+        if num_str == "FFFF":
+            error_code_num = num_str
 
 
-def get_error_code():
+def get_error_code(task=None):
     global error_code_num
+    global error_code_num_task
+    if task != None:
+        return error_code_num_task[task]
     return error_code_num
 
 
-def errorcode_msg():
+def errorcode_msg(task=None):
     global error_code_num
+    global error_code_num_task
     global eflash_loader_error_code
+    if task != None:
+        return '{"ErrorCode": "' + error_code_num_task[task] + '", "ErrorMsg":"' + eflash_loader_error_code[error_code_num_task[task]] + '"}'
     return '{"ErrorCode": "' + error_code_num + '", "ErrorMsg":"' + eflash_loader_error_code[error_code_num] + '"}'
 
 
@@ -699,7 +733,7 @@ def serial_enumerate():
                         file_dict[p] = sdio_file_ser_dict[ser_value]
                         sdio_ports.append(p+" (SDIO)")
             else:
-                if "FACTORYAIOT_PROG" in h.upper():
+                if "FACTORYAIOT_PROG" in h.upper() or "PID=42BF:B210" in h.upper():
                     prog_ports.append(p+" (PROG)")
                 else:
                     uart_ports.append(p)

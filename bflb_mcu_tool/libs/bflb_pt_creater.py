@@ -105,14 +105,19 @@ class PtCreater(object):
         for tbl_item in self.parsed_toml["pt_entry"]:
             if tbl_item['name'] == 'factory':
                 parcel['conf_addr'] = tbl_item['address0']
+                parcel['conf_len'] = tbl_item['size0']
             if tbl_item['name'] == 'FW_CPU0':
                 parcel['fw_cpu0_addr'] = tbl_item['address0']
+                parcel['fw_cpu0_len'] = tbl_item['size0']
             if tbl_item['name'] == 'FW':
                 parcel['fw_addr'] = tbl_item['address0']
+                parcel['fw_len'] = tbl_item['size0']
             if tbl_item['name'] == 'media':
                 parcel['media_addr'] = tbl_item['address0']
+                parcel['media_len'] = tbl_item['size0']
             if tbl_item['name'] == 'mfg':
                 parcel['mfg_addr'] = tbl_item['address0']
+                parcel['mfg_len'] = tbl_item['size0']
         return parcel
 
 

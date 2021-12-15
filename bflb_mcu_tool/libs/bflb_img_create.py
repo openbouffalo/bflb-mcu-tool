@@ -161,6 +161,8 @@ def run():
             "bl602": "bl602",
             "bl702": "bl702",
             "bl808": "bl808",
+            "bl616": "bl616",
+            "wb03" : "wb03",
         }
         chipname = args.chipname
         chiptype = chip_dict[chipname]

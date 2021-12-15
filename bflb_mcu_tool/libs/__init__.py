@@ -36,3 +36,6 @@ else:
     from . import bl60x
     from . import bl602
     from . import bl702
+    from . import bl808
+    from . import bl616
+    from . import wb03

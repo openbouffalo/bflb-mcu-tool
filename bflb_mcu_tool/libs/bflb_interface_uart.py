@@ -51,13 +51,20 @@ class BflbUartPort(object):
                 dev = device
             self._device = dev.upper()
 
-            self._ser = serial.Serial(dev,
-                                      rate,
-                                      timeout=2.0,
-                                      xonxoff=False,
-                                      rtscts=False,
-                                      write_timeout=None,
-                                      dsrdtr=False)
+            for i in range(4):
+                try:
+                    self._ser = serial.Serial(dev,
+                                              rate,
+                                              timeout=2.0,
+                                              xonxoff=False,
+                                              rtscts=False,
+                                              write_timeout=None,
+                                              dsrdtr=False)
+                except Exception as error:
+                    bflb_utils.printf(error)
+                    time.sleep(0.1)
+                else:
+                    break
         else:
             self._ser.baudrate = rate
             self._baudrate = rate
@@ -148,7 +155,7 @@ class BflbUartPort(object):
             for p, d, h in comports():
                 if "Virtual" in d or not p:
                     continue
-                if "PID=FFFF" in h.upper():
+                if "PID=FFFF" in h.upper() or "PID=42BF:B210" in h.upper():
                     if p.upper() == dev.upper():
                         return True
         elif sys.platform.startswith('linux') or sys.platform.startswith('darwin'):
@@ -231,6 +238,10 @@ class BflbUartPort(object):
                     # dtr high, power on
                     self._ser.setDTR(0)
                 bflb_utils.printf("power on tx and rx ")
+                time.sleep(0.1)
+            else:
+                self._ser.setDTR(0)
+                bflb_utils.printf("default set DTR high ")
                 time.sleep(0.1)
             if do_reset is True and blusbserialwriteflag is not True:
                 # MP_TOOL_V3 reset high to make boot pin high
@@ -334,6 +345,110 @@ class BflbUartPort(object):
             shake_hand_retry -= 1
         self._ser.timeout = timeout
         return "FL"
+
+    def if_toggle_boot(self,
+                     do_reset=False,
+                     reset_hold_time=100,
+                     shake_hand_delay=100,
+                     reset_revert=True,
+                     cutoff_time=0,
+                     shake_hand_retry=2,
+                     iap_timeout=0,
+                     boot_load=False):
+        timeout = self._ser.timeout
+        # cut of tx rx power and rst
+        if cutoff_time != 0:
+            cutoff_revert = False
+            if cutoff_time > 1000:
+                cutoff_revert = True
+                cutoff_time = cutoff_time - 1000
+            # MP_TOOL_V3 generate rising pulse to make D trigger output low
+            # reset low
+            self._ser.setRTS(1)
+            # RC delay is 100ms
+            time.sleep(0.2)
+            # reset high
+            self._ser.setRTS(0)
+            time.sleep(0.05)
+            # do power off
+            # reset low
+            self._ser.setRTS(1)
+            if cutoff_revert:
+                # dtr high, power off
+                self._ser.setDTR(0)
+            else:
+                # dtr low, power off
+                self._ser.setDTR(1)
+            bflb_utils.printf("tx rx and power off, press the machine!")
+            bflb_utils.printf("cutoff time is ", cutoff_time / 1000.0)
+            time.sleep(cutoff_time / 1000.0)
+            if cutoff_revert:
+                # dtr low, power on
+                self._ser.setDTR(1)
+            else:
+                # dtr high, power on
+                self._ser.setDTR(0)
+            bflb_utils.printf("power on tx and rx ")
+            time.sleep(0.1)
+        if do_reset is True:
+            # MP_TOOL_V3 reset high to make boot pin high
+            self._ser.setRTS(0)
+            time.sleep(0.2)
+            if reset_revert:
+                # reset low for reset revert to make boot pin high when cpu rset
+                self._ser.setRTS(1)
+                time.sleep(0.001)
+            reset_cnt = 2
+            if reset_hold_time > 1000:
+                reset_cnt = int(reset_hold_time // 1000)
+                reset_hold_time = reset_hold_time % 1000
+            while reset_cnt > 0:
+                if reset_revert:
+                    # reset high
+                    self._ser.setRTS(0)
+                else:
+                    # reset low
+                    self._ser.setRTS(1)
+                # Boot high
+                # self._ser.setDTR(0)
+                time.sleep(reset_hold_time / 1000.0)
+                if reset_revert:
+                    # reset low
+                    self._ser.setRTS(1)
+                else:
+                    # reset high
+                    self._ser.setRTS(0)
+                if shake_hand_delay > 0:
+                    time.sleep(shake_hand_delay / 1000.0)
+                else:
+                    time.sleep(5 / 1000.0)
+
+                # do reset agian to make sure boot pin is high
+                if reset_revert:
+                    # reset high
+                    self._ser.setRTS(0)
+                else:
+                    # reset low
+                    self._ser.setRTS(1)
+                # Boot high
+                # self._ser.setDTR(0)
+                time.sleep(reset_hold_time / 1000.0)
+                if reset_revert:
+                    # reset low
+                    self._ser.setRTS(1)
+                else:
+                    # reset high
+                    self._ser.setRTS(0)
+                if shake_hand_delay > 0:
+                    time.sleep(shake_hand_delay / 1000.0)
+                else:
+                    time.sleep(5 / 1000.0)
+                reset_cnt -= 1
+            bflb_utils.printf("reset cnt: " + str(reset_cnt) + ", reset hold: " +
+                                str(reset_hold_time / 1000.0) + ", shake hand delay: " +
+                                str(shake_hand_delay / 1000.0))
+        self._ser.timeout = timeout
+        return "OK"
 
     def if_close(self):
         if self._ser is not None:
@@ -491,6 +606,10 @@ class CliInfUart(object):
             self._tx_queue.put(data_send)
         else:
             return 0
+        
+    def read(self):
+        time.sleep(0.1)
+        return self.msg
 
     def _write(self):
         while self._tx_thread_running:
@@ -531,7 +650,7 @@ class CliInfUart(object):
 
     def _read(self):
         data = ''
-
+        self.msg = ''
         while self._rx_thread_running:
             try:
                 byte_msg = self._ser.read(1)
@@ -554,6 +673,7 @@ class CliInfUart(object):
                     continue
                 if str(str_msg) == '\r':
                     if data != '':
+                        self.msg = data
                         bflb_utils.printf(data)
                         # check on_boot
                         if self._check_boot_cond(data) is True:

@@ -171,6 +171,9 @@ def check_basic_flash_cfg(cfg_file, section):
     cfg.read(cfg_file)
     if cfg.has_option(section, "mfg_id"):
         if cfg.get(section, "mfg_id") == "0xff" or cfg.get(section, "mfg_id") == "0xFF":
+            cfg.set(section, "io_mode", "0x10")
+            cfg.set(section, "cont_read_support", "0")
+            cfg.write(cfg_file, "w+")
             return True
     return False
 

@@ -68,40 +68,36 @@ def img_update_efuse(cfg, sign, pk_hash, flash_encryp_type, flash_key, sec_eng_k
     if flash_key is not None:
         if flash_encryp_type == 1:
             # aes 128
-            efuse_data[keyslot2:keyslot4] = flash_key
-            efuse_mask_data[keyslot2:keyslot4] = mask_4bytes * 8
+            efuse_data[keyslot2:keyslot3] = flash_key[0:16]
+            efuse_mask_data[keyslot2:keyslot3] = mask_4bytes * 4
         elif flash_encryp_type == 2:
             # aes 192
             efuse_data[keyslot2:keyslot4] = flash_key
             efuse_mask_data[keyslot2:keyslot4] = mask_4bytes * 8
+            rw_lock |= (1 << wr_lock_key_slot_3)
+            rw_lock |= (1 << rd_lock_key_slot_3)
         elif flash_encryp_type == 3:
             # aes 256
             efuse_data[keyslot2:keyslot4] = flash_key
             efuse_mask_data[keyslot2:keyslot4] = mask_4bytes * 8
+            rw_lock |= (1 << wr_lock_key_slot_3)
+            rw_lock |= (1 << rd_lock_key_slot_3)
 
         rw_lock |= (1 << wr_lock_key_slot_2)
-        rw_lock |= (1 << wr_lock_key_slot_3)
         rw_lock |= (1 << rd_lock_key_slot_2)
-        rw_lock |= (1 << rd_lock_key_slot_3)
 
     if sec_eng_key is not None:
         if flash_encryp_type == 0:
             if sec_eng_key_sel == 0:
-                efuse_data[keyslot2:keyslot3] = sec_eng_key[16:32]
                 efuse_data[keyslot3:keyslot4] = sec_eng_key[0:16]
-                efuse_mask_data[keyslot2:keyslot4] = mask_4bytes * 8
-                rw_lock |= (1 << wr_lock_key_slot_2)
+                efuse_mask_data[keyslot3:keyslot4] = mask_4bytes * 4
                 rw_lock |= (1 << wr_lock_key_slot_3)
-                rw_lock |= (1 << rd_lock_key_slot_2)
                 rw_lock |= (1 << rd_lock_key_slot_3)
             if sec_eng_key_sel == 1:
-                efuse_data[keyslot3:keyslot4] = sec_eng_key[16:32]
                 efuse_data[keyslot2:keyslot3] = sec_eng_key[0:16]
-                efuse_mask_data[keyslot2:keyslot4] = mask_4bytes * 8
+                efuse_mask_data[keyslot2:keyslot3] = mask_4bytes * 4
                 rw_lock |= (1 << wr_lock_key_slot_2)
-                rw_lock |= (1 << wr_lock_key_slot_3)
                 rw_lock |= (1 << rd_lock_key_slot_2)
-                rw_lock |= (1 << rd_lock_key_slot_3)
         if flash_encryp_type == 1:
             if sec_eng_key_sel == 0:
                 efuse_data[keyslot5:keyslot6] = sec_eng_key[0:16]
@@ -275,7 +271,7 @@ def encrypt_loader_bin_do(file, sign, encrypt, createcfg):
             newval = oldval
             if encrypt != 0:
                 newval = (newval | (1 << encrypt_type_pos))
-                newval = (newval | (1 << key_sel_pos))
+                newval = (newval | (0 << key_sel_pos))
             if sign != 0:
                 newval = (newval | (1 << sign_pos))
                 data_tohash += load_helper_bin_body_encrypt

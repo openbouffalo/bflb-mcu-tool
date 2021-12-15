@@ -55,21 +55,39 @@ def bl_dts2hex(dts):
     with open(dts, "r", encoding='utf-8') as f:
         tmp_dts = f.read()
     fdt_obj = fdt.parse_dts(tmp_dts)
+    
+    xtal_mode = ""
+    xtal = ""
+    pwr_mode = ""
+    pwr_table_11b = ""
+    pwr_table_11g = ""
+    pwr_table_11n = ""
+    pwr_offset = ""
+    en_tcal = ""
+    linear_or_follow = ""
+    tchannels = ""
+    tchannel_os = ""
+    tchannel_os_low = ""
+    troom_os = ""
+    pwr_table_ble = ""
 
-    xtal_mode = fdt_obj.get_property("xtal_mode", "wifi/brd_rf")
-    xtal = fdt_obj.get_property("xtal", "wifi/brd_rf")
-    pwr_mode = fdt_obj.get_property("pwr_mode", "wifi/brd_rf")
-    pwr_offset = fdt_obj.get_property("pwr_offset", "wifi/brd_rf")
-    pwr_table_11b = fdt_obj.get_property("pwr_table_11b", "wifi/brd_rf")
-    pwr_table_11g = fdt_obj.get_property("pwr_table_11g", "wifi/brd_rf")
-    pwr_table_11n = fdt_obj.get_property("pwr_table_11n", "wifi/brd_rf")
-    en_tcal = fdt_obj.get_property("en_tcal", "wifi/rf_temp")
-    linear_or_follow = fdt_obj.get_property("linear_or_follow", "wifi/rf_temp")
-    tchannels = fdt_obj.get_property("Tchannels", "wifi/rf_temp")
-    tchannel_os = fdt_obj.get_property("Tchannel_os", "wifi/rf_temp")
-    tchannel_os_low = fdt_obj.get_property("Tchannel_os_low", "wifi/rf_temp")
-    troom_os = fdt_obj.get_property("Troom_os", "wifi/rf_temp")
-    pwr_table_ble = fdt_obj.get_property("pwr_table_ble", "bluetooth/brd_rf")
+    if fdt_obj.exist_node("wifi/brd_rf"):
+        xtal_mode = fdt_obj.get_property("xtal_mode", "wifi/brd_rf")
+        xtal = fdt_obj.get_property("xtal", "wifi/brd_rf")
+        pwr_mode = fdt_obj.get_property("pwr_mode", "wifi/brd_rf")
+        pwr_offset = fdt_obj.get_property("pwr_offset", "wifi/brd_rf")
+        pwr_table_11b = fdt_obj.get_property("pwr_table_11b", "wifi/brd_rf")
+        pwr_table_11g = fdt_obj.get_property("pwr_table_11g", "wifi/brd_rf")
+        pwr_table_11n = fdt_obj.get_property("pwr_table_11n", "wifi/brd_rf")
+    if fdt_obj.exist_node("wifi/rf_temp"):
+        en_tcal = fdt_obj.get_property("en_tcal", "wifi/rf_temp")
+        linear_or_follow = fdt_obj.get_property("linear_or_follow", "wifi/rf_temp")
+        tchannels = fdt_obj.get_property("Tchannels", "wifi/rf_temp")
+        tchannel_os = fdt_obj.get_property("Tchannel_os", "wifi/rf_temp")
+        tchannel_os_low = fdt_obj.get_property("Tchannel_os_low", "wifi/rf_temp")
+        troom_os = fdt_obj.get_property("Troom_os", "wifi/rf_temp")
+    if fdt_obj.exist_node("bluetooth/brd_rf"):
+        pwr_table_ble = fdt_obj.get_property("pwr_table_ble", "bluetooth/brd_rf")
 
     init_hex = little_endian(string_to_bytearray("k1bXkD6O").hex())
 
