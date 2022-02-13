@@ -90,10 +90,11 @@ class BflbOpenocdPort(object):
         self._openocd_data_addr = "20000004"
         self._inited = False
         self._chiptype = "bl60x"
+        self._chipname = "bl60x"
         self._openocd_run_addr = "22010000"
         self.tn = telnetlib.Telnet()
 
-    def if_init(self, device, rate, chiptype="bl60x"):
+    def if_init(self, device, rate, chiptype="bl60x", chipname="bl60x"):
         if self._inited is False:
             sub_module = __import__("libs." + chiptype, fromlist=[chiptype])
             self._openocd_shake_hand_addr = sub_module.openocd_load_cfg.openocd_shake_hand_addr
@@ -104,6 +105,7 @@ class BflbOpenocdPort(object):
             self._speed = rate
             self._inited = True
             self._chiptype = chiptype
+            self._chipname = chipname
 
             self._openocd_th = ThreadOpenocdServer(chiptype, device)
             self._openocd_th.setDaemon(True)
@@ -285,6 +287,8 @@ class BflbOpenocdPort(object):
             return ack.decode("utf-8")
         if ack.find(b'\x4F') != -1 or ack.find(b'\x4B') != -1:
             return "OK"
+        elif ack.find(b'\x50') != -1 or ack.find(b'\x44') != -1:
+            return "PD"
         success, err_code = self.if_read(4)
         if success == 0:
             bflb_utils.printf("err_code:" + str(binascii.hexlify(err_code)))
@@ -292,7 +296,7 @@ class BflbOpenocdPort(object):
         err_code_str = str(binascii.hexlify(err_code[3:4] + err_code[2:3]).decode('utf-8'))
         ack = "FL"
         try:
-            ret = ack + err_code_str + "(" + bflb_utils.get_bflb_error_code[err_code_str] + ")"
+            ret = ack + err_code_str + "(" + bflb_utils.get_bflb_error_code(err_code_str) + ")"
         except Exception:
             ret = ack + err_code_str + " unknown"
         bflb_utils.printf(ret)

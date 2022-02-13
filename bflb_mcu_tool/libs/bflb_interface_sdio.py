@@ -43,17 +43,19 @@ class BflbSdioPort(object):
         self._rx_timeout = 10000
         self._inited = False
         self._chiptype = "bl60x"
+        self._chipname = "bl60x"
 
         self._udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self._send_address = None
 
-    def if_init(self, device, rate, chiptype="bl60x"):
+    def if_init(self, device, rate, chiptype="bl60x", chipname="bl60x"):
         if self._inited is False:
             host = socket.gethostname()
             # send_address is server address
             self._send_address = (host, device)
             self._inited = True
             self._chiptype = chiptype
+            self._chipname = chipname
         return True
 
     def if_set_rx_timeout(self, val):
@@ -108,6 +110,8 @@ class BflbSdioPort(object):
             return ack.decode("utf-8")
         if ack.find(b'\x4F') != -1 or ack.find(b'\x4B') != -1:
             return "OK"
+        elif ack.find(b'\x50') != -1 or ack.find(b'\x44') != -1:
+            return "PD"
         success, err_code = self.if_read(4)
         if success == 0:
             bflb_utils.printf("err_code:" + str(binascii.hexlify(err_code)))
@@ -115,7 +119,7 @@ class BflbSdioPort(object):
         err_code_str = str(binascii.hexlify(err_code[3:4] + err_code[2:3]).decode('utf-8'))
         ack = "FL"
         try:
-            ret = ack + err_code_str + "(" + bflb_utils.get_bflb_error_code[err_code_str] + ")"
+            ret = ack + err_code_str + "(" + bflb_utils.get_bflb_error_code(err_code_str) + ")"
         except Exception:
             ret = ack + err_code_str + " unknown"
         bflb_utils.printf(ret)

@@ -26,6 +26,7 @@ import time
 import binascii
 import serial
 import threading
+import traceback
 from queue import Queue
 from queue import Empty
 
@@ -40,8 +41,9 @@ class BflbUartPort(object):
         self._ser = None
         self._shakehand_flag = False
         self._chiptype = "bl602"
+        self._chipname = "bl602"
 
-    def if_init(self, device, rate, chiptype="bl602"):
+    def if_init(self, device, rate, chiptype="bl602", chipname="bl602"):
         if self._ser is None:
             self._baudrate = rate
 
@@ -51,7 +53,7 @@ class BflbUartPort(object):
                 dev = device
             self._device = dev.upper()
 
-            for i in range(4):
+            for i in range(5):
                 try:
                     self._ser = serial.Serial(dev,
                                               rate,
@@ -62,7 +64,7 @@ class BflbUartPort(object):
                                               dsrdtr=False)
                 except Exception as error:
                     bflb_utils.printf(error)
-                    time.sleep(0.1)
+                    time.sleep(1)
                 else:
                     break
         else:
@@ -70,6 +72,7 @@ class BflbUartPort(object):
             self._baudrate = rate
         self._602a0_dln_fix = False
         self._chiptype = chiptype
+        self._chipname = chipname
 
     def if_set_rx_timeout(self, val):
         self._ser.timeout = val
@@ -163,7 +166,7 @@ class BflbUartPort(object):
             for p, d, h in comports():
                 if not p:
                     continue
-                if "PID=FFFF" in h.upper():
+                if "PID=FFFF" in h.upper() or "PID=42BF:B210" in h.upper():
                     if p.upper() == dev.upper():
                         return True
         else:
@@ -319,6 +322,9 @@ class BflbUartPort(object):
             else:
                 self._ser.write(self._if_get_sync_bytes(
                     int(0.006 * self._baudrate / 10)))
+            if self._chipname == "bl808":
+                time.sleep(0.3)
+                self._ser.write(bflb_utils.hexstr_to_bytearray("5000080038F0002000000018"))
             if self._602a0_dln_fix:
                 time.sleep(4)
             success, ack = self.if_read(1000)
@@ -467,6 +473,8 @@ class BflbUartPort(object):
             #    if success==0:
             #        return "FL"
             return "OK"
+        elif ack.find(b'\x50') != -1 or ack.find(b'\x44') != -1:
+            return "PD"
         success, err_code = self.if_read(2)
         if success == 0:
             bflb_utils.printf("err code is ", str(binascii.hexlify(err_code)))
@@ -476,7 +484,7 @@ class BflbUartPort(object):
         ack = "FL"
         try:
             ret = ack + err_code_str + \
-                "(" + bflb_utils.get_bflb_error_code[err_code_str] + ")"
+                "(" + bflb_utils.get_bflb_error_code(err_code_str) + ")"
         except Exception:
             ret = ack + err_code_str + " unknown"
         bflb_utils.printf(ret)

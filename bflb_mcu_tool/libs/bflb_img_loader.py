@@ -54,11 +54,12 @@ except ImportError:
 
 class BflbImgLoader(object):
 
-    def __init__(self, chiptype="bl60x", interface="uart", createcfg=None):
+    def __init__(self, chiptype="bl60x", chipname="bl60x", interface="uart", createcfg=None):
         self.bflb_boot_if = None
         self._imge_fp = None
         self._segcnt = 0
         self._chip_type = chiptype
+        self._chip_name = chipname
         self._create_cfg = createcfg
 
         if interface == "uart":
@@ -276,7 +277,7 @@ class BflbImgLoader(object):
             stime = 0.003
         time.sleep(stime)
         self.bflb_boot_if.if_close()
-        self.bflb_boot_if.if_init(comnum, newrate, self._chip_type)
+        self.bflb_boot_if.if_init(comnum, newrate, self._chip_type, self._chip_name)
         return self.bflb_boot_if.if_deal_ack(dmy_data=False)
 
     #####################install command call back##########################################
@@ -295,6 +296,7 @@ class BflbImgLoader(object):
         self._bootrom_cmds.get("load_seg_data")["callback"] = self.boot_process_load_cmd
         self._bootrom_cmds.get("check_image")["callback"] = self.boot_process_load_cmd
         self._bootrom_cmds.get("run_image")["callback"] = self.boot_process_load_cmd
+        self._bootrom_cmds.get("reset")["callback"] = self.boot_process_load_cmd
 
     ########################check encrypt and sign match###############################################
     def boot_check_encrpt_sign(self, security):
@@ -356,7 +358,7 @@ class BflbImgLoader(object):
                             shake_hand_retry=2,
                             iap_timeout=0,
                             boot_load=True):
-        self.bflb_boot_if.if_init(comnum, sh_baudrate, self._chip_type)
+        self.bflb_boot_if.if_init(comnum, sh_baudrate, self._chip_type, self._chip_name)
 
         self.boot_install_cmds_callback()
         if self._chip_type == "wb03":
@@ -395,6 +397,7 @@ class BflbImgLoader(object):
                     return "change rate fail"
 
         bflb_utils.printf("shake hand success")
+        return ret
 
 
     ########################main process###############################################
@@ -611,6 +614,14 @@ class BflbImgLoader(object):
         data_read = binascii.hexlify(data_read)
         bflb_utils.printf("data read is ", data_read)
         return True, data_read
+
+    def img_loader_reset_cpu(self):
+        bflb_utils.printf("========= reset cpu =========")
+        ret, data_read = self.boot_process_one_section("reset", 0)
+        if ret.startswith("OK") is False:
+            bflb_utils.printf("reset cpu fail")
+            return False
+        return True
 
     def img_load_process(self,
                          comnum,

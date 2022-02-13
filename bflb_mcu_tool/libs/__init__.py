@@ -7,6 +7,7 @@ import serial
 import ecdsa
 
 from . import bflb_version
+from . import bflb_interface_cklink
 from . import bflb_interface_jlink
 from . import bflb_interface_uart
 from . import bflb_interface_sdio
@@ -36,6 +37,4 @@ else:
     from . import bl60x
     from . import bl602
     from . import bl702
-    from . import bl808
-    from . import bl616
-    from . import wb03
+

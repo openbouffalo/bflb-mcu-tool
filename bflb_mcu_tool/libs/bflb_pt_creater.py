@@ -109,9 +109,18 @@ class PtCreater(object):
             if tbl_item['name'] == 'FW_CPU0':
                 parcel['fw_cpu0_addr'] = tbl_item['address0']
                 parcel['fw_cpu0_len'] = tbl_item['size0']
+            if tbl_item['name'] == 'FW_GRP0':
+                parcel['fw_group0_addr'] = tbl_item['address0']
+                parcel['fw_group0_len'] = tbl_item['size0']
             if tbl_item['name'] == 'FW':
                 parcel['fw_addr'] = tbl_item['address0']
                 parcel['fw_len'] = tbl_item['size0']
+            if tbl_item['name'] == 'D0FW':
+                parcel['fw_d0_addr'] = tbl_item['address0']
+                parcel['fw_d0_len'] = tbl_item['size0']
+            if tbl_item['name'] == 'IMTB':
+                parcel['imtb_addr'] = tbl_item['address0']
+                parcel['imtb_len'] = tbl_item['size0']
             if tbl_item['name'] == 'media':
                 parcel['media_addr'] = tbl_item['address0']
                 parcel['media_len'] = tbl_item['size0']

@@ -39,9 +39,23 @@ def img_load_create_predata_before_run_img():
     pre_data3[5] = 0x00
     pre_data3[6] = 0x00
     pre_data3[7] = 0x40
-    pre_data3[8] = 0x02
+    pre_data3[8] = 0x00
     pre_data3[9] = 0x00
     pre_data3[10] = 0x00
     pre_data3[11] = 0x00
 
-    return pre_data + pre_data2 + pre_data3
+    pre_data4 = bytearray(12)
+    pre_data4[0] = 0x50
+    pre_data4[1] = 0x00
+    pre_data4[2] = 0x08
+    pre_data4[3] = 0x00
+    pre_data4[4] = 0x18
+    pre_data4[5] = 0x00
+    pre_data4[6] = 0x00
+    pre_data4[7] = 0x40
+    pre_data4[8] = 0x02
+    pre_data4[9] = 0x00
+    pre_data4[10] = 0x00
+    pre_data4[11] = 0x00
+
+    return pre_data + pre_data2 + pre_data3 + pre_data4

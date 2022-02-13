@@ -56,9 +56,10 @@ class BflbJLinkPort(object):
         self._jlink_data_addr = "20000004"
         self._inited = False
         self._chiptype = "bl60x"
+        self._chipname = "bl60x"
         self._jlink_run_addr = "22010000"
 
-    def if_init(self, device, rate, chiptype="bl60x"):
+    def if_init(self, device, rate, chiptype="bl60x", chipname="bl60x"):
         if self._inited is False:
             # jlink_cfg_module = __import__(chiptype + ".jlink_load_cfg")
             # jlink_cfg_module = __import__("libs." + chiptype + ".jlink_load_cfg", fromlist=["jlink_load_cfg"])
@@ -83,6 +84,7 @@ class BflbJLinkPort(object):
             self._jlink.connect(core_type, rate)
             self._inited = True
             self._chiptype = chiptype
+            self._chipname = chipname
             self._jlink_run_addr = sub_module.jlink_load_cfg.jlink_run_addr
 
     def if_set_rx_timeout(self, val):
@@ -270,6 +272,8 @@ class BflbJLinkPort(object):
             return ack.decode("utf-8")
         if ack.find(b'\x4F') != -1 or ack.find(b'\x4B') != -1:
             return "OK"
+        elif ack.find(b'\x50') != -1 or ack.find(b'\x44') != -1:
+            return "PD"
         success, err_code = self.if_read(4)
         if success == 0:
             bflb_utils.printf("err_code:" + str(binascii.hexlify(err_code)))
@@ -277,7 +281,7 @@ class BflbJLinkPort(object):
         err_code_str = str(binascii.hexlify(err_code[3:4] + err_code[2:3]).decode('utf-8'))
         ack = "FL"
         try:
-            ret = ack + err_code_str + "(" + bflb_utils.get_bflb_error_code[err_code_str] + ")"
+            ret = ack + err_code_str + "(" + bflb_utils.get_bflb_error_code(err_code_str) + ")"
         except Exception:
             ret = ack + err_code_str + " unknown"
         bflb_utils.printf(ret)
