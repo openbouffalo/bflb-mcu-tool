@@ -49,7 +49,7 @@ class PtCreater(object):
                 entry_table[36 * entry_cnt +
                             2] = bflb_utils.int_to_2bytearray_l(entry_activeindex)[0]
             if len(entry_name) >= 8:
-                bflb_utils.printf("Entry name is too long!")
+                bflb_utils.printf("%s entry name is too long!" % entry_name)
                 return False
             entry_table[36 * entry_cnt + 3:36 * entry_cnt + 3 +
                         len(entry_name)] = bytearray(entry_name, "utf-8") + bytearray(0) 
@@ -112,6 +112,9 @@ class PtCreater(object):
             if tbl_item['name'] == 'FW_GRP0':
                 parcel['fw_group0_addr'] = tbl_item['address0']
                 parcel['fw_group0_len'] = tbl_item['size0']
+            if tbl_item['name'] == 'FW_GRP1':
+                parcel['fw_group1_addr'] = tbl_item['address0']
+                parcel['fw_group1_len'] = tbl_item['size0']
             if tbl_item['name'] == 'FW':
                 parcel['fw_addr'] = tbl_item['address0']
                 parcel['fw_len'] = tbl_item['size0']
@@ -127,6 +130,18 @@ class PtCreater(object):
             if tbl_item['name'] == 'mfg':
                 parcel['mfg_addr'] = tbl_item['address0']
                 parcel['mfg_len'] = tbl_item['size0']
+            if tbl_item['name'] == 'Imgload':
+                parcel['imgloader_addr'] = tbl_item['address0']
+                parcel['imgloader_len'] = tbl_item['size0']
+            if tbl_item['name'] == 'SBI':
+                parcel['sbi_addr'] = tbl_item['address0']
+                parcel['sbi_len'] = tbl_item['size0']
+            if tbl_item['name'] == 'Kernel':
+                parcel['kernel_addr'] = tbl_item['address0']
+                parcel['kernel_len'] = tbl_item['size0']
+            if tbl_item['name'] == 'Rootfs':
+                parcel['rootfs_addr'] = tbl_item['address0']
+                parcel['rootfs_len'] = tbl_item['size0']
         return parcel
 
 

@@ -34,7 +34,7 @@ def cli_proto_tx_11g(rate, short_preamble):
     return g_pre_type + str(g_rate)
 
 
-def cli_proto_tx_11n(mcs, short_gi, mod_type, bw):
+def cli_proto_tx_11n(mcs, short_gi, mod_type, bw, coding=""):
     gi = 'l'
     mod = 'm'
     bandwidth = '2'
@@ -54,7 +54,12 @@ def cli_proto_tx_11n(mcs, short_gi, mod_type, bw):
     elif bw == 'HT40':
         bandwidth = '4'
 
-    return 'm' + gi + mod + bandwidth + str(mcs)
+    return 'm' + gi + mod + bandwidth + str(mcs) + str(coding)
+
+
+def cli_proto_tx_11ax_wb03(mcs, coding, heltf_gi):
+    mcs = "{:0>2s}".format(str(mcs if mcs < 10 else mcs+2))            
+    return 'Q{0}{1}{2}\r'.format(str(coding), str(heltf_gi), mcs)
 
 
 def cli_ble_tx_power(tx_power):

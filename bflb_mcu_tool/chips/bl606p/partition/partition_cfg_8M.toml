@@ -1,0 +1,71 @@
+[pt_table]
+#partition table is 4K in size
+address0 = 0xE000
+address1 = 0xF000
+
+[[pt_entry]]
+type = 0
+name = "FW"
+device = 0
+address0 = 0x10000
+size0 = 0x480000
+address1 = 0x490000
+size1 = 0x10000
+# compressed image must set len,normal image can left it to 0
+len = 0
+
+[[pt_entry]]
+type = 10
+name = "mfg"
+device = 0
+address0 = 0x490000
+size0 = 0x10000
+address1 = 0
+size1 = 0
+# compressed image must set len,normal image can left it to 0
+len = 0
+
+[[pt_entry]]
+type = 2
+name = "D0FW"
+device = 0
+address0 = 0x4A0000
+size0 = 0x170000
+address1 = 0
+size1 = 0
+# compressed image must set len,normal image can left it to 0
+len = 0
+
+[[pt_entry]]
+type = 3
+name = "IMTB"
+device = 0
+address0 = 0x610000
+size0 = 0x2000
+address1 = 0
+size1 = 0
+# compressed image must set len,normal image can left it to 0
+len = 0
+
+[[pt_entry]]
+type = 4
+name = "kv"
+device = 0
+address0 = 0x620000
+size0 = 0x10000
+address1 = 0
+size1 = 0
+# compressed image must set len,normal image can left it to 0
+len = 0
+
+[[pt_entry]]
+type = 5
+name = "media"
+device = 0
+address0 = 0x630000
+size0 = 0x100000
+address1 = 0
+size1 = 0
+# compressed image must set len,normal image can left it to 0
+len = 0
+

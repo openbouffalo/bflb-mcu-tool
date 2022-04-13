@@ -47,36 +47,45 @@ class BflbCKLinkPort(object):
         self._cklink_run_addr = "22010000"
         self._cklink_reg_pc = 32
         self._inited = False
-        self._chiptype = "bl60x"
-        self._chipname = "bl60x"
+        self._chiptype = "bl808"
+        self._chipname = "bl808"
         self.vid = vid
         self.pid = pid
         self.link = None
 
-    def if_init(self, device, rate, chiptype="bl60x", chipname="bl60x"):
+    def if_init(self, device, sn, rate, chiptype="bl808", chipname="bl808"):
         if self._inited is False:
+            dev = device.split("|")
+            vid = int(dev[0].replace("0x", ""), 16)
+            pid = int(dev[1].replace("0x", ""), 16)
+            serial = str(sn) 
+            bflb_utils.printf("SN is " + serial)
             sub_module = __import__("libs." + chiptype, fromlist=[chiptype])
             self._cklink_shake_hand_addr = sub_module.cklink_load_cfg.cklink_shake_hand_addr
             self._cklink_data_addr = sub_module.cklink_load_cfg.cklink_data_addr
             self._cklink_run_addr = sub_module.cklink_load_cfg.cklink_run_addr
-            self._cklink_vid = sub_module.cklink_load_cfg.vid
-            self._cklink_pid = sub_module.cklink_load_cfg.pid
+            self._cklink_vid = vid
+            self._cklink_pid = pid
             self._speed = rate
             self._inited = True
             self._chiptype = chiptype
             self._chipname = chipname
-            self.link = cklink.CKLink(dlldir=dir_dll, vid=self._cklink_vid, pid=self._cklink_pid, arch=2)
-            #self.link = cklink.CKLink(dlldir=dir_dll)
+            self.link = cklink.CKLink(dlldir=dir_dll, vid=self._cklink_vid, pid=self._cklink_pid, sn=serial, arch=2)
             #self.link.print_version()
             self.link.open()
-            if self.link.connected(): 
-                self.link.reset(1)    
+            if self.link.connected():
+                self.link.reset(1)
             return False
         
     def if_close(self):
         if self.link:
-            self.link.close()
-            self._inited = False
+            try:
+                self.link.halt()
+                self.link.close()
+            except Exception as e:
+                print(e)
+            finally:
+                self._inited = False
 
     def if_set_rx_timeout(self, val):
         self._rx_timeout = val * 1000
@@ -108,7 +117,7 @@ class BflbCKLinkPort(object):
         self.resume_cpu()
 
     def if_write(self, data_send):
-        #print(self._cklink_data_addr, self._cklink_shake_hand_addr)        
+        #print(self._cklink_data_addr, self._cklink_shake_hand_addr)
         self.if_raw_write(self._cklink_data_addr, data_send)
         # write flag
         self.if_raw_write(self._cklink_shake_hand_addr, binascii.unhexlify("48524459"))

@@ -362,8 +362,12 @@ class BflbUartPort(object):
                      iap_timeout=0,
                      boot_load=False):
         timeout = self._ser.timeout
+        blusbserialwriteflag = False
+
+        if self.check_bl_usb_serial(self._device) and boot_load:
+            blusbserialwriteflag = True
         # cut of tx rx power and rst
-        if cutoff_time != 0:
+        if cutoff_time != 0 and blusbserialwriteflag is not True:
             cutoff_revert = False
             if cutoff_time > 1000:
                 cutoff_revert = True
@@ -396,7 +400,7 @@ class BflbUartPort(object):
                 self._ser.setDTR(0)
             bflb_utils.printf("power on tx and rx ")
             time.sleep(0.1)
-        if do_reset is True:
+        if do_reset is True and blusbserialwriteflag is not True:
             # MP_TOOL_V3 reset high to make boot pin high
             self._ser.setRTS(0)
             time.sleep(0.2)
@@ -453,6 +457,12 @@ class BflbUartPort(object):
             bflb_utils.printf("reset cnt: " + str(reset_cnt) + ", reset hold: " +
                                 str(reset_hold_time / 1000.0) + ", shake hand delay: " +
                                 str(shake_hand_delay / 1000.0))
+        if blusbserialwriteflag:
+            self.bl_usb_serial_write(cutoff_time, reset_revert)
+        # clean buffer before start
+        bflb_utils.printf("clean buf")
+        self._ser.timeout = 0.1
+        self._ser.read_all()
         self._ser.timeout = timeout
         return "OK"
 
@@ -516,8 +526,8 @@ class BflbUartPort(object):
 
 class CliInfUart(object):
 
-    def __init__(self, recv_cb_objs=None):
-        self._baudrate = 115200
+    def __init__(self, recv_cb_objs=None, baudrate=115200):
+        self._baudrate = baudrate
         self._ser = None
         # self._logfile = None
         self._rx_thread = None

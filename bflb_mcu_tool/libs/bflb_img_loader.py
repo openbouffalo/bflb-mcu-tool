@@ -38,9 +38,10 @@ from libs import bflb_security
 from libs import bflb_img_create
 from libs import bflb_interface_uart
 from libs import bflb_interface_sdio
+import config as gol
 
 try:
-    from globalvar import mutex, GlobalVar
+    from config import mutex
     th_sign = True
 except ImportError:
     th_sign = False
@@ -415,30 +416,26 @@ class BflbImgLoader(object):
         data_read = binascii.hexlify(data_read)
         bflb_utils.printf("data read is ", data_read)
         bootinfo = data_read.decode("utf-8")
+        chipid = ""
         if self._chip_type == "bl702":
             chipid = bootinfo[32:34] + bootinfo[34:36] + bootinfo[36:38] + \
                 bootinfo[38:40] + bootinfo[40:42] + bootinfo[42:44] + bootinfo[44:46] + bootinfo[46:48]
-            bflb_utils.printf(
-                "========= ChipID: ", bootinfo[32:34] + bootinfo[34:36] + bootinfo[36:38] + 
-                bootinfo[38:40] + bootinfo[40:42] + bootinfo[42:44] + bootinfo[44:46] + bootinfo[46:48], " =========")
         else:
             chipid = bootinfo[34:36] + bootinfo[32:34] + bootinfo[30:32] + \
                 bootinfo[28:30] + bootinfo[26:28] + bootinfo[24:26]
-            bflb_utils.printf(
-                "========= ChipID: ", bootinfo[34:36] + bootinfo[32:34] + bootinfo[30:32] +
-                bootinfo[28:30] + bootinfo[26:28] + bootinfo[24:26], " =========")
+        bflb_utils.printf("========= ChipID: ", chipid, " =========")
         if qt_sign and th_sign and QtCore.QThread.currentThread().objectName():
             with mutex:
                 num = str(QtCore.QThread.currentThread().objectName())
-                # print("=========" + str(GlobalVar.list_download_last) + "=========")
-                for i, j in GlobalVar.list_download_last:
+                # print("=========" + str(gol.list_download_last) + "=========")
+                for i, j in gol.list_download_last:
                     if chipid == i and j is True:
                         return "repeat_burn", bootinfo
-                GlobalVar.list_chipid[int(num)-1] = chipid
-#                 if chipid in GlobalVar.list_chipid and GlobalVar.list_result_last[int(num)-1] is True:
+                gol.list_chipid[int(num)-1] = chipid
+#                 if chipid in gol.list_chipid and gol.list_result_last[int(num)-1] is True:
 #                     return "repeat_burn", bootinfo
 #                 else:
-#                     GlobalVar.list_chipid[int(num)-1] = chipid           
+#                     gol.list_chipid[int(num)-1] = chipid
         # bflb_utils.printf(int(data_read[10:12], 16))
         bflb_utils.printf("last boot info: ", record_bootinfo)
         if record_bootinfo!=None and bootinfo[8:] == record_bootinfo[8:]:
@@ -480,9 +477,16 @@ class BflbImgLoader(object):
                 fp.close()
                 self._imge_fp = open(file_encrypt, 'rb')
             else:
+                if sys.platform.startswith('darwin'):
+                    file = os.path.join(bflb_utils.app_path, file)
                 self._imge_fp = open(file, 'rb')
         else:
+            if sys.platform.startswith('darwin'):
+                file = os.path.join(bflb_utils.app_path, file)
             self._imge_fp = open(file, 'rb')
+        if self._chip_type == "wb03":
+            # wb03 img loader, read 0xD0 len for cut wb03 header
+            self._imge_fp.read(0xD0)
 
         # start to process load flow
         if self._chip_type == "bl808":

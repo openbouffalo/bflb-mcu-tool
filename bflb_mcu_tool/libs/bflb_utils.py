@@ -71,6 +71,7 @@ try:
     import changeconf as cgc
     conf_sign = True
 except ImportError:
+    cgc = None
     conf_sign = False
     
 PY2 = sys.version_info[0] == 2
@@ -97,21 +98,6 @@ error_code_num_task = ["FFFF", "FFFF", "FFFF", "FFFF", "FFFF", \
 local_log_en = True
 local_log_data = ""
 
-
-if conf_sign:
-    flash_dict = {cgc.lower_name: cgc.lower_name}
-else:
-    flash_dict = {
-        "bl56x": "bl60x",
-        "bl60x": "bl60x",
-        "bl562": "bl602",
-        "bl602": "bl602",
-        "bl702": "bl702",
-        "bl808": "bl808",
-        "bl606p": "bl808",
-        "bl616": "bl616",
-        "wb03" : "wb03",
-    }
 
 # all in hex mode
 if conf_sign:
@@ -269,7 +255,11 @@ if conf_sign:
         "0081": "MFG BIN NOT SET",
         "0082": "PT CHECK FAIL",
         "0083": "D0 FW BIN NOT SET",  
-        "0084": "IMTB BIN NOT SET",      
+        "0084": "IMTB BIN NOT SET", 
+        "0085": "IMG LOADER BIN NOT SET",
+        "0086": "SBI BIN NOT SET",
+        "0087": "KERNEL BIN NOT SET",  
+        "0088": "ROOTFS BIN NOT SET",     
         "FFFF": "BURN RETRY FAIL",
     }
 else:
@@ -427,7 +417,11 @@ else:
         "0081": "BFLB MFG BIN NOT SET",
         "0082": "BFLB PT CHECK FAIL",
         "0083": "D0 FW BIN NOT SET",  
-        "0084": "IMTB BIN NOT SET",        
+        "0084": "IMTB BIN NOT SET",   
+        "0085": "IMG LOADER BIN NOT SET",
+        "0086": "SBI BIN NOT SET",
+        "0087": "KERNEL BIN NOT SET",  
+        "0088": "ROOTFS BIN NOT SET",      
         "FFFF": "BFLB BURN RETRY FAIL",
     }
 
@@ -760,7 +754,6 @@ def serial_enumerate():
     file_dict = {}
     ports = []
     if sys.platform.startswith("win"):
-        ports = []
         for p, d, h in comports():
             if "Virtual" in d or not p:
                 if "STM" not in d:
@@ -788,7 +781,6 @@ def serial_enumerate():
             uart_ports = sorted(uart_ports)                    
         ports = sorted(prog_ports) + sorted(sdio_ports) + uart_ports
     elif sys.platform.startswith('linux'):
-        ports = []
         for p, d, h in comports():
             if not p:
                 continue        
@@ -812,17 +804,47 @@ def serial_enumerate():
     elif sys.platform.startswith('darwin'):
         for dev in glob('/dev/tty.usb*'):
             ports.append(dev)
-    else:  
-        ports = []
     return ports
 
 
 def pylink_enumerate():
-    obj_dll = pylink.Library(dllpath=path_dll)
-    obj = pylink.JLink(lib=obj_dll)
-    return obj.connected_emulators()
-
-
+    try:
+        if sys.platform == 'win32':
+            obj_dll = pylink.Library(dllpath=path_dll)
+            obj = pylink.JLink(lib=obj_dll)
+        else:
+            obj = pylink.JLink()
+    except Exception:
+        return []
+    else:
+        return obj.connected_emulators()
+      
+      
+def cklink_openocd_enumerate():
+    ports_cklink = []
+    ports_openocd = []
+    if sys.platform.startswith("win"):     
+        for p, d, h in comports():
+            if not p:
+                continue
+            elif "FACTORYAIOT_PROG" in h.upper():
+                match1 = re.search("FACTORYAIOT_PROG_([a-zA-Z0-9]{6}) LOCATION", h.upper(), re.I)
+                match2 = re.search("FACTORYAIOT_PROG_([a-zA-Z0-9]{6})$", h.upper(), re.I)
+                if match1 is not None:
+                    ports_cklink.append(match1.group(1)) 
+                if match2 is not None:
+                    ports_openocd.append(match2.group(1)) 
+    elif sys.platform.startswith("linux"):     
+        for p, d, h in comports():
+            if not p:
+                continue
+            elif "FactoryAIOT Prog" in h:
+                match1 = re.search("FactoryAIOT Prog ([a-zA-Z0-9]{6}) LOCATION", h, re.I)
+                if match1 is not None:
+                    ports_cklink.append(match1.group(1)) 
+    return ports_cklink, ports_openocd
+                 
+                 
 def image_create_parser_init():
     parser = argparse.ArgumentParser(description="bouffalolab image create command")
     parser.add_argument("--chipname", dest="chipname", help="chip name")

@@ -271,7 +271,7 @@ def encrypt_loader_bin_do(file, sign, encrypt, createcfg):
             newval = oldval
             if encrypt != 0:
                 newval = (newval | (1 << encrypt_type_pos))
-                newval = (newval | (0 << key_sel_pos))
+                newval = (newval | (1 << key_sel_pos))
             if sign != 0:
                 newval = (newval | (1 << sign_pos))
                 data_tohash += load_helper_bin_body_encrypt
@@ -286,7 +286,7 @@ def encrypt_loader_bin_do(file, sign, encrypt, createcfg):
                 pk_data + signature + aesiv_data + load_helper_bin_body_encrypt
             # calculate hash
             hashfun = hashlib.sha256()
-            hashfun.update(load_helper_bin_body_encrypt)
+            hashfun.update(data_tohash)
             hash = bflb_utils.hexstr_to_bytearray(hashfun.hexdigest())
             # update hash & crc
             load_helper_bin_data = bytearray(load_helper_bin_encrypt)

@@ -44,8 +44,6 @@ if python_version == 64:
 else:
     path_dll = os.path.join(app_path, "utils/jlink", "JLinkARM.dll")
     
-jlink_path = os.path.join(app_path, "utils/jlink", "JLink.exe")
-
 
 class BflbJLinkPort(object):
 
@@ -69,8 +67,10 @@ class BflbJLinkPort(object):
             if sys.platform == 'win32':
                 obj_dll = pylink.Library(dllpath=path_dll)
                 self._jlink = pylink.JLink(lib=obj_dll)
+                self.jlink_path = os.path.join(app_path, "utils/jlink", "JLink.exe")
             else:
                 self._jlink = pylink.JLink()
+                self.jlink_path = "JLinkExe"
             match = re.search("\d{8,10}", device, re.I)
             if match is not None:
                 bflb_utils.printf(device)
@@ -86,6 +86,7 @@ class BflbJLinkPort(object):
             self._chiptype = chiptype
             self._chipname = chipname
             self._jlink_run_addr = sub_module.jlink_load_cfg.jlink_run_addr
+            self._device = device
 
     def if_set_rx_timeout(self, val):
         self._rx_timeout = val * 1000
@@ -120,9 +121,12 @@ class BflbJLinkPort(object):
                 fp.write(cmd)
                 fp.close()
                 # jlink_cmd=r'C:/Keil_v5/ARM/Segger/JLink.exe -device Cortex-M4 -Speed 4000 -IF SWD  -JTAGConf -1,-1 -CommanderScript jlink.cmd'
-                jlink_cmd = jlink_path + ' -device RISC-V -Speed ' + str(
-                    self._speed
-                ) + ' -IF JTAG -jtagconf -1,-1 -autoconnect 1 -CommanderScript jlink.cmd'
+                if self._device:
+                    jlink_cmd = self.jlink_path + ' -device RISC-V -Speed {0} -SelectEmuBySN {1} \
+                    -IF JTAG -jtagconf -1,-1 -autoconnect 1 -CommanderScript jlink.cmd'.format(str(self._speed), str(self._device))
+                else:
+                    jlink_cmd = self.jlink_path + ' -device RISC-V -Speed {0} \
+                    -IF JTAG -jtagconf -1,-1 -autoconnect 1 -CommanderScript jlink.cmd'.format(str(self._speed))
                 bflb_utils.printf(jlink_cmd)
                 p = subprocess.Popen(jlink_cmd,
                                      shell=True,

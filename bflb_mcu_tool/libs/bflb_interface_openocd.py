@@ -26,6 +26,7 @@ import binascii
 import subprocess
 import threading
 import telnetlib
+import serial
 
 try:
     import bflb_path
@@ -39,39 +40,46 @@ openocd_path = os.path.join(app_path, "utils/openocd", "openocd.exe")
 
 class ThreadOpenocdServer(threading.Thread):
 
-    def __init__(self, chiptype="bl602", device="rv_dbg_plus"):
+    def __init__(self, chiptype="bl602", device="rv_dbg_plus", serial=None):
         threading.Thread.__init__(self)
         self.timeToQuit = threading.Event()
         self.timeToQuit.clear()
         self._chiptype = chiptype
         self._device = device
+        self._serial = serial
+        bflb_utils.printf("SN is " + str(self._serial))
 
     def stop(self):
         self.timeToQuit.set()
 
     def run(self):
         cmd = ""
+        if self._serial:
+            cmd_ftdi_serial = " -c \"ftdi_serial \\\"" + self._serial + "\\\"\""
+        else:
+            cmd_ftdi_serial = ""
         if self._device == "rv_dbg_plus":
             if self._chiptype == "bl602":
                 cmd = openocd_path + " -f " + \
-                      app_path + "/utils/openocd/if_rv_dbg_plus.cfg -f " + \
-                      app_path + "/utils/openocd/tgt_602.cfg"
+                      app_path + "/utils/openocd/if_rv_dbg_plus.cfg " + cmd_ftdi_serial +\
+                      " -f " + app_path + "/utils/openocd/tgt_602.cfg"
             else:
                 cmd = openocd_path + " -f " + \
-                      app_path + "/utils/openocd/if_rv_dbg_plus.cfg -f " + \
-                      app_path + "/utils/openocd/tgt_702.cfg"
+                      app_path + "/utils/openocd/if_rv_dbg_plus.cfg" + cmd_ftdi_serial +\
+                      " -f " + app_path + "/utils/openocd/tgt_702.cfg"
         elif self._device == "ft2232hl":
             if self._chiptype == "bl602":
                 cmd = openocd_path + " -f " + \
-                      app_path + "/utils/openocd/if_bflb_dbg.cfg -f " + \
-                      app_path + "/utils/openocd/tgt_602.cfg"
+                      app_path + "/utils/openocd/if_bflb_dbg.cfg" + cmd_ftdi_serial +\
+                      " -f " + app_path + "/utils/openocd/tgt_602.cfg" 
             else:
                 cmd = openocd_path + " -f " + \
-                      app_path + "/utils/openocd/if_bflb_dbg.cfg -f " + \
-                      app_path + "/utils/openocd/tgt_702.cfg"
+                      app_path + "/utils/openocd/if_bflb_dbg.cfg" + cmd_ftdi_serial +\
+                      " -f " + app_path + "/utils/openocd/tgt_702.cfg"
         else:
             cmd = openocd_path + " -f " + \
-                  app_path + "/utils/openocd/openocd-usb-sipeed.cfg"
+                  app_path + "/utils/openocd/openocd-usb-sipeed.cfg " + cmd_ftdi_serial
+        bflb_utils.printf(cmd)
         p = subprocess.Popen(cmd,
                              shell=True,
                              stdin=subprocess.PIPE,
@@ -94,20 +102,23 @@ class BflbOpenocdPort(object):
         self._openocd_run_addr = "22010000"
         self.tn = telnetlib.Telnet()
 
-    def if_init(self, device, rate, chiptype="bl60x", chipname="bl60x"):
+    def if_init(self, device, sn, rate, chiptype="bl60x", chipname="bl60x"):
         if self._inited is False:
             sub_module = __import__("libs." + chiptype, fromlist=[chiptype])
             self._openocd_shake_hand_addr = sub_module.openocd_load_cfg.openocd_shake_hand_addr
             self._openocd_data_addr = sub_module.openocd_load_cfg.openocd_data_addr
             # tif_set = sub_module.openocd_load_cfg.openocd_set_tif
             self._openocd_run_addr = sub_module.openocd_load_cfg.openocd_run_addr
-
             self._speed = rate
             self._inited = True
             self._chiptype = chiptype
             self._chipname = chipname
-
-            self._openocd_th = ThreadOpenocdServer(chiptype, device)
+            if sn:
+                serial = 'FactoryAIOT Prog ' + str(sn)
+            else:
+                serial = None
+            self._openocd_th = None
+            self._openocd_th = ThreadOpenocdServer(chiptype, device, serial)
             self._openocd_th.setDaemon(True)
             self._openocd_th.start()
             # time.sleep(0.1)
@@ -277,8 +288,9 @@ class BflbOpenocdPort(object):
             self.tn.write("shutdown\n".encode('ascii'))
             time.sleep(0.05)
         self.tn.close()
-        self._openocd_th.stop()
-        self._inited = False
+        if self._openocd_th:
+            self._openocd_th.stop()
+            self._inited = False
 
     def if_deal_ack(self):
         success, ack = self.if_read(2)

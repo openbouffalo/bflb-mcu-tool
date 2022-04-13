@@ -7,5 +7,3 @@ cklink_load_addr = "22010000"
 cklink_core_type = "RISC-V"
 cklink_set_tif = 0
 cklink_run_addr = "22010000"
-vid = 0x42bf
-pid = 0xb210
