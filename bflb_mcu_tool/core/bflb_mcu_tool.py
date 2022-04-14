@@ -2044,6 +2044,7 @@ def get_value(args):
         else:
             config["boot_src"] = args.bootsrc 
     elif chiptype == "bl702":
+        config["key_sel"] = "1"
         if not args.xtal: 
             config["dl_xtal"] = "32M"
             config["xtal_type"] = 'XTAL_32M'
@@ -2113,6 +2114,7 @@ def run():
             port = sorted(ports, key=lambda x: int(re.match('COM(\d+)', x).group(1)))[0]
         except Exception:
             port = sorted(ports)[0]
+    firmware_default = os.path.join(app_path, "img/project.bin")
     parser = argparse.ArgumentParser(description='mcu-tool')
     parser.add_argument('--chipname', required=True, help='chip name')
     parser.add_argument("--interface", dest="interface", default="uart", help="interface to use")
@@ -2122,7 +2124,7 @@ def run():
     parser.add_argument("--xtal", dest="xtal", help="xtal type")
     parser.add_argument("--flashclk", dest="flashclk", help="flash clock")
     parser.add_argument("--pllclk", dest="pllclk", help="pll clock")
-    parser.add_argument("--firmware", dest="firmware", required=True, help="image to write") 
+    parser.add_argument("--firmware", dest="firmware", default=firmware_default, help="image to write") 
     parser.add_argument("--addr", dest="addr", default="2000", help="address to write") 
     parser.add_argument("--dts", dest="dts", help="device tree")
     parser.add_argument("--build", dest="build", action="store_true", help="build image")

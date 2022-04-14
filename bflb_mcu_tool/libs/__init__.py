@@ -29,5 +29,3 @@ from . import bl60x
 from . import bl602
 from . import bl702
 from . import bl808
-
-

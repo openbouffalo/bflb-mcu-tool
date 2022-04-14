@@ -904,6 +904,10 @@ def img_creat_process(group_type, flash_img, cfg):
         seg_cnt = len(data_toencrypt)
     # do encrypt
     if encrypt != 0:
+        unencrypt_mfg_data = bytearray(0)
+        if seg_cnt >= 0x2000:
+            if data_toencrypt[0x1000:0x1004] == bytearray("0mfg".encode("utf-8")):
+                unencrypt_mfg_data = data_toencrypt[0x1000:0x2000]
         if xts_mode != 0:
             # encrypt_iv = codecs.decode(reverse_iv(encrypt_iv), 'hex')
             data_toencrypt = img_create_encrypt_data_xts(data_toencrypt, encrypt_key, encrypt_iv,
@@ -911,6 +915,8 @@ def img_creat_process(group_type, flash_img, cfg):
         else:
             data_toencrypt = img_create_encrypt_data(data_toencrypt, encrypt_key, encrypt_iv,
                                                     flash_img)
+        if unencrypt_mfg_data != bytearray(0):
+            data_toencrypt = data_toencrypt[0:0x1000] + unencrypt_mfg_data + data_toencrypt[0x2000:]
     # get fw data
     fw_data = bytearray(0)
     data_tohash += data_toencrypt

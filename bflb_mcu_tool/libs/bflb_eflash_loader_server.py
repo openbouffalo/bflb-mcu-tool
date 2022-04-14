@@ -35,6 +35,7 @@ try:
     import bflb_path
 except ImportError:
     from libs import bflb_path
+import config as gol
 from libs import bflb_eflash_loader
 from libs import bflb_version
 from libs import bflb_ecdh
@@ -44,17 +45,6 @@ from libs.bflb_utils import eflash_loader_parser_init
 total_cnt = 0
 success_cnt = 0
 ecdh_enable = False
-
-chip_dict = {
-    "bl56x": "bl60x",
-    "bl60x": "bl60x",
-    "bl562": "bl602",
-    "bl602": "bl602",
-    "bl702": "bl702",
-    "bl808": "bl808",
-    "bl616": "bl616",
-    "wb03" : "wb03",
-}
 
 try:
     import changeconf as cgc
@@ -174,7 +164,7 @@ def eflash_loader_worker(client_addr, client_data):
     try:
         parser = eflash_loader_parser_init()
         args = parser.parse_args(request.split(" "))
-        eflash_loader_t = bflb_eflash_loader.BflbEflashLoader(args.chipname, chip_dict[args.chipname])
+        eflash_loader_t = bflb_eflash_loader.BflbEflashLoader(args.chipname, gol.dict_chip_cmd[args.chipname])
         ret = eflash_loader_t.efuse_flash_loader(args, None, None)
     finally:
         udp_socket_result = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)

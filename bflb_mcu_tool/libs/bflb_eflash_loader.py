@@ -2216,7 +2216,7 @@ class BflbEflashLoader(object):
             offset, flashCfgLen, flash_para, flashCrcOffset, crcOffset = \
                 bflb_flash_select.update_flash_para_from_cfg\
                 (sub_module.bootheader_cfg_keys.bootheader_cfg_keys, cfg_dir+conf_name)
-            fp = open(file, 'wb+')
+            fp = open(os.path.join(app_path, file), 'wb+')
             fp.write(flash_para)
             fp.close()
         return flash_para
