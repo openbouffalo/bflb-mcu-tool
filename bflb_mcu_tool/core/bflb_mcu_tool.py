@@ -7,6 +7,7 @@ import shutil
 import argparse
 import traceback
 from importlib import reload
+from os.path import expanduser
 
 try:
     import bflb_path
@@ -130,15 +131,22 @@ class BflbMcuTool(object):
         return addr
 
     def bl616_img_addr_remap(self, addr):
+        startwith = 0
         remap_list = {
-            "20": "22",
-            "21": "23",
-            "60": "62",
-            "61": "63"
+            "22": "20",
+            "23": "21",
+            "62": "60",
+            "63": "61"
         }
+        if addr[0:2] == "0x":
+            addr = addr[2:]
+            startwith = 1
         for key, value in remap_list.items():
             if addr[0:2] == key:
                 addr = value + addr[2:]
+                break
+        if startwith:
+            addr = "0x" + addr
         return addr
 
     def eflash_loader_thread(self, args, eflash_loader_bin=None, callback=None, create_img_callback=None):
@@ -188,6 +196,10 @@ class BflbMcuTool(object):
             cfg.write(self.eflash_loader_cfg_tmp, "w+")
             bflb_utils.printf("Save as efuse.bin")
             options = ["--read", "--efuse", "--start=0", "--end=255", "--file=efuse.bin", "-c", self.eflash_loader_cfg_tmp]
+            if cfg.has_option("LOAD_CFG", "boot2_isp_mode"):
+                boot2_isp_mode = cfg.get("LOAD_CFG", "boot2_isp_mode")
+                if int(boot2_isp_mode) == 1:
+                    options.extend(["--isp"])
             eflash_loader_bin = os.path.join(chip_path, self.chipname,
                                              "eflash_loader/" + get_eflash_loader(values["dl_xtal"]))
             args = parser_eflash.parse_args(options)
@@ -245,6 +257,10 @@ class BflbMcuTool(object):
                 return ret
             bflb_utils.printf("Save as flash.bin")
             options = ["--read", "--flash", "--start="+start, "--end="+end, "--file=flash.bin", "-c", self.eflash_loader_cfg_tmp]
+            if cfg.has_option("LOAD_CFG", "boot2_isp_mode"):
+                boot2_isp_mode = cfg.get("LOAD_CFG", "boot2_isp_mode")
+                if int(boot2_isp_mode) == 1:
+                    options.extend(["--isp"])
             eflash_loader_bin = os.path.join(chip_path, self.chipname, "eflash_loader/" + get_eflash_loader(values["dl_xtal"]))
             args = parser_eflash.parse_args(options)
             bh_cfg_file = self.img_create_path + "/efuse_bootheader_cfg.ini"
@@ -303,6 +319,10 @@ class BflbMcuTool(object):
                 options = ["--erase", "--flash", "--end=0", "-c", self.eflash_loader_cfg_tmp]
             else:
                 options = ["--erase", "--flash", "--start="+start, "--end="+end, "-c", self.eflash_loader_cfg_tmp]
+            if cfg.has_option("LOAD_CFG", "boot2_isp_mode"):
+                boot2_isp_mode = cfg.get("LOAD_CFG", "boot2_isp_mode")
+                if int(boot2_isp_mode) == 1:
+                    options.extend(["--isp"])
             eflash_loader_bin = os.path.join(chip_path, self.chipname,
                                              "eflash_loader/" + get_eflash_loader(values["dl_xtal"]))
             args = parser_eflash.parse_args(options)
@@ -565,7 +585,8 @@ class BflbMcuTool(object):
         if chiptype == "bl702":
             bflb_utils.update_cfg(cfg, section, "boot2_enable", "0")
         if "xtal_type" in values.keys():
-            bflb_utils.update_cfg(cfg, section, "xtal_type",
+            if chiptype == "bl60x" or chiptype == "bl602" or chiptype == "bl702":
+                bflb_utils.update_cfg(cfg, section, "xtal_type",
                                     self.xtal_type_.index(values["xtal_type"]))
         if "pll_clk" in values.keys():
             if chiptype == "bl602":
@@ -968,9 +989,9 @@ class BflbMcuTool(object):
         cfg.read(bh_cfg_file)
         bflb_utils.update_cfg(cfg, group0_section, "boot2_enable", "0")
         bflb_utils.update_cfg(cfg, group1_section, "boot2_enable", "0")
-        if "xtal_type" in values.keys():
-            bflb_utils.update_cfg(cfg, group0_section, "xtal_type",
-                                  self.xtal_type_.index(values["xtal_type"]))
+#         if "xtal_type" in values.keys():
+#             bflb_utils.update_cfg(cfg, group0_section, "xtal_type",
+#                                   self.xtal_type_.index(values["xtal_type"]))
         if "mcu_clk" in values.keys():
             if values["mcu_clk"] == "WIFIPLL 320M":
                 bflb_utils.update_cfg(cfg, group0_section, "mcu_clk", "4")
@@ -1222,11 +1243,43 @@ class BflbMcuTool(object):
         group0_img = ""
         img_addr_offset = "0x0"
         segheader_file = "/segheader.bin"
-        if values["img1_file"] == "":
-            error = "Please select image1 file"
-            bflb_utils.printf(error)
-            bflb_utils.set_error_code("0061")
-            return bflb_utils.errorcode_msg()
+        
+        dts_bytearray = None
+        if values["device_tree"]:
+            ro_params_d = values["device_tree"]
+            try:
+                dts_hex = bl_ro_device_tree.bl_dts2hex(ro_params_d)
+                dts_bytearray = bflb_utils.hexstr_to_bytearray(dts_hex)
+            except Exception as e:
+                pass
+            if dts_bytearray:
+                tlv_bin = self.img_create_path + "/tlv.bin"
+                with open(tlv_bin, "wb") as fp:
+                    fp.write(dts_bytearray)
+                bflb_utils.printf("tlv bin created success")
+        if values["img1_file"]:
+            img_org = values["img1_file"]
+            if parse_rfpa(img_org) == b'BLRFPARA' and dts_bytearray:
+                length = len(dts_bytearray)
+                with open(img_org, "rb") as fp:
+                    bin_byte = fp.read()
+                    bin_bytearray = bytearray(bin_byte)
+                    bin_bytearray[1032:1032+length] = dts_bytearray
+                filedir, ext = os.path.splitext(img_org)
+                img_new = filedir + "_rfpa" + ext
+                with open(img_new, "wb") as fp:
+                    fp.write(bin_bytearray)
+                values["img1_file"] = img_new
+                bflb_utils.printf("tlv bin inserted success")
+        else:
+            if values["dl_chiperase"] == "True":
+                bflb_utils.printf("flash chiperase operation")
+                return True
+            else:
+                error = "Please select image1 file"
+                bflb_utils.printf(error)
+                bflb_utils.set_error_code("0061")
+                return bflb_utils.errorcode_msg()              
         if values["img1_addr"] == "" or values["img1_addr"] == "0x":
             error = "Please set image1 address"
             bflb_utils.printf(error)
@@ -1309,9 +1362,9 @@ class BflbMcuTool(object):
         cfg = BFConfigParser()
         cfg.read(bh_cfg_file)
         bflb_utils.update_cfg(cfg, group0_section, "boot2_enable", "0")
-        if "xtal_type" in values.keys():
-            bflb_utils.update_cfg(cfg, group0_section, "xtal_type",
-                                  self.xtal_type_.index(values["xtal_type"]))
+#         if "xtal_type" in values.keys():
+#             bflb_utils.update_cfg(cfg, group0_section, "xtal_type",
+#                                   self.xtal_type_.index(values["xtal_type"]))
         if "mcu_clk" in values.keys():
             if values["mcu_clk"] == "WIFIPLL 320M":
                 bflb_utils.update_cfg(cfg, group0_section, "mcu_clk", "5")
@@ -1573,6 +1626,10 @@ class BflbMcuTool(object):
                 options = ["--write", "--flash", "-p", values["dl_comport"], "-c", self.eflash_loader_cfg_tmp]
             else:
                 options = ["--write", "--flash", "-c", self.eflash_loader_cfg_tmp]
+            if cfg.has_option("LOAD_CFG", "boot2_isp_mode"):
+                boot2_isp_mode = cfg.get("LOAD_CFG", "boot2_isp_mode")
+                if int(boot2_isp_mode) == 1:
+                    options.extend(["--isp"])
             if  "encrypt_key" in values.keys() or\
                 "encrypt_type" in values.keys() or\
                 "aes_iv" in values.keys() or\
@@ -1772,6 +1829,10 @@ class BflbMcuTool(object):
             options = ["--write", "--flash", "-p", values["dl_comport"], "-c", self.eflash_loader_cfg_tmp]
         else:
             options = ["--write", "--flash", "-c", self.eflash_loader_cfg_tmp]
+        if cfg.has_option("LOAD_CFG", "boot2_isp_mode"):
+            boot2_isp_mode = cfg.get("LOAD_CFG", "boot2_isp_mode")
+            if int(boot2_isp_mode) == 1:
+                options.extend(["--isp"])
         if  "encrypt_key-group0" in values.keys() or\
             "encrypt_key-group1" in values.keys() or\
             "encrypt_type-group0" in values.keys() or\
@@ -1903,6 +1964,10 @@ class BflbMcuTool(object):
             options = ["--write", "--flash", "-p", values["dl_comport"], "-c", self.eflash_loader_cfg_tmp]
         else:
             options = ["--write", "--flash", "-c", self.eflash_loader_cfg_tmp]
+        if cfg.has_option("LOAD_CFG", "boot2_isp_mode"):
+            boot2_isp_mode = cfg.get("LOAD_CFG", "boot2_isp_mode")
+            if int(boot2_isp_mode) == 1:
+                options.extend(["--isp"])
         if  "encrypt_key-group0" in values.keys() or\
             "encrypt_type-group0" in values.keys() or\
             "aes_iv-group0" in values.keys() or\
@@ -1994,6 +2059,23 @@ class BflbMcuTool(object):
 
 
 def get_value(args):
+    
+    if args.firmware:
+        firmware = args.firmware.replace('~', expanduser("~"))
+    else:
+        firmware = None
+    if not firmware or not os.path.exists(firmware):
+        bflb_utils.printf("firmware is not existed")
+        sys.exit(1)
+        
+    if args.dts:
+        dts = args.dts.replace('~', expanduser("~"))
+        if not os.path.exists(dts):                                              
+            bflb_utils.printf("device tree is not existed")
+            sys.exit(1)
+    else:
+        dts = None
+ 
     chipname = args.chipname
     chiptype = gol.dict_chip_cmd.get(chipname, "unkown chip type") 
     config = dict()
@@ -2011,15 +2093,15 @@ def get_value(args):
     config.setdefault('aes_iv', '')
     config.setdefault('public_key_cfg', '')
     config.setdefault('private_key_cfg', '')
-    config.setdefault('bootinfo_addr', '0x0')  
+    config.setdefault('bootinfo_addr', '0x0')
     config["dl_device"] = args.interface.lower()
     config["dl_comport"] = args.port
     config["dl_comspeed"] = str(args.baudrate)
     config["dl_jlinkspeed"] = str(args.baudrate)
-    config["img_file"] = args.firmware
-    config["img_addr"] = "0x" + str(args.addr) 
-    config["device_tree"] = args.dts
-    
+    config["img_file"] = firmware
+    config["img_addr"] = "0x" + args.addr.replace("0x", "")
+    config["device_tree"] = dts
+        
     if chiptype == "bl602":
         if not args.xtal: 
             config["dl_xtal"] = "40M"
@@ -2071,15 +2153,15 @@ def get_value(args):
         if not args.xtal: 
             config["dl_xtal"] = "38.4M"
             config["xtal_type"] = 'XTAL_38.4M'
+            bflb_utils.printf("Default xtal is 38.4M")
         else:   
             config["dl_xtal"] = args.xtal 
             config["xtal_type"] = 'XTAL_' + args.xtal
-            bflb_utils.printf("Default xtal is 38.4M")
         if not args.flashclk:
             config["flash_clk_type"] = "XTAL"
+            bflb_utils.printf("Default flash clock is XTAL")
         else:      
             config["flash_clk_type"] = args.flashclk
-            bflb_utils.printf("Default flash clock is XTAL")
         if not args.pllclk:
             config["pll_clk"] = "160M"
         else:
@@ -2089,7 +2171,92 @@ def get_value(args):
             config["boot_src"] = "Flash"
             bflb_utils.printf("Default boot source is flash")
         else:
-            config["boot_src"] = args.bootsrc 
+            config["boot_src"] = args.bootsrc
+    elif chiptype == "bl616" or chiptype == "wb03":
+        if not args.xtal: 
+            config["dl_xtal"] = "40M"
+            config["xtal_type"] = 'XTAL_40M'
+            bflb_utils.printf("Default xtal is 40M")
+        else:   
+            config["dl_xtal"] = args.xtal 
+            config["xtal_type"] = 'XTAL_' + args.xtal
+        if not args.flashclk:
+            config["flash_clk_type"] = "XTAL"
+            bflb_utils.printf("Default flash clock is XTAL")
+        else:      
+            config["flash_clk_type"] = args.flashclk
+        if not args.pllclk:
+            config["pll_clk"] = "WIFIPLL 320M"
+            bflb_utils.printf("Default pll clock is WIFIPLL 320M")
+        else:
+            config["pll_clk"] = args.pllclk
+        if not args.bootsrc:
+            config["boot_src"] = "Flash"
+            bflb_utils.printf("Default boot source is flash")
+        else:
+            config["boot_src"] = args.bootsrc              
+        config["img1_file"] = firmware
+        if args.addr:
+            config["img1_addr"] = args.addr
+    elif chiptype == "bl808":
+        config["key_sel"] = "0"
+        if not args.xtal: 
+            config["dl_xtal"] = "40M"
+            config["xtal_type"] = 'XTAL_40M'
+            bflb_utils.printf("Default xtal is 40M")
+        else:   
+            config["dl_xtal"] = args.xtal 
+            config["xtal_type"] = 'XTAL_' + args.xtal
+        if not args.flashclk:
+            config["flash_clk_type"] = "XTAL"
+            bflb_utils.printf("Default flash clock is XTAL")
+        else:      
+            config["flash_clk_type"] = args.flashclk
+        if not args.pllclk:
+            config["mcu_clk"] = "WIFIPLL 320M"
+            bflb_utils.printf("Default mcu clock is WIFIPLL 320M")
+        else:
+            config["mcu_clk"] = args.pllclk 
+        if not args.bootsrc:
+            config["boot_src"] = "Flash"
+            bflb_utils.printf("Default boot source is flash")
+        else:
+            config["boot_src"] = args.bootsrc          
+        config["encrypt_type-group0"] = 'None'
+        config["key_sel-group0"] = '0'
+        config["cache_way_disable-group0"] = '0'
+        config["sign_type-group0"] = 'None'
+        config["crc_ignore-group0"] = 'False'
+        config["hash_ignore-group0"] = 'False'
+        config["encrypt_key-group0"] = ''
+        config["aes_iv-group0"] = ''
+        config["public_key_cfg-group0"] = ''
+        config["private_key_cfg-group0"] = ''    
+        config["encrypt_type-group1"] = 'None'
+        config["key_sel-group1"] = '0'
+        config["cache_way_disable-group1"] = '0'
+        config["sign_type-group1"] = 'None'
+        config["crc_ignore-group1"] = 'False'
+        config["hash_ignore-group1"] = 'False'
+        config["encrypt_key-group1"] = ''
+        config["aes_iv-group1"] = ''
+        config["public_key_cfg-group1"] = ''
+        config["private_key_cfg-group1"] = ''   
+        config["img1_group"] = "group0" 
+        config["img2_group"] = "unused"  
+        config["img3_group"] = "unused"
+        config["img2_file"] = ""  
+        config["img2_addr"] = "" 
+        config["img3_file"] = ""  
+        config["img3_addr"] = ""  
+        config["img1_file"] = firmware
+        if args.addr:
+            if args.addr == "0x2000": 
+                config["img1_addr"] = "0x58000000"
+            else:
+                config["img1_addr"] = args.addr
+        else:
+            config["img1_addr"] = "0x58000000"
     else:
         bflb_utils.printf("Chip type is not correct")
         sys.exit(1)
@@ -2125,7 +2292,7 @@ def run():
     parser.add_argument("--flashclk", dest="flashclk", help="flash clock")
     parser.add_argument("--pllclk", dest="pllclk", help="pll clock")
     parser.add_argument("--firmware", dest="firmware", default=firmware_default, help="image to write") 
-    parser.add_argument("--addr", dest="addr", default="2000", help="address to write") 
+    parser.add_argument("--addr", dest="addr", default="0x2000", help="address to write") 
     parser.add_argument("--dts", dest="dts", help="device tree")
     parser.add_argument("--build", dest="build", action="store_true", help="build image")
     parser.add_argument("--erase", dest="erase", action="store_true", help="chip erase") 
@@ -2135,15 +2302,18 @@ def run():
     gol.chip_name = args.chipname
     if conf_sign:
         reload(cgc)    
-    if not args.port:
-        bflb_utils.printf("Serial port is not found")
-    else:
-        bflb_utils.printf("Serial port is " + str(port)) 
+    if args.port:
+        bflb_utils.printf("Serial port is " + args.port)
+    elif port:
+        bflb_utils.printf("Serial port is " + port)    
+    else: 
+        bflb_utils.printf("Serial port is not found") 
     bflb_utils.printf("Baudrate is " + str(args.baudrate)) 
-    bflb_utils.printf("Firmware is " + args.firmware)
+    bflb_utils.printf("Firmware is " + str(args.firmware))
+    bflb_utils.printf("Device Tree is " + str(args.dts))
+    bflb_utils.printf("==================================================")
     config = get_value(args)      
     obj_mcu = BflbMcuTool(args.chipname, gol.dict_chip_cmd.get(args.chipname, "unkown chip type"))
-    bflb_utils.printf("==================================================")
     try:
         obj_mcu.create_img(args.chipname, gol.dict_chip_cmd[args.chipname], config)
         if args.build:

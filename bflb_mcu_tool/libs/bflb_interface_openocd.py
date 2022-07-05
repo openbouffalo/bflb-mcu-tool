@@ -240,7 +240,7 @@ class BflbOpenocdPort(object):
                 data += self.if_addr_unaligned_read(addr, pre_read_len)
             data += self.if_addr_aligned_read(hex(addr_int + pre_read_len),
                                               data_len - pre_read_len)
-            return data
+            return data[:data_len]
 
     def if_read(self, data_len):
         start_time = (time.time() * 1000)
@@ -272,7 +272,7 @@ class BflbOpenocdPort(object):
                      reset_revert=True,
                      cutoff_time=0,
                      shake_hand_retry=2,
-                     iap_timeout=0,
+                     isp_timeout=0,
                      boot_load=False):
         self.if_clear_buff()
         self.if_write(bytearray(1))

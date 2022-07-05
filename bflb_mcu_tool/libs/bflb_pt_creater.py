@@ -96,53 +96,99 @@ class PtCreater(object):
 
     def construct_table(self):
         parcel = {}
+        name_list = []
         if self.pt_new is True:
             parcel['pt_new'] = True
         else:
             parcel['pt_new'] = False
         parcel['pt_addr0'] = self.parsed_toml["pt_table"]["address0"]
         parcel['pt_addr1'] = self.parsed_toml["pt_table"]["address1"]
-        for tbl_item in self.parsed_toml["pt_entry"]:
-            if tbl_item['name'] == 'factory':
-                parcel['conf_addr'] = tbl_item['address0']
-                parcel['conf_len'] = tbl_item['size0']
-            if tbl_item['name'] == 'FW_CPU0':
-                parcel['fw_cpu0_addr'] = tbl_item['address0']
-                parcel['fw_cpu0_len'] = tbl_item['size0']
-            if tbl_item['name'] == 'FW_GRP0':
-                parcel['fw_group0_addr'] = tbl_item['address0']
-                parcel['fw_group0_len'] = tbl_item['size0']
-            if tbl_item['name'] == 'FW_GRP1':
-                parcel['fw_group1_addr'] = tbl_item['address0']
-                parcel['fw_group1_len'] = tbl_item['size0']
-            if tbl_item['name'] == 'FW':
-                parcel['fw_addr'] = tbl_item['address0']
-                parcel['fw_len'] = tbl_item['size0']
-            if tbl_item['name'] == 'D0FW':
-                parcel['fw_d0_addr'] = tbl_item['address0']
-                parcel['fw_d0_len'] = tbl_item['size0']
-            if tbl_item['name'] == 'IMTB':
-                parcel['imtb_addr'] = tbl_item['address0']
-                parcel['imtb_len'] = tbl_item['size0']
-            if tbl_item['name'] == 'media':
-                parcel['media_addr'] = tbl_item['address0']
-                parcel['media_len'] = tbl_item['size0']
-            if tbl_item['name'] == 'mfg':
-                parcel['mfg_addr'] = tbl_item['address0']
-                parcel['mfg_len'] = tbl_item['size0']
-            if tbl_item['name'] == 'Imgload':
-                parcel['imgloader_addr'] = tbl_item['address0']
-                parcel['imgloader_len'] = tbl_item['size0']
-            if tbl_item['name'] == 'SBI':
-                parcel['sbi_addr'] = tbl_item['address0']
-                parcel['sbi_len'] = tbl_item['size0']
-            if tbl_item['name'] == 'Kernel':
-                parcel['kernel_addr'] = tbl_item['address0']
-                parcel['kernel_len'] = tbl_item['size0']
-            if tbl_item['name'] == 'Rootfs':
-                parcel['rootfs_addr'] = tbl_item['address0']
-                parcel['rootfs_len'] = tbl_item['size0']
-        return parcel
+        version_sign = 1
+        try:
+            if "version" in self.parsed_toml["pt_table"] and self.parsed_toml["pt_table"]["version"]==2:
+                version_sign = 2
+                parcel["version"] = 2#self.parsed_toml["pt_table"]["version"]
+        except:
+            pass
+        if version_sign==1:
+            for tbl_item in self.parsed_toml["pt_entry"]:
+                if tbl_item['name'].upper()  == 'FW_CPU0':
+                    parcel['fw_cpu0_addr'] = tbl_item['address0']
+                    parcel['fw_cpu0_len'] = tbl_item['size0']
+                    parcel['fw1_cpu0_addr'] = tbl_item['address1']
+                    parcel['fw1_cpu0_len'] = tbl_item['size1']
+                if tbl_item['name'].upper()  == 'FW_GRP0':
+                    parcel['fw_group0_addr'] = tbl_item['address0']
+                    parcel['fw_group0_len'] = tbl_item['size0']
+                    parcel['fw1_group0_addr'] = tbl_item['address1']
+                    parcel['fw1_group0_len'] = tbl_item['size1']
+                if tbl_item['name'].upper()  == 'FW_GRP1':
+                    parcel['fw_group1_addr'] = tbl_item['address0']
+                    parcel['fw_group1_len'] = tbl_item['size0']
+                    parcel['fw1_group1_addr'] = tbl_item['address1']
+                    parcel['fw1_group1_len'] = tbl_item['size1']
+                if tbl_item['name'].lower() == 'factory':
+                    parcel['conf_addr'] = tbl_item['address0']
+                    parcel['conf_len'] = tbl_item['size0']
+                if tbl_item['name'].upper()  == 'FW':
+                    parcel['fw_addr'] = tbl_item['address0']
+                    parcel['fw_len'] = tbl_item['size0']
+                    parcel['fw1_addr'] = tbl_item['address1']
+                    parcel['fw1_len'] = tbl_item['size1']
+                if tbl_item['name'].upper()  == 'D0FW':
+                    parcel['fw_d0_addr'] = tbl_item['address0']
+                    parcel['fw_d0_len'] = tbl_item['size0']
+                    parcel['fw1_d0_addr'] = tbl_item['address1']
+                    parcel['fw1_d0_len'] = tbl_item['size1']
+                if tbl_item['name'].lower() == 'imtb':
+                    parcel['imtb_addr'] = tbl_item['address0']
+                    parcel['imtb_len'] = tbl_item['size0']
+                if tbl_item['name'].lower() == 'media':
+                    parcel['media_addr'] = tbl_item['address0']
+                    parcel['media_len'] = tbl_item['size0']
+                if tbl_item['name'].lower() == 'kv':
+                    parcel['kv_addr'] = tbl_item['address0']
+                    parcel['kv_len'] = tbl_item['size0']
+                if tbl_item['name'].lower() == 'yocboot':
+                    parcel['fw_yocboot_addr'] = tbl_item['address0']
+                    parcel['fw_yocboot_len'] = tbl_item['size0']                
+                if tbl_item['name'].lower() == 'mfg':
+                    parcel['mfg_addr'] = tbl_item['address0']
+                    parcel['mfg_len'] = tbl_item['size0']
+                if tbl_item['name'].lower() == 'imgload':
+                    parcel['imgloader_addr'] = tbl_item['address0']
+                    parcel['imgloader_len'] = tbl_item['size0']
+                if tbl_item['name'].lower() == 'sbi':
+                    parcel['sbi_addr'] = tbl_item['address0']
+                    parcel['sbi_len'] = tbl_item['size0']
+                if tbl_item['name'].lower() == 'kernel':
+                    parcel['kernel_addr'] = tbl_item['address0']
+                    parcel['kernel_len'] = tbl_item['size0']
+                if tbl_item['name'].lower() == 'rootfs':
+                    parcel['rootfs_addr'] = tbl_item['address0']
+                    parcel['rootfs_len'] = tbl_item['size0']
+                if tbl_item['name'].lower() == 'dtb':
+                    parcel['dtb_addr'] = tbl_item['address0']
+                    parcel['dtb_len'] = tbl_item['size0']
+        elif version_sign==2:
+            for tbl_item in self.parsed_toml["pt_entry"]:
+                name = tbl_item['name'].lower().replace(' ','_')
+                parcel[name+'_addr'] = tbl_item['address0']
+                parcel[name+'_len'] = tbl_item['size0']
+                parcel[name+'_header'] = tbl_item['header']
+                if name.startswith("fw"):
+                    parcel[name.replace("fw", "fw1")+'_addr'] = tbl_item['address1']
+                    parcel[name.replace("fw", "fw1")+'_len'] = tbl_item['size1']
+                try:
+                    if "security" in tbl_item:
+                        parcel[name+'_security'] = tbl_item['security']
+                except:
+                    pass
+                name_list.append(name)
+        if len(name_list) > 0:
+            return parcel, name_list
+        else:
+            return parcel, []
 
 
 if __name__ == '__main__':

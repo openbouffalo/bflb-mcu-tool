@@ -25,7 +25,7 @@ from . import bflb_utils
 from . import bflb_configobj
 from . import bflb_fdt
 
-from . import bl60x
 from . import bl602
 from . import bl702
 from . import bl808
+from . import bl616

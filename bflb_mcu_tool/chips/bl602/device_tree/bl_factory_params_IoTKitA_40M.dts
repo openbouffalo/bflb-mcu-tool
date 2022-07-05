@@ -342,7 +342,7 @@
         #address-cells = <1>;
         #size-cells = <1>;
         brd_rf {
-            pwr_table_ble = <13>;  //range:-3~15dbm; if set -3, please set 253 here
+            pwr_table_ble = <13>;  //range:0~15dbm
         };
     };
 };

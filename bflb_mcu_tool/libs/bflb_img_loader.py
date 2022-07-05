@@ -357,7 +357,7 @@ class BflbImgLoader(object):
                             reset_revert=True,
                             cutoff_time=0,
                             shake_hand_retry=2,
-                            iap_timeout=0,
+                            isp_timeout=0,
                             boot_load=True):
         self.bflb_boot_if.if_init(comnum, sh_baudrate, self._chip_type, self._chip_name)
 
@@ -365,7 +365,7 @@ class BflbImgLoader(object):
         if self._chip_type == "wb03":
             self.bflb_boot_if.if_toggle_boot(do_reset, reset_hold_time, shake_hand_delay,
                                              reset_revert, cutoff_time, shake_hand_retry,
-                                             iap_timeout, boot_load)
+                                             isp_timeout, boot_load)
             bflb_utils.printf("get_chip_id")
             # get chip id before download
             ret, data_read = self.boot_process_one_section("get_chip_id", 0)
@@ -383,7 +383,7 @@ class BflbImgLoader(object):
                 self.bflb_boot_if.if_set_602a0_download_fix(False)
             ret = self.bflb_boot_if.if_shakehand(do_reset, reset_hold_time, shake_hand_delay,
                                                  reset_revert, cutoff_time, shake_hand_retry,
-                                                 iap_timeout, boot_load)
+                                                 isp_timeout, boot_load)
             if self._chip_type == "bl602":
                 self.bflb_boot_if.if_set_602a0_download_fix(False)
             if ret != "OK":
@@ -477,12 +477,10 @@ class BflbImgLoader(object):
                 fp.close()
                 self._imge_fp = open(file_encrypt, 'rb')
             else:
-                if sys.platform.startswith('darwin'):
-                    file = os.path.join(bflb_utils.app_path, file)
+                file = os.path.join(bflb_utils.app_path, file)
                 self._imge_fp = open(file, 'rb')
         else:
-            if sys.platform.startswith('darwin'):
-                file = os.path.join(bflb_utils.app_path, file)
+            file = os.path.join(bflb_utils.app_path, file)
             self._imge_fp = open(file, 'rb')
         if self._chip_type == "wb03":
             # wb03 img loader, read 0xD0 len for cut wb03 header
@@ -599,12 +597,12 @@ class BflbImgLoader(object):
                          reset_revert=True,
                          cutoff_time=0,
                          shake_hand_retry=2,
-                         iap_timeout=0,
+                         isp_timeout=0,
                          boot_load=True):
         bflb_utils.printf("========= image get bootinfo =========")
         ret = self.img_load_shake_hand(comnum, sh_baudrate, wk_baudrate, do_reset, reset_hold_time,
                                        shake_hand_delay, reset_revert, cutoff_time,
-                                       shake_hand_retry, iap_timeout, boot_load)
+                                       shake_hand_retry, isp_timeout, boot_load)
         if ret == "shake hand fail" or ret == "change rate fail":
             bflb_utils.printf("shake hand fail")
             self.bflb_boot_if.if_close()
@@ -640,7 +638,7 @@ class BflbImgLoader(object):
                          reset_revert=True,
                          cutoff_time=0,
                          shake_hand_retry=2,
-                         iap_timeout=0,
+                         isp_timeout=0,
                          boot_load=True,
                          record_bootinfo=None):
         bflb_utils.printf("========= image load =========")
@@ -649,7 +647,7 @@ class BflbImgLoader(object):
         try:
             ret = self.img_load_shake_hand(comnum, sh_baudrate, wk_baudrate, do_reset, reset_hold_time,
                                         shake_hand_delay, reset_revert, cutoff_time,
-                                        shake_hand_retry, iap_timeout, boot_load)
+                                        shake_hand_retry, isp_timeout, boot_load)
             if ret == "shake hand fail" or ret == "change rate fail":
                 bflb_utils.printf("shake hand fail")
                 self.bflb_boot_if.if_close()

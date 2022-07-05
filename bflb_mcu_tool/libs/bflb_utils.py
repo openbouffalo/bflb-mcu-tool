@@ -52,7 +52,7 @@ except ImportError:
 try:
     from serial.tools.list_ports import comports
 except ImportError:
-    raise exception.GetSerialPortsError(os.name)
+    pass
 
 # Get app path
 if getattr(sys, "frozen", False):
@@ -259,7 +259,10 @@ if conf_sign:
         "0085": "IMG LOADER BIN NOT SET",
         "0086": "SBI BIN NOT SET",
         "0087": "KERNEL BIN NOT SET",  
-        "0088": "ROOTFS BIN NOT SET",     
+        "0088": "ROOTFS BIN NOT SET", 
+        "0089": "KV BIN NOT SET",  
+        "0090": "YOCBOOT BIN NOT SET",
+        "0091": "DTB BIN NOT SET",         
         "FFFF": "BURN RETRY FAIL",
     }
 else:
@@ -421,7 +424,9 @@ else:
         "0085": "IMG LOADER BIN NOT SET",
         "0086": "SBI BIN NOT SET",
         "0087": "KERNEL BIN NOT SET",  
-        "0088": "ROOTFS BIN NOT SET",      
+        "0088": "ROOTFS BIN NOT SET", 
+        "0089": "KV BIN NOT SET",  
+        "0090": "YOCBOOT BIN NOT SET",              
         "FFFF": "BFLB BURN RETRY FAIL",
     }
 
@@ -707,7 +712,7 @@ def copyfile(srcfile, dstfile):
         shutil.copyfile(srcfile, dstfile)
     else:
         printf("Src file not exists")
-        sys.exit()
+        #sys.exit()
 
 
 def get_systype():
@@ -723,7 +728,7 @@ def get_serial_ports():
         # pylint: disable=import-outside-toplevel
         from serial.tools.list_ports import comports
     except ImportError:
-        raise exception.GetSerialPortsError(os.name)
+        return None
     
     WINDOWS = sys.platform.startswith("win")
     result = []
@@ -889,7 +894,7 @@ def eflash_loader_parser_init():
     parser.add_argument("--csvfile", dest="csvfile", help="csv file contains 3/5 tuples")
     parser.add_argument("--csvaddr", dest="csvaddr", help="address to write for csv file")
     parser.add_argument("--para", dest="para", help="efuse para")
-    parser.add_argument("--iap", dest="iap", action="store_true", help="iap page config")
+    parser.add_argument("--isp", dest="isp", action="store_true", help="isp config")
     parser.add_argument("--createcfg", dest="createcfg", help="img create cfg file")
     parser.add_argument("--key", dest="key", help="aes key for socket")
     parser.add_argument("--ecdh", dest="ecdh", action="store_true", help="open ecdh function")

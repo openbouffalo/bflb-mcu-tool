@@ -89,7 +89,7 @@ class BflbSdioPort(object):
                      reset_revert=True,
                      cutoff_time=0,
                      shake_hand_retry=2,
-                     iap_timeout=0,
+                     isp_timeout=0,
                      boot_load=False):
         self.if_write(bytearray(self._if_get_sync_bytes(8)))
         success, ack = self.if_read(2)
