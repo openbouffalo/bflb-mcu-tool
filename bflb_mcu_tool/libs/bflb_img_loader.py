@@ -416,8 +416,8 @@ class BflbImgLoader(object):
         data_read = binascii.hexlify(data_read)
         bflb_utils.printf("data read is ", data_read)
         bootinfo = data_read.decode("utf-8")
-        chipid = ""
-        if self._chip_type == "bl702":
+        chipid = None
+        if self._chip_type == "bl702" or self._chip_type == "bl702l":
             chipid = bootinfo[32:34] + bootinfo[34:36] + bootinfo[36:38] + \
                 bootinfo[38:40] + bootinfo[40:42] + bootinfo[42:44] + bootinfo[44:46] + bootinfo[46:48]
         else:
@@ -427,15 +427,12 @@ class BflbImgLoader(object):
         if qt_sign and th_sign and QtCore.QThread.currentThread().objectName():
             with mutex:
                 num = str(QtCore.QThread.currentThread().objectName())
-                # print("=========" + str(gol.list_download_last) + "=========")
-                for i, j in gol.list_download_last:
-                    if chipid == i and j is True:
-                        return "repeat_burn", bootinfo
                 gol.list_chipid[int(num)-1] = chipid
-#                 if chipid in gol.list_chipid and gol.list_result_last[int(num)-1] is True:
-#                     return "repeat_burn", bootinfo
-#                 else:
-#                     gol.list_chipid[int(num)-1] = chipid
+                if chipid is not None:
+                    gol.list_chipid_check[int(num)-1] = chipid
+                for i, j in gol.list_download_check_last:
+                    if (chipid is not None) and (chipid == i) and (j is True):
+                        return "repeat_burn", bootinfo
         # bflb_utils.printf(int(data_read[10:12], 16))
         bflb_utils.printf("last boot info: ", record_bootinfo)
         if record_bootinfo!=None and bootinfo[8:] == record_bootinfo[8:]:
@@ -449,7 +446,9 @@ class BflbImgLoader(object):
         if self._chip_type == "bl60x":
             sign = int(data_read[8:10], 16) & 0x03
             encrypt = (int(data_read[8:10], 16) & 0x0c) >> 2
-        elif self._chip_type == "bl602" or self._chip_type == "bl702":
+        elif self._chip_type == "bl602" \
+          or self._chip_type == "bl702" \
+          or self._chip_type == "bl702l":
             sign = int(data_read[8:10], 16)
             encrypt = int(data_read[10:12], 16)
         elif self._chip_type == "bl808":
@@ -606,12 +605,12 @@ class BflbImgLoader(object):
         if ret == "shake hand fail" or ret == "change rate fail":
             bflb_utils.printf("shake hand fail")
             self.bflb_boot_if.if_close()
-            return False
+            return False, ""
         time.sleep(0.5)
         ret, data_read = self.boot_process_one_section("get_boot_info", 0)
         if ret.startswith("OK") is False:
             bflb_utils.printf("get_boot_info no ok")
-            return ret
+            return ret, ""
         # check with image file
         data_read = binascii.hexlify(data_read)
         bflb_utils.printf("data read is ", data_read)

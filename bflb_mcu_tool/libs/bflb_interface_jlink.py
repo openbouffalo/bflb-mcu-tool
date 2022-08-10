@@ -88,6 +88,9 @@ class BflbJLinkPort(object):
             self._jlink_run_addr = sub_module.jlink_load_cfg.jlink_run_addr
             self._device = device
 
+    def if_clear_buf(self):
+        pass
+
     def if_set_rx_timeout(self, val):
         self._rx_timeout = val * 1000
 
@@ -113,7 +116,9 @@ class BflbJLinkPort(object):
         if self._jlink.halted() is False:
             self._jlink.halt()
         if self._jlink.halted():
-            if self._chiptype == "bl602" or self._chiptype == "bl702":
+            if self._chiptype == "bl602" \
+            or self._chiptype == "bl702" \
+            or self._chiptype == "bl702l":
                 jlink_script = "jlink.cmd"
                 fp = open(jlink_script, 'w+')
                 cmd = "h\r\nSetPC " + str(self._jlink_run_addr) + "\r\nexit"

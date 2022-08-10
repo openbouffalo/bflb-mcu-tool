@@ -20,7 +20,7 @@
 #  SOFTWARE.
 
 
-version_text = "(V_2.4.1)"
-eflash_loader_version_text = "eflash_loader_v2.4.1"
+version_text = "(V_2.4.2)"
+eflash_loader_version_text = "eflash_loader_v2.4.2"
 
     

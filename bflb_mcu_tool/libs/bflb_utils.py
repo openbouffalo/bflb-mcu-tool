@@ -883,6 +883,7 @@ def eflash_loader_parser_init():
     parser.add_argument("--addr", dest="addr", help="address to write")
     parser.add_argument("--mac", dest="mac", help="mac address to write")
     parser.add_argument("--file", dest="file", help="file to store read data or file to write")
+    parser.add_argument("--skip", dest="skip", help="skip write file to flash")
     parser.add_argument("--packet", dest="packet", help=" import packet to replace burn file")
     parser.add_argument("--efusefile", dest="efusefile", help="efuse file to write efuse")
     parser.add_argument("--data", dest="data", help="data to write")

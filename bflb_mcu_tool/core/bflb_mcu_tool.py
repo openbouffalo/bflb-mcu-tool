@@ -298,7 +298,7 @@ class BflbMcuTool(object):
                 else:
                     bflb_utils.printf("Error, start_addr is HEX data, must begin with 0x")
                     ret = "start_addr is HEX data, must begin with 0x"
-            else:
+            elif values["whole_chip"] is False:
                 bflb_utils.printf("Error, Please check start_addr hex data")
                 ret = "Please check start_addr hex data"
             if verify_hex_num(values["end_addr"][2:]) is True:
@@ -307,12 +307,13 @@ class BflbMcuTool(object):
                 else:
                     bflb_utils.printf("Error, end_addr is HEX data, must begin with 0x")
                     ret = "end_addr is HEX data, must begin with 0x"
-            else:
+            elif values["whole_chip"] is False:
                 bflb_utils.printf("Error, Please check end_addr hex data")
                 ret = "Please check end_addr hex data"
-            if int(start, 16) >= int(end, 16) and values["whole_chip"] is False:
-                bflb_utils.printf("Error, Start addr must less than end addr")
-                ret = "Start addr must less than end addr"
+            if values["whole_chip"] is False:
+                if int(start, 16) >= int(end, 16):
+                    bflb_utils.printf("Error, Start addr must less than end addr")
+                    ret = "Start addr must less than end addr"
             if ret is not None:
                 return ret
             if values["whole_chip"] is True:
@@ -337,6 +338,9 @@ class BflbMcuTool(object):
     def bind_img(self, values):
         error = None
         # decide file name
+        ret = self.create_img(self.chipname, self.chiptype, values)
+        if ret:
+            bflb_utils.printf(ret)
         try:
             if self.chiptype != "bl808":
                 if values["img_type"] == "SingleCPU":
@@ -582,12 +586,15 @@ class BflbMcuTool(object):
         cfg.write(bh_cfg_file, "w+")
         cfg = BFConfigParser()
         cfg.read(bh_cfg_file)
-        if chiptype == "bl702":
+        if chiptype == "bl702" or chiptype == "bl702l":
             bflb_utils.update_cfg(cfg, section, "boot2_enable", "0")
         if "xtal_type" in values.keys():
-            if chiptype == "bl60x" or chiptype == "bl602" or chiptype == "bl702":
+            if chiptype == "bl60x" \
+            or chiptype == "bl602" \
+            or chiptype == "bl702" \
+            or chiptype == "bl702l":
                 bflb_utils.update_cfg(cfg, section, "xtal_type",
-                                    self.xtal_type_.index(values["xtal_type"]))
+                                      self.xtal_type_.index(values["xtal_type"]))
         if "pll_clk" in values.keys():
             if chiptype == "bl602":
                 if values["pll_clk"] == "160M":
@@ -683,7 +690,7 @@ class BflbMcuTool(object):
             bflb_efuse_boothd_create.bootheader_create_process(
                 chipname, chiptype, bh_cfg_file, self.img_create_path + "/bootheader_dummy.bin",
                 bh_file)
-        elif values["boot_src"] == "UART/SDIO" or values["boot_src"] == "UART/USB":
+        elif values["boot_src"].upper() == "UART/SDIO" or values["boot_src"].upper() == "UART/USB":
             bflb_efuse_boothd_create.bootheader_create_process(
                 chipname, chiptype, bh_cfg_file, bh_file,
                 self.img_create_path + "/bootheader_dummy.bin", True)
@@ -692,7 +699,9 @@ class BflbMcuTool(object):
                 chipname, chiptype, bh_cfg_file, bh_file,
                 self.img_create_path + "/bootheader_dummy.bin")
         # create efuse data
-        if self.chiptype == "bl602" or self.chiptype == "bl702":
+        if self.chiptype == "bl602" \
+        or self.chiptype == "bl702" \
+        or self.chiptype == "bl702l":
             efuse_data = bytearray(128)
         else:
             efuse_data = bytearray(256)
@@ -764,7 +773,7 @@ class BflbMcuTool(object):
         else:
             self.efuse_load_en = False
         # create img
-        if values["boot_src"] == "Flash":
+        if values["boot_src"].upper() == "FLASH":
             if values["img_type"] == "SingleCPU":
                 # TODO: double sign
                 options = ["--image=media", "--signer=none"]
@@ -1135,14 +1144,14 @@ class BflbMcuTool(object):
                 bflb_utils.update_cfg(cfg, group1_section, "%s_boot_entry" % cpu_list[index],
                                     "0x%X" % (int(img_addr_offset[index+3].replace("0x", ""), 16)))
     
-        if values["boot_src"] == "UART/USB":
+        if values["boot_src"].upper() == "UART/USB":
             for index in range(3):
                 bflb_utils.update_cfg(cfg, group0_section, "%s_boot_entry" % cpu_list[index],
                                       self.img_addr_remap(img_addr_offset[index]))
                 bflb_utils.update_cfg(cfg, group1_section, "%s_boot_entry" % cpu_list[index],
                                       self.img_addr_remap(img_addr_offset[index+3]))
         cfg.write(bh_cfg_file, "w+")
-        if values["boot_src"] == "Flash":
+        if values["boot_src"].upper() == "FLASH":
             bflb_efuse_boothd_create.bootheader_create_process(
                 chipname, chiptype, bh_cfg_file, group0_bh_file, group1_bh_file,
                 self.img_create_path + "/bootheader_dummy.bin")
@@ -1220,7 +1229,7 @@ class BflbMcuTool(object):
                               group1_img_output_file.replace(".bin", "_if.bin"))
         cfg.write(self.img_create_cfg, "w+")
         # create img
-        if values["boot_src"] == "Flash":
+        if values["boot_src"].upper() == "FLASH":
             options = ["--image=media", "--group=all", "--signer=none"]
             args = parser_image.parse_args(options)
             bflb_img_create.img_create(args, chipname, chiptype, self.img_create_path, self.img_create_cfg)
@@ -1446,10 +1455,10 @@ class BflbMcuTool(object):
             bflb_utils.update_cfg(cfg, group0_section, "custom_vendor_boot_offset",
                                  "0x%X" % (int(img_addr_offset.replace("0x", ""), 16)))
 
-        if values["boot_src"] == "UART/USB":
+        if values["boot_src"].upper() == "UART/USB":
             bflb_utils.update_cfg(cfg, group0_section, "m0_boot_entry", img_addr_offset)
         cfg.write(bh_cfg_file, "w+")
-        if values["boot_src"] == "Flash":
+        if values["boot_src"].upper() == "FLASH":
             bflb_efuse_boothd_create.bootheader_create_process(
                 chipname, chiptype, bh_cfg_file, group0_bh_file, None,
                 self.img_create_path + "/bootheader_dummy.bin")
@@ -1494,7 +1503,7 @@ class BflbMcuTool(object):
                               group0_img_output_file.replace(".bin", "_if.bin"))
         cfg.write(self.img_create_cfg, "w+")
         # create img
-        if values["boot_src"] == "Flash":
+        if values["boot_src"].upper() == "FLASH":
             options = ["--image=media", "--group=all", "--signer=none"]
             args = parser_image.parse_args(options)
             bflb_img_create.img_create(args, chipname, chiptype, self.img_create_path, self.img_create_cfg)
@@ -1553,7 +1562,7 @@ class BflbMcuTool(object):
                 img_output_file = create_output_path + "/img_cpu1.bin"
                 whole_img_output_file = create_output_path + "/whole_img_cpu1.bin"
             # uart download
-            if values["boot_src"] == "UART/SDIO" or values["boot_src"] == "UART/USB":
+            if values["boot_src"].upper() == "UART/SDIO" or values["boot_src"].upper() == "UART/USB":
                 cfg = BFConfigParser()
                 if os.path.isfile(self.eflash_loader_cfg_tmp) is False:
                     shutil.copyfile(self.eflash_loader_cfg, self.eflash_loader_cfg_tmp)
@@ -1642,7 +1651,7 @@ class BflbMcuTool(object):
                    (values["sign_type"] != "None" and\
                     values["public_key_cfg"] != "" and\
                     values["private_key_cfg"] != ""):
-                        if values["boot_src"] == "Flash":
+                        if values["boot_src"].upper() == "FLASH":
                             options.extend(["--efuse", "--createcfg=" + self.img_create_cfg])
                             self.efuse_load_en = True
         ret = bflb_img_create.compress_dir(self.chipname, "img_create_mcu", self.efuse_load_en)
@@ -1695,7 +1704,7 @@ class BflbMcuTool(object):
         else:
             group1_img_start = 0
         # uart download
-        if values["boot_src"] == "UART/USB":
+        if values["boot_src"].upper() == "UART/USB":
             cfg = BFConfigParser()
             if os.path.isfile(self.eflash_loader_cfg_tmp) is False:
                 shutil.copyfile(self.eflash_loader_cfg, self.eflash_loader_cfg_tmp)
@@ -1857,7 +1866,7 @@ class BflbMcuTool(object):
                    (values["sign_type-group1"] != "None" and\
                     values["public_key_cfg-group1"] != "" and\
                     values["private_key_cfg-group1"] != ""):
-                        if values["boot_src"] == "Flash":
+                        if values["boot_src"].upper() == "FLASH":
                             options.extend(["--efuse", "--createcfg=" + self.img_create_cfg])
                             self.efuse_load_en = True
         ret = bflb_img_create.compress_dir(self.chipname, "img_create_mcu", self.efuse_load_en)
@@ -1881,7 +1890,7 @@ class BflbMcuTool(object):
         group0_img_output_file = create_output_path + "/img.bin"
         whole_img_output_file = create_output_path + "/whole_img.bin"
         # uart download
-        if values["boot_src"] == "UART/USB":
+        if values["boot_src"].upper() == "UART/USB":
             cfg = BFConfigParser()
             if os.path.isfile(self.eflash_loader_cfg_tmp) is False:
                 shutil.copyfile(self.eflash_loader_cfg, self.eflash_loader_cfg_tmp)
@@ -1980,7 +1989,7 @@ class BflbMcuTool(object):
                    (values["sign_type-group0"] != "None" and\
                     values["public_key_cfg-group0"] != "" and\
                     values["private_key_cfg-group0"] != ""):
-                    if values["boot_src"] == "Flash":
+                    if values["boot_src"].upper() == "FLASH":
                         options.extend(["--efuse", "--createcfg=" + self.img_create_cfg])
                         self.efuse_load_en = True
         ret = bflb_img_create.compress_dir(self.chipname, "img_create_mcu", self.efuse_load_en)
@@ -2025,7 +2034,10 @@ class BflbMcuTool(object):
             if not values["dl_comspeed"].isdigit() or not values["dl_jlinkspeed"].isdigit():
                 ret = '{"ErrorCode":"FFFF","ErrorMsg":"BAUDRATE MUST BE DIGIT"}'
                 return ret
-            if self.chiptype == "bl60x" or self.chiptype == "bl602" or self.chiptype == "bl702":
+            if self.chiptype == "bl60x" \
+            or self.chiptype == "bl602" \
+            or self.chiptype == "bl702" \
+            or self.chiptype == "bl702l":
                 ret = self.program_default_img(values, callback)
             elif self.chiptype == "bl808":
                 ret = self.program_bl808_img(values, callback)
@@ -2081,7 +2093,7 @@ def get_value(args):
     config = dict()
     config.setdefault('xtal_type', 'XTAL_38.4M')
     config.setdefault('pll_clk', '160M')
-    config.setdefault('boot_src', 'Flash')
+    config.setdefault('boot_src', 'FLASH')
     config.setdefault('img_type', 'SingleCPU')
     config.setdefault('encrypt_type', 'None')
     config.setdefault('key_sel', '0')
@@ -2121,7 +2133,7 @@ def get_value(args):
         else:
             config["pll_clk"] = args.pllclk
         if not args.bootsrc:
-            config["boot_src"] = "Flash"
+            config["boot_src"] = "FLASH"
             bflb_utils.printf("Default boot source is flash")
         else:
             config["boot_src"] = args.bootsrc 
@@ -2145,7 +2157,7 @@ def get_value(args):
         else:
             config["pll_clk"] = args.pllclk 
         if not args.bootsrc:
-            config["boot_src"] = "Flash"
+            config["boot_src"] = "FLASH"
             bflb_utils.printf("Default boot source is flash")
         else:
             config["boot_src"] = args.bootsrc       
@@ -2168,7 +2180,7 @@ def get_value(args):
             config["pll_clk"] = args.pllclk
             bflb_utils.printf("Default pll clock is 160M")
         if not args.bootsrc:
-            config["boot_src"] = "Flash"
+            config["boot_src"] = "FLASH"
             bflb_utils.printf("Default boot source is flash")
         else:
             config["boot_src"] = args.bootsrc
@@ -2191,10 +2203,10 @@ def get_value(args):
         else:
             config["pll_clk"] = args.pllclk
         if not args.bootsrc:
-            config["boot_src"] = "Flash"
+            config["boot_src"] = "FLASH"
             bflb_utils.printf("Default boot source is flash")
         else:
-            config["boot_src"] = args.bootsrc              
+            config["boot_src"] = args.bootsrc
         config["img1_file"] = firmware
         if args.addr:
             config["img1_addr"] = args.addr
@@ -2218,7 +2230,7 @@ def get_value(args):
         else:
             config["mcu_clk"] = args.pllclk 
         if not args.bootsrc:
-            config["boot_src"] = "Flash"
+            config["boot_src"] = "FLASH"
             bflb_utils.printf("Default boot source is flash")
         else:
             config["boot_src"] = args.bootsrc          

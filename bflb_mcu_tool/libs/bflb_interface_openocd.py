@@ -135,6 +135,9 @@ class BflbOpenocdPort(object):
                 self.if_close()
             return False
 
+    def if_clear_buf(self):
+        pass
+
     def if_set_rx_timeout(self, val):
         self._rx_timeout = val * 1000
 
@@ -152,7 +155,9 @@ class BflbOpenocdPort(object):
 
     def set_pc_msp(self, pc, msp):
         self.halt_cpu()
-        if self._chiptype == "bl602" or self._chiptype == "bl702":
+        if self._chiptype == "bl602" \
+        or self._chiptype == "bl702" \
+        or self._chiptype == "bl702l":
             self.tn.write(("reg pc 0x" + self._openocd_run_addr).encode('ascii') + b"\n")
             self.tn.write("resume".encode('ascii') + b"\n")
 

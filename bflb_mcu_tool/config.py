@@ -3,7 +3,7 @@
 import os
 import sys
 
-version = "1.7.5"
+version = "1.7.6.005(非正式发布版本，严禁用于量产，请更新到1.8.0版本)"
 chip_name = "tg7100c"
 ENABLE_HAIER = False
 
@@ -21,9 +21,9 @@ except ImportError:
     conf_sign = False
        
 if not conf_sign:
-    back_color = "#EFF4F7"
+    back_color = "#B3DCFB"
+    list_chip = ["BL602/604", "BL702/704/706", "BL702L", "BL808", "BL606P", "BL616/618"]
     list_chip = ["BL602/604", "BL702/704/706", "BL808", "BL606P", "BL616/618"]
-    #list_chip = ["BL561/563", "BL606/608", "BL562/564", "BL602/604", "BL702/704/706", "BL808", "BL606P", "BL616/618", "WB03"]
     #list_chip = ["WB03"]
     type_chip = ("bl602", "bl602")
     dict_chip = {
@@ -32,6 +32,7 @@ if not conf_sign:
         "BL562/564": ("bl562", "bl602"),
         "BL602/604": ("bl602", "bl602"),
         "BL702/704/706": ("bl702", "bl702"),
+        "BL702L": ("bl702l", "bl702l"),
         "BL808": ("bl808", "bl808"),
         "BL606P": ("bl606p", "bl808"),
         "BL616/618": ("bl616", "bl616"),
@@ -43,6 +44,7 @@ if not conf_sign:
         "bl562": "bl602",
         "bl602": "bl602",
         "bl702": "bl702",
+        "bl702l": "bl702l",
         "bl808": "bl808",
         "bl606p": "bl808",
         "bl616": "bl616",
@@ -54,6 +56,7 @@ if not conf_sign:
         "bl562": "bl602",
         "bl602": "bl602",
         "bl702": "bl702",
+        "bl702l": "bl702l",
         "bl808": "bl808",
         "bl606p": "bl808",
         "bl616": "bl616",
@@ -136,6 +139,21 @@ crc_ignore['bl702'] = ["False", "True"]
 hash_ignore['bl702'] = ["False", "True"]
 img_type['bl702'] = ["SingleCPU", "RAW"]
 boot_src['bl702'] = ["Flash", "UART/USB"]
+
+# BL702L
+xtal_type['bl702l'] = ["None", "32M", "RC32M"]
+xtal_type_['bl702l'] = ["XTAL_" + item for item in xtal_type['bl702l']]
+pll_clk['bl702l'] = ["144M", "Manual"]
+encrypt_type['bl702l'] = ["None", "AES128", "AES256", "AES192"]
+#key_sel['bl702l'] = ["0", "1", "2", "3"]
+key_sel['bl702l'] = ["1"]
+sign_type['bl702l'] = ["None", "ECC"]
+cache_way_disable['bl702l'] = ["None", "OneWay", "TwoWay", "ThreeWay", "FourWay"]
+flash_clk_type['bl702l'] = ["XCLK", "Manual"]
+crc_ignore['bl702l'] = ["False", "True"]
+hash_ignore['bl702l'] = ["False", "True"]
+img_type['bl702l'] = ["SingleCPU", "RAW"]
+boot_src['bl702l'] = ["Flash", "UART/USB"]
 
 # BL808
 xtal_type['bl808'] = ["None", "24M", "32M", "38.4M", "40M", "26M", "RC32M", "Auto"]

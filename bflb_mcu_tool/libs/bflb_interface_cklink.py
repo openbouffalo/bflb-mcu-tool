@@ -87,6 +87,9 @@ class BflbCKLinkPort(object):
             finally:
                 self._inited = False
 
+    def if_clear_buf(self):
+        pass
+
     def if_set_rx_timeout(self, val):
         self._rx_timeout = val * 1000
 
@@ -104,7 +107,9 @@ class BflbCKLinkPort(object):
 
     def set_pc_msp(self, pc, msp):
         self.halt_cpu()
-        if self._chiptype == "bl602" or self._chiptype == "bl702":
+        if self._chiptype == "bl602" \
+        or self._chiptype == "bl702"\
+        or self._chiptype == "bl702l":
             addr = int(self._cklink_run_addr, 16)
             self.link.write_cpu_reg(self._cklink_reg_pc, addr)
             #self.link.resume()

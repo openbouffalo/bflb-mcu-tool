@@ -43,6 +43,7 @@ class BflbUartPort(object):
     def __init__(self):
         self._device = "COM1"
         self._baudrate = 115200
+        self._isp_baudrate = 2000000
         self._ser = None
         self._shakehand_flag = False
         self._chiptype = "bl602"
@@ -118,6 +119,13 @@ class BflbUartPort(object):
             self._ser.flushInput()
         #self._ser.flushOutput()
 
+    def if_clear_buf(self):
+        if self._ser:
+            timeout = self._ser.timeout
+            self._ser.timeout = 0.1
+            self._ser.read_all()
+            self._ser.timeout = timeout
+
     def if_set_rx_timeout(self, val):
         if self._ser:
             self._ser.timeout = val
@@ -130,6 +138,10 @@ class BflbUartPort(object):
         if self._ser:
             self._ser.setRTS(val)
 
+    def if_set_isp_baudrate(self, baudrate):
+        bflb_utils.printf("isp mode speed: ", baudrate)
+        self._isp_baudrate = baudrate
+
     def if_get_rate(self):
         return self._baudrate
 
@@ -139,30 +151,34 @@ class BflbUartPort(object):
             self._ser.write(data_send)
 
     def if_raw_read(self):
-        return self._ser.read(self._ser.in_waiting or 1)
+        if self._ser:
+            return self._ser.read(self._ser.in_waiting or 1)
     
     def if_raw_read_tmall(self):
-        return self._ser.read(self._ser.in_waiting or 200)
+        if self._ser:
+            return self._ser.read(self._ser.in_waiting or 200)
     
     # this function return bytearray or bytes type
     def if_read(self, data_len):
-        try:
-            data = bytearray(0)
-            received = 0
-            while received < data_len:
-                tmp = self._ser.read(data_len - received)
-                if len(tmp) == 0:
-                    break
-                data += tmp
-                received += len(tmp)
-
-            if len(data) != data_len:
-                return 0, data
-            return 1, data
-        except Exception as e:
-            bflb_utils.printf("Error: %s" % e)
-    
-        
+        data = bytearray(0)
+        received = 0
+        if self._ser:
+            try:
+                while received < data_len:
+                    if self._ser:
+                        tmp = self._ser.read(data_len - received)
+                        if len(tmp) == 0:
+                            break
+                        data += tmp
+                        received += len(tmp)
+                if len(data) != data_len:
+                    return 0, data
+                return 1, data
+            except Exception as e:
+                bflb_utils.printf("Error: %s" % e)
+        else:
+            return 0, data
+         
     def _if_get_sync_bytes(self, length):
         try:
             data = bytearray(length)
@@ -182,7 +198,7 @@ class BflbUartPort(object):
             while True:
                 if self._shakehand_flag is True:
                     break
-                if self._chiptype == "bl702":
+                if self._chiptype == "bl702" or self._chiptype == "bl702l":
                     self._ser.write(self._if_get_sync_bytes(
                         int(0.003 * self._baudrate / 10)))
                 else:
@@ -247,9 +263,257 @@ class BflbUartPort(object):
                      shake_hand_retry=2,
                      isp_timeout=0,
                      boot_load=False):
+        if self._ser:
+            try:
+                timeout = self._ser.timeout
+                blusbserialwriteflag = False
+                if isp_timeout > 0:
+                    wait_timeout = isp_timeout
+                    self._ser.timeout = 0.1
+                    self._shakehand_flag = False
+                    # do not auto toggle DTR&RTS
+                    cutoff_time = 0
+                    do_reset = False
+                    # set baudrate to 2000000 for shakehand with boot2
+                    baudrate = self._baudrate
+                    self.if_init(self._device, self._isp_baudrate, self._chiptype, self._chipname)
+                    self._baudrate = baudrate
+                    # send reboot to make sure boot2 is running
+                    self._ser.write(b"reboot\r\n")
+                    # send 5555 to boot2, boot2 jump to bootrom if mode
+                    fl_thrx = None
+                    fl_thrx = threading.Thread(target=self.if_send_55)
+                    fl_thrx.setDaemon(True)
+                    fl_thrx.start()
+    
+                    bflb_utils.printf("Please Press Reset Key!")
+                    # reset low
+                    self._ser.setRTS(1)
+                    # RC delay is 100ms
+                    time.sleep(0.2)
+                    # reset high
+                    self._ser.setRTS(0)
+    
+                    time_stamp = time.time()
+                    while time.time() - time_stamp < wait_timeout:
+                        if self._chiptype == "bl602"or self._chiptype == "bl702":
+                            self._ser.timeout = 0.01
+                            success, ack = self.if_read(3000)
+                            if ack.find(b'Boot2 ISP Shakehand Suss') != -1:
+                                self._shakehand_flag = True
+                                if ack.find(b'Boot2 ISP Ready') != -1:
+                                    bflb_utils.printf("isp ready")
+                                    self.if_write(bytearray.fromhex("a0000000"))
+                                    self._ser.timeout = timeout
+                                    return "OK"
+                        else:
+                            success, ack = self.if_read(3000)
+                            if ack.find(b'Boot2 ISP Ready') != -1:
+                                self._shakehand_flag = True
+                        if self._shakehand_flag is True:
+                            self._ser.timeout = timeout
+                            tmp_timeout = self._ser.timeout
+                            self._ser.timeout = 0.1
+                            if self._chiptype == "bl602" or self._chiptype == "bl702":
+                                self._ser.timeout = 0.5
+                                # read 15 byte key word
+                                ack = self._ser.read(15)
+                                # reduce timeout and read 15 byte again, make sure recv all key word
+                                self._ser.timeout = 0.005
+                                ack += self._ser.read(15)
+                                self._ser.timeout = tmp_timeout
+                                bflb_utils.printf("read ready")
+                                if ack.find(b'Boot2 ISP Ready') == -1:
+                                    bflb_utils.printf("Boot2 isp is not ready")
+                                    return "FL"
+                                else:
+                                    self.if_write(bytearray.fromhex("a0000000"))
+                                    return "OK"
+                            else:
+                                while True:
+                                    # clear boot2 log
+                                    ack = self.if_raw_read()
+                                    if len(ack) == 0:
+                                        break
+                                time.sleep(0.1)
+                                while True:
+                                    # clear boot2 log
+                                    ack = self.if_raw_read()
+                                    if len(ack) == 0:
+                                        break
+                            self._ser.timeout = tmp_timeout
+                            break
+    
+                    self._shakehand_flag = True
+                    self._ser.timeout = timeout
+                    # set actual baudrate
+                    self.if_init(self._device, self._baudrate, self._chiptype, self._chipname)
+                    time.sleep(2.2)
+    
+                if self.check_bl_usb_serial(self._device) and boot_load:
+                    blusbserialwriteflag = True
+                while shake_hand_retry > 0:
+                    # cut of tx rx power and rst
+                    if cutoff_time != 0 and blusbserialwriteflag is not True:
+                        cutoff_revert = False
+                        if cutoff_time > 1000:
+                            cutoff_revert = True
+                            cutoff_time = cutoff_time - 1000
+                        # MP_TOOL_V3 generate rising pulse to make D trigger output low
+                        # reset low
+                        self._ser.setRTS(1)
+                        # RC delay is 100ms
+                        time.sleep(0.2)
+                        # reset high
+                        self._ser.setRTS(0)
+                        time.sleep(0.05)
+                        # do power off
+                        # reset low
+                        self._ser.setRTS(1)
+                        if cutoff_revert:
+                            # dtr high, power off
+                            self._ser.setDTR(0)
+                        else:
+                            # dtr low, power off
+                            self._ser.setDTR(1)
+                        bflb_utils.printf("tx rx and power off, press the machine!")
+                        bflb_utils.printf("cutoff time is ", cutoff_time / 1000.0)
+                        time.sleep(cutoff_time / 1000.0)
+                        if cutoff_revert:
+                            # dtr low, power on
+                            self._ser.setDTR(1)
+                        else:
+                            # dtr high, power on
+                            self._ser.setDTR(0)
+                        bflb_utils.printf("power on tx and rx ")
+                        time.sleep(0.1)
+                    else:
+                        self._ser.setDTR(0)
+                        bflb_utils.printf("default set DTR high ")
+                        time.sleep(0.1)
+                    if do_reset is True and blusbserialwriteflag is not True:
+                        # MP_TOOL_V3 reset high to make boot pin high
+                        self._ser.setRTS(0)
+                        time.sleep(0.2)
+                        if reset_revert:
+                            # reset low for reset revert to make boot pin high when cpu rset
+                            self._ser.setRTS(1)
+                            time.sleep(0.001)
+                        reset_cnt = 2
+                        if reset_hold_time > 1000:
+                            reset_cnt = int(reset_hold_time // 1000)
+                            reset_hold_time = reset_hold_time % 1000
+                        while reset_cnt > 0:
+                            if reset_revert:
+                                # reset high
+                                self._ser.setRTS(0)
+                            else:
+                                # reset low
+                                self._ser.setRTS(1)
+                            # Boot high
+                            # self._ser.setDTR(0)
+                            time.sleep(reset_hold_time / 1000.0)
+                            if reset_revert:
+                                # reset low
+                                self._ser.setRTS(1)
+                            else:
+                                # reset high
+                                self._ser.setRTS(0)
+                            if shake_hand_delay > 0:
+                                time.sleep(shake_hand_delay / 1000.0)
+                            else:
+                                time.sleep(5 / 1000.0)
+    
+                            # do reset agian to make sure boot pin is high
+                            if reset_revert:
+                                # reset high
+                                self._ser.setRTS(0)
+                            else:
+                                # reset low
+                                self._ser.setRTS(1)
+                            # Boot high
+                            # self._ser.setDTR(0)
+                            time.sleep(reset_hold_time / 1000.0)
+                            if reset_revert:
+                                # reset low
+                                self._ser.setRTS(1)
+                            else:
+                                # reset high
+                                self._ser.setRTS(0)
+                            if shake_hand_delay > 0:
+                                time.sleep(shake_hand_delay / 1000.0)
+                            else:
+                                time.sleep(5 / 1000.0)
+                            reset_cnt -= 1
+                        bflb_utils.printf("reset cnt: " + str(reset_cnt) + ", reset hold: " +
+                                          str(reset_hold_time / 1000.0) + ", shake hand delay: " +
+                                          str(shake_hand_delay / 1000.0))
+                    if blusbserialwriteflag:
+                        self.bl_usb_serial_write(cutoff_time, reset_revert)
+                    # clean buffer before start
+                    bflb_utils.printf("clean buf")
+                    self._ser.timeout = 0.1
+                    ack = self._ser.read_all()
+                    # change tiemout value when shake hand
+                    if self._602a0_dln_fix:
+                        self._ser.timeout = 0.5
+                    else:
+                        self._ser.timeout = 0.1
+                    bflb_utils.printf("send sync")
+                    # send keep 6ms ,N*10/baudrate=0.01
+                    if self._chiptype == "bl702" or self._chiptype == "bl702l":
+                        self._ser.write(self._if_get_sync_bytes(
+                            int(0.003 * self._baudrate / 10)))
+                    else:
+                        self._ser.write(self._if_get_sync_bytes(
+                            int(0.006 * self._baudrate / 10)))
+                    if self._chipname == "bl808":
+                        time.sleep(0.3)
+                        self._ser.write(bflb_utils.hexstr_to_bytearray("5000080038F0002000000018"))
+                    if self._602a0_dln_fix:
+                        time.sleep(4)
+                    success, ack = self.if_read(1000)
+                    bflb_utils.printf("ack is ", binascii.hexlify(ack))
+                    if ack.find(b'\x4F') != -1 or ack.find(b'\x4B') != -1:
+                        self._ser.timeout = timeout
+                        if self._602a0_dln_fix:
+                            self._ser.write(bytearray(2))
+                        time.sleep(0.03)
+                        return "OK"
+                    if len(ack) != 0:
+                        # peer is alive, but shake hand it's not expected, do again
+                        bflb_utils.printf("reshake")
+                        if do_reset is False:
+                            bflb_utils.printf("sleep")
+                            # tmp=0
+                            # while tmp<60:
+                            #    time.sleep(2)
+                            #    bflb_utils.printf("Pls check eflash loader log")
+                            #    tmp+=1
+                            time.sleep(3)
+                    else:
+                        bflb_utils.printf("retry")
+                    shake_hand_retry -= 1
+                self._ser.timeout = timeout
+                return "FL"
+            except Exception as e:
+                bflb_utils.printf("Error: %s" % e)
+        else:
+            return "FL"
+
+    def if_toggle_boot(self,
+                     do_reset=False,
+                     reset_hold_time=100,
+                     shake_hand_delay=100,
+                     reset_revert=True,
+                     cutoff_time=0,
+                     shake_hand_retry=2,
+                     isp_timeout=0,
+                     boot_load=False):
         try:
             timeout = self._ser.timeout
             blusbserialwriteflag = False
+
             if isp_timeout > 0:
                 wait_timeout = isp_timeout
                 self._ser.timeout = 0.1
@@ -259,7 +523,7 @@ class BflbUartPort(object):
                 do_reset = False
                 # set baudrate to 2000000 for shakehand with boot2
                 baudrate = self._baudrate
-                self.if_init(self._device, 2000000, self._chiptype, self._chipname)
+                self.if_init(self._device, self._isp_baudrate, self._chiptype, self._chipname)
                 self._baudrate = baudrate
                 # send reboot to make sure boot2 is running
                 self._ser.write(b"reboot\r\n")
@@ -279,22 +543,33 @@ class BflbUartPort(object):
 
                 time_stamp = time.time()
                 while time.time() - time_stamp < wait_timeout:
-                    if self._chiptype == "bl602":
+                    if self._chiptype == "bl602"or self._chiptype == "bl702":
                         self._ser.timeout = 0.01
                         success, ack = self.if_read(3000)
                         if ack.find(b'Boot2 ISP Shakehand Suss') != -1:
                             self._shakehand_flag = True
+                            if ack.find(b'Boot2 ISP Ready') != -1:
+                                bflb_utils.printf("isp ready")
+                                self.if_write(bytearray.fromhex("a0000000"))
+                                self._ser.timeout = timeout
+                                return "OK"
                     else:
                         success, ack = self.if_read(3000)
                         if ack.find(b'Boot2 ISP Ready') != -1:
+                            bflb_utils.printf("isp ready")
                             self._shakehand_flag = True
                     if self._shakehand_flag is True:
                         self._ser.timeout = timeout
                         tmp_timeout = self._ser.timeout
                         self._ser.timeout = 0.1
-                        if self._chiptype == "bl602":
-                            self._ser.timeout = 0.05
-                            success, ack = self.if_read(3000)
+                        if self._chiptype == "bl602" or self._chiptype == "bl702":
+                            self._ser.timeout = 0.5
+                            # read 15 byte key word
+                            ack = self._ser.read(15)
+                            # reduce timeout and read 15 byte again, make sure recv all key word
+                            self._ser.timeout = 0.005
+                            ack += self._ser.read(15)
+                            self._ser.timeout = tmp_timeout
                             bflb_utils.printf("read ready")
                             if ack.find(b'Boot2 ISP Ready') == -1:
                                 bflb_utils.printf("Boot2 isp is not ready")
@@ -322,168 +597,6 @@ class BflbUartPort(object):
                 # set actual baudrate
                 self.if_init(self._device, self._baudrate, self._chiptype, self._chipname)
                 time.sleep(2.2)
-
-            if self.check_bl_usb_serial(self._device) and boot_load:
-                blusbserialwriteflag = True
-            while shake_hand_retry > 0:
-                # cut of tx rx power and rst
-                if cutoff_time != 0 and blusbserialwriteflag is not True:
-                    cutoff_revert = False
-                    if cutoff_time > 1000:
-                        cutoff_revert = True
-                        cutoff_time = cutoff_time - 1000
-                    # MP_TOOL_V3 generate rising pulse to make D trigger output low
-                    # reset low
-                    self._ser.setRTS(1)
-                    # RC delay is 100ms
-                    time.sleep(0.2)
-                    # reset high
-                    self._ser.setRTS(0)
-                    time.sleep(0.05)
-                    # do power off
-                    # reset low
-                    self._ser.setRTS(1)
-                    if cutoff_revert:
-                        # dtr high, power off
-                        self._ser.setDTR(0)
-                    else:
-                        # dtr low, power off
-                        self._ser.setDTR(1)
-                    bflb_utils.printf("tx rx and power off, press the machine!")
-                    bflb_utils.printf("cutoff time is ", cutoff_time / 1000.0)
-                    time.sleep(cutoff_time / 1000.0)
-                    if cutoff_revert:
-                        # dtr low, power on
-                        self._ser.setDTR(1)
-                    else:
-                        # dtr high, power on
-                        self._ser.setDTR(0)
-                    bflb_utils.printf("power on tx and rx ")
-                    time.sleep(0.1)
-                else:
-                    self._ser.setDTR(0)
-                    bflb_utils.printf("default set DTR high ")
-                    time.sleep(0.1)
-                if do_reset is True and blusbserialwriteflag is not True:
-                    # MP_TOOL_V3 reset high to make boot pin high
-                    self._ser.setRTS(0)
-                    time.sleep(0.2)
-                    if reset_revert:
-                        # reset low for reset revert to make boot pin high when cpu rset
-                        self._ser.setRTS(1)
-                        time.sleep(0.001)
-                    reset_cnt = 2
-                    if reset_hold_time > 1000:
-                        reset_cnt = int(reset_hold_time // 1000)
-                        reset_hold_time = reset_hold_time % 1000
-                    while reset_cnt > 0:
-                        if reset_revert:
-                            # reset high
-                            self._ser.setRTS(0)
-                        else:
-                            # reset low
-                            self._ser.setRTS(1)
-                        # Boot high
-                        # self._ser.setDTR(0)
-                        time.sleep(reset_hold_time / 1000.0)
-                        if reset_revert:
-                            # reset low
-                            self._ser.setRTS(1)
-                        else:
-                            # reset high
-                            self._ser.setRTS(0)
-                        if shake_hand_delay > 0:
-                            time.sleep(shake_hand_delay / 1000.0)
-                        else:
-                            time.sleep(5 / 1000.0)
-
-                        # do reset agian to make sure boot pin is high
-                        if reset_revert:
-                            # reset high
-                            self._ser.setRTS(0)
-                        else:
-                            # reset low
-                            self._ser.setRTS(1)
-                        # Boot high
-                        # self._ser.setDTR(0)
-                        time.sleep(reset_hold_time / 1000.0)
-                        if reset_revert:
-                            # reset low
-                            self._ser.setRTS(1)
-                        else:
-                            # reset high
-                            self._ser.setRTS(0)
-                        if shake_hand_delay > 0:
-                            time.sleep(shake_hand_delay / 1000.0)
-                        else:
-                            time.sleep(5 / 1000.0)
-                        reset_cnt -= 1
-                    bflb_utils.printf("reset cnt: " + str(reset_cnt) + ", reset hold: " +
-                                      str(reset_hold_time / 1000.0) + ", shake hand delay: " +
-                                      str(shake_hand_delay / 1000.0))
-                if blusbserialwriteflag:
-                    self.bl_usb_serial_write(cutoff_time, reset_revert)
-                # clean buffer before start
-                bflb_utils.printf("clean buf")
-                self._ser.timeout = 0.1
-                ack = self._ser.read_all()
-                # change tiemout value when shake hand
-                if self._602a0_dln_fix:
-                    self._ser.timeout = 0.5
-                else:
-                    self._ser.timeout = 0.1
-                bflb_utils.printf("send sync")
-                # send keep 6ms ,N*10/baudrate=0.01
-                if self._chiptype == "bl702":
-                    self._ser.write(self._if_get_sync_bytes(
-                        int(0.003 * self._baudrate / 10)))
-                else:
-                    self._ser.write(self._if_get_sync_bytes(
-                        int(0.006 * self._baudrate / 10)))
-                if self._chipname == "bl808":
-                    time.sleep(0.3)
-                    self._ser.write(bflb_utils.hexstr_to_bytearray("5000080038F0002000000018"))
-                if self._602a0_dln_fix:
-                    time.sleep(4)
-                success, ack = self.if_read(1000)
-                bflb_utils.printf("ack is ", binascii.hexlify(ack))
-                if ack.find(b'\x4F') != -1 or ack.find(b'\x4B') != -1:
-                    self._ser.timeout = timeout
-                    if self._602a0_dln_fix:
-                        self._ser.write(bytearray(2))
-                    time.sleep(0.03)
-                    return "OK"
-                if len(ack) != 0:
-                    # peer is alive, but shake hand it's not expected, do again
-                    bflb_utils.printf("reshake")
-                    if do_reset is False:
-                        bflb_utils.printf("sleep")
-                        # tmp=0
-                        # while tmp<60:
-                        #    time.sleep(2)
-                        #    bflb_utils.printf("Pls check eflash loader log")
-                        #    tmp+=1
-                        time.sleep(3)
-                else:
-                    bflb_utils.printf("retry")
-                shake_hand_retry -= 1
-            self._ser.timeout = timeout
-            return "FL"
-        except Exception as e:
-            bflb_utils.printf("Error: %s" % e)
-
-    def if_toggle_boot(self,
-                     do_reset=False,
-                     reset_hold_time=100,
-                     shake_hand_delay=100,
-                     reset_revert=True,
-                     cutoff_time=0,
-                     shake_hand_retry=2,
-                     isp_timeout=0,
-                     boot_load=False):
-        try:
-            timeout = self._ser.timeout
-            blusbserialwriteflag = False
 
             if self.check_bl_usb_serial(self._device) and boot_load:
                 blusbserialwriteflag = True
@@ -553,7 +666,6 @@ class BflbUartPort(object):
                         time.sleep(shake_hand_delay / 1000.0)
                     else:
                         time.sleep(5 / 1000.0)
-
                     # do reset agian to make sure boot pin is high
                     if reset_revert:
                         # reset high
@@ -590,12 +702,12 @@ class BflbUartPort(object):
             bflb_utils.printf("Error: %s" % e)
 
     def if_close(self):
-        try:
-            if self._ser is not None:
+        if self._ser:
+            try:            
                 self._ser.close()
                 self._ser = None
-        except Exception as e:
-            bflb_utils.printf("Error: %s" % e)
+            except Exception as e:
+                bflb_utils.printf("Error: %s" % e)
 
     # this function return str type
     def if_deal_ack(self, dmy_data=True):
@@ -606,8 +718,8 @@ class BflbUartPort(object):
                 return ack.decode("utf-8")
             if ack.find(b'\x4F') != -1 or ack.find(b'\x4B') != -1:
                 # if dmy_data:
-                #    success,ack=self.if_read(14)
-                #    if success==0:
+                #    success, ack = self.if_read(14)
+                #    if success == 0:
                 #        return "FL"
                 return "OK"
             elif ack.find(b'\x50') != -1 or ack.find(b'\x44') != -1:
@@ -681,6 +793,11 @@ class CliInfUart(object):
             return True
         else:
             return False
+        
+    def set_baudrate(self, baudrate):
+        self._baudrate = baudrate
+        if self._ser:
+            self._ser.baudrate = baudrate
 
     def is_open(self):
         if self._ser is None:
@@ -691,7 +808,7 @@ class CliInfUart(object):
             else:
                 return False
 
-    def open(self, dev_com):
+    def open(self, dev_com, baudrate=None):
         try:
             if not dev_com:
                 bflb_utils.printf("No Serial Port Found")
@@ -702,7 +819,9 @@ class CliInfUart(object):
                         dev = dev_com[:dev_com.find(" (")]
                     else:
                         dev = dev_com
-
+                    
+                    if baudrate:
+                        self._baudrate = baudrate
                     self._ser = serial.Serial(dev,
                                               self._baudrate,
                                               timeout=5.0,
@@ -727,14 +846,14 @@ class CliInfUart(object):
                     self._tx_thread.setDaemon(True)
                     self._tx_thread.start()
                 except serial.SerialException:
-                    bflb_utils.printf("Open %s Fail" % (dev_com))
+                    bflb_utils.printf("Open %s Fail" % (dev))
                     return False
                 except TypeError:
                     if self._ser is not None:
                         self._ser.close()
                     return False
                 else:
-                    bflb_utils.printf("Open %s Success" % (dev_com))
+                    bflb_utils.printf("Open %s Success" % (dev))
                     return True
         except Exception as e:
             bflb_utils.printf("Error: %s" % e)
@@ -742,17 +861,21 @@ class CliInfUart(object):
     def close(self):
         try:
             if self._ser is not None:
+                port = self._ser.port
                 self._ser.setDTR(1)
                 self._ser.close()
                 # self._logfile.close()
                 self._ser = None
                 # self._logfile = None
                 self._rx_thread_running = False
-                self._rx_thread.join()
+                if self._rx_thread:
+                    self._rx_thread.join()
                 self._tx_thread_running = False
-                self._tx_thread.join()
+                if self._tx_thread:
+                    self._tx_thread.join()
                 self._tx_queue = None
                 self._boot = 0
+                bflb_utils.printf("Close %s Success" % (port))
         except Exception as e:
             bflb_utils.printf("Error: %s" % e)
 

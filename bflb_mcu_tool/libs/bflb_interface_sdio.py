@@ -58,6 +58,9 @@ class BflbSdioPort(object):
             self._chipname = chipname
         return True
 
+    def if_clear_buf(self):
+        pass
+
     def if_set_rx_timeout(self, val):
         self._rx_timeout = val * 1000
 

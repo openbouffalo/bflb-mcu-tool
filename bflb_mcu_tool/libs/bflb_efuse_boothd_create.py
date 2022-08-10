@@ -144,6 +144,8 @@ def bootheader_create_do(chipname, chiptype, config_file, section, output_file=N
                 fp.write(bh_data[0:256])
             elif chiptype == "wb03":
                 fp.write(bh_data[0:208+256])
+            elif chiptype == "bl702l":
+                fp.write(bh_data[0:240])
             else:
                 fp.write(bh_data[0:176])
         else:
@@ -173,6 +175,14 @@ def bootheader_create_do(chipname, chiptype, config_file, section, output_file=N
                 fp.close()
                 fp = open(efuse_bootheader_path + "/flash_para.bin", 'wb+')
                 fp.write(bh_data[208+12 : 208+12+84])
+                fp.close()
+        elif chiptype == "bl702l":
+            if section == "BOOTHEADER_CFG":
+                fp = open(efuse_bootheader_path + "/clock_para.bin", 'wb+')
+                fp.write(bh_data[100 : 100+16])
+                fp.close()
+                fp = open(efuse_bootheader_path + "/flash_para.bin", 'wb+')
+                fp.write(bh_data[12 : 12+84])
                 fp.close()
         else:
             fp = open(efuse_bootheader_path + "/flash_para.bin", 'wb+')
@@ -254,6 +264,7 @@ def run():
         "bl562": "bl602",
         "bl602": "bl602",
         "bl702": "bl702",
+        "bl702l": "bl702l",
         "bl808": "bl808",
         "bl616": "bl616",
         "wb03" : "wb03",
