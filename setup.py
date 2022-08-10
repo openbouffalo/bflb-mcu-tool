@@ -18,7 +18,7 @@ and making it more easy for users who are accustomed to using command line opera
 * --port：serial port or jlink serial number
 * --baudrate：baudrate of serial port, default is 115200
 * --xtal：xtal on the board, for bl602,1:24M,2:32M,3:38.4M,4:40M(default value when not specified),5:26M; for bl702,1:32M(default value when not specified); for bl616,just use value 7(auto adjust)
-* --config：eflash loader configuration file,default is chips\blXXXX\eflash_loader\eflash_loader_cfg.ini
+* --config：eflash loader configuration file,default is chips/blXXXX/eflash_loader/eflash_loader_cfg.ini
 * --flashclk：clock of flash
 * --pllclk：clock of pll
 
@@ -54,7 +54,7 @@ entry_points = {'console_scripts': ['bflb-mcu-tool = bflb_mcu_tool.__main__:run_
 
 setup(
     name="bflb-mcu-tool",
-    version="1.7.6",
+    version="1.7.6.post2",
     author="bouffalolab",
     author_email="jxtan@bouffalolab.com",
     description="Bouffalolab Mcu Tool",
