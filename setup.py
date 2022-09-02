@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 longdesc = """
 ## Bouffalolab Mcu Command Tool
-============
+====================================
 
 The functions of bflb_mcu_tool is the same as DevCube(MCU View) which is a GUI tool for image programing.
 bflb_mcu_tool is designed for the convenience of integrating into the compilation system after image buid,
@@ -54,7 +54,7 @@ entry_points = {'console_scripts': ['bflb-mcu-tool = bflb_mcu_tool.__main__:run_
 
 setup(
     name="bflb-mcu-tool",
-    version="1.7.6.post2",
+    version="1.8.0",
     author="bouffalolab",
     author_email="jxtan@bouffalolab.com",
     description="Bouffalolab Mcu Tool",

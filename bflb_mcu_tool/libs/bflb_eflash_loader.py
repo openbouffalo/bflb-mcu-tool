@@ -598,6 +598,33 @@ class BflbEflashLoader(object):
             return False
 
 
+    def clear_boot_status(self, shakehand=0):
+        bflb_utils.printf("Clear boot status at hbn rsvd register")
+        # shake hand
+        if shakehand != 0:
+            bflb_utils.printf(FLASH_ERASE_SHAKE_HAND)
+            if self.img_load_shake_hand() is False:
+                return False
+
+        # write memory, 0x2000F108=0x00000000
+        data = bytearray(12)
+        data[0] = 0x50
+        data[1] = 0x00
+        data[2] = 0x08
+        data[3] = 0x00
+        data[4] = 0x08
+        data[5] = 0xF1
+        data[6] = 0x00
+        data[7] = 0x20
+        data[8] = 0x00
+        data[9] = 0x00
+        data[10] = 0x00
+        data[11] = 0x00
+        self._bflb_com_if.if_write(data)
+        self._bflb_com_if.if_deal_ack(dmy_data=False)
+        return True
+
+
     def reset_cpu(self, shakehand=0):
         bflb_utils.printf("CPU Reset")
         # shake hand
@@ -1236,7 +1263,7 @@ class BflbEflashLoader(object):
 
     def flash_erase_main_process(self, start_addr, end_addr, shakehand=0):
         bflb_utils.printf("========= flash erase =========")
-        bflb_utils.printf("Erase flash  from ", hex(start_addr), " to ", hex(end_addr))
+        bflb_utils.printf("Erase flash from ", hex(start_addr), " to ", hex(end_addr))
         # shake hand
         if shakehand != 0:
             bflb_utils.printf(FLASH_ERASE_SHAKE_HAND)
@@ -1951,7 +1978,7 @@ class BflbEflashLoader(object):
                 addr = self._skip_addr + self._skip_len
                 data = flash_data[self._skip_addr+self._skip_len - start_addr : ]
                 filename, ext = os.path.splitext(file)
-                file_temp = filename + '_skip' + ext
+                file_temp = os.path.join(app_path, filename + '_skip' + ext)
                 fp = open(file_temp, 'wb')
                 fp.write(data)
                 fp.close()
@@ -1961,7 +1988,7 @@ class BflbEflashLoader(object):
                 addr = start_addr
                 data = flash_data[ : self._skip_addr - start_addr]
                 filename, ext = os.path.splitext(file)
-                file_temp = filename + '_skip1' + ext
+                file_temp = os.path.join(app_path, filename + '_skip1' + ext)
                 fp = open(file_temp, 'wb')
                 fp.write(data)
                 fp.close()
@@ -1969,7 +1996,7 @@ class BflbEflashLoader(object):
                 addr = self._skip_addr + self._skip_len
                 data = flash_data[self._skip_addr+self._skip_len - start_addr : ]
                 filename, ext = os.path.splitext(file)
-                file_temp = filename + '_skip2' + ext
+                file_temp = os.path.join(app_path, filename + '_skip2' + ext)
                 fp = open(file_temp, 'wb')
                 fp.write(data)
                 fp.close()
@@ -1980,11 +2007,14 @@ class BflbEflashLoader(object):
                 addr = start_addr
                 data = flash_data[ : self._skip_addr - start_addr]
                 filename, ext = os.path.splitext(file)
-                file_temp = filename + '_skip' + ext
+                file_temp = os.path.join(app_path, filename + '_skip' + ext)
                 fp = open(file_temp, 'wb')
                 fp.write(data)
                 fp.close()
                 ret = self.flash_load_opt(file_temp, addr, erase, verify, shakehand, callback)
+            elif self._skip_addr <= start_addr and \
+                 self._skip_addr + self._skip_len >= start_addr + flash_data_len:
+                return True
             else:
                 ret = self.flash_load_opt(file, start_addr, erase, verify, shakehand, callback)
         else:
@@ -2422,6 +2452,7 @@ class BflbEflashLoader(object):
                                                                    create_img_callback,
                                                                    macaddr_callback,
                                                                    task_num)
+                self._skip_len = 0
                 if ret == "repeat_burn":
                     if self._bflb_com_if is not None:
                         self._bflb_com_if.if_close()
@@ -2764,6 +2795,21 @@ class BflbEflashLoader(object):
             bflb_utils.printf("retry delay: ", self._retry_delay_after_cpu_reset)
         if cfg.has_option("LOAD_CFG", "eflash_loader_file") and eflash_loader_file is None:
                 eflash_loader_file = cfg.get("LOAD_CFG", "eflash_loader_file")
+        if cfg.has_option("LOAD_CFG", "skip_mode") and self._skip_len == 0:
+            skip_para = cfg.get("LOAD_CFG", "skip_mode")
+            if skip_para[0][0:2] == "0x":
+                self._skip_addr = int(skip_para[0][2:], 16)
+            else:
+                self._skip_addr = int(skip_para[0], 10)
+            if skip_para[1][0:2] == "0x":
+                self._skip_len = int(skip_para[1][2:], 16)
+            else:
+                self._skip_len = int(skip_para[1], 10)
+            if self._skip_len > 0:
+                if erase == 2:
+                    bflb_utils.printf("error: skip mode can not set flash chiperase!")
+                    self.error_code_print("0044")
+                    return False, 0
         if self._bflb_auto_download is False and cfg.has_option("LOAD_CFG", "auto_burn"):
                 if "true" == cfg.get("LOAD_CFG", "auto_burn"):
                     self._bflb_auto_download = True
@@ -2878,7 +2924,7 @@ class BflbEflashLoader(object):
                 if res == "shake hand fail":
                     self.error_code_print("0050")
                 if res.startswith("repeat_burn") is True:
-                    self.error_code_print("000A")
+                    #self.error_code_print("000A")
                     return "repeat_burn", flash_burn_retry
                 if res.startswith("error_shakehand") is True:
                     if self._cpu_reset is True:
@@ -2901,7 +2947,7 @@ class BflbEflashLoader(object):
                 if res == "shake hand fail":
                     self.error_code_print("0050")
                 if res.startswith("repeat_burn") is True:
-                    self.error_code_print("000A")
+                    #self.error_code_print("000A")
                     return "repeat_burn", flash_burn_retry
                 if res.startswith("error_shakehand") is True:
                     if self._cpu_reset is True:
@@ -2930,6 +2976,14 @@ class BflbEflashLoader(object):
             self.error_code_print("0003")
             return False, flash_burn_retry
         time.sleep(0.1)
+
+        if self._isp_en is True and self._cpu_reset is True:
+            if self._chip_type == "bl808" or \
+               self._chip_type == "bl616" or \
+               self._chip_type == "wb03":
+                # clear boot status for boot from media after isp mode
+                self.clear_boot_status(self._need_shake_hand)
+
         macaddr_check = False
         mac_addr = bytearray(0)
         if cfg.has_option("LOAD_CFG", "check_mac"):

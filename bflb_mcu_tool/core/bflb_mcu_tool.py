@@ -8,6 +8,7 @@ import argparse
 import traceback
 from importlib import reload
 from os.path import expanduser
+from _ast import Or
 
 try:
     import bflb_path
@@ -2263,10 +2264,10 @@ def get_value(args):
         config["img3_addr"] = ""  
         config["img1_file"] = firmware
         if args.addr:
-            if args.addr == "0x2000": 
+            if args.addr == "0x2000" or args.addr == "2000": 
                 config["img1_addr"] = "0x58000000"
             else:
-                config["img1_addr"] = args.addr
+                config["img1_addr"] = "0x" + args.addr.replace("0x", "")
         else:
             config["img1_addr"] = "0x58000000"
     else:

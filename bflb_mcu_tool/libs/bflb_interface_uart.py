@@ -279,7 +279,7 @@ class BflbUartPort(object):
                     self.if_init(self._device, self._isp_baudrate, self._chiptype, self._chipname)
                     self._baudrate = baudrate
                     # send reboot to make sure boot2 is running
-                    self._ser.write(b"reboot\r\n")
+                    self._ser.write(b"\r\nispboot if\r\nreboot\r\n")
                     # send 5555 to boot2, boot2 jump to bootrom if mode
                     fl_thrx = None
                     fl_thrx = threading.Thread(target=self.if_send_55)
@@ -309,6 +309,7 @@ class BflbUartPort(object):
                         else:
                             success, ack = self.if_read(3000)
                             if ack.find(b'Boot2 ISP Ready') != -1:
+                                bflb_utils.printf("isp ready")
                                 self._shakehand_flag = True
                         if self._shakehand_flag is True:
                             self._ser.timeout = timeout
@@ -526,7 +527,7 @@ class BflbUartPort(object):
                 self.if_init(self._device, self._isp_baudrate, self._chiptype, self._chipname)
                 self._baudrate = baudrate
                 # send reboot to make sure boot2 is running
-                self._ser.write(b"reboot\r\n")
+                self._ser.write(b"\r\nispboot if\r\nreboot\r\n")
                 # send 5555 to boot2, boot2 jump to bootrom if mode
                 fl_thrx = None
                 fl_thrx = threading.Thread(target=self.if_send_55)
@@ -543,7 +544,7 @@ class BflbUartPort(object):
 
                 time_stamp = time.time()
                 while time.time() - time_stamp < wait_timeout:
-                    if self._chiptype == "bl602"or self._chiptype == "bl702":
+                    if self._chiptype == "bl602" or self._chiptype == "bl702":
                         self._ser.timeout = 0.01
                         success, ack = self.if_read(3000)
                         if ack.find(b'Boot2 ISP Shakehand Suss') != -1:
@@ -819,6 +820,12 @@ class CliInfUart(object):
                         dev = dev_com[:dev_com.find(" (")]
                     else:
                         dev = dev_com
+                        
+                    for p, d, h in comports():
+                        if dev == p:
+                            if "VID:PID=42BF:B210" in h or "VID:PID=FFFF:FFFF" in h:
+                                self.mode = "bouffalo"                                        
+                    bflb_utils.printf('serial type is ' + self.mode) 
                     
                     if baudrate:
                         self._baudrate = baudrate
@@ -829,13 +836,21 @@ class CliInfUart(object):
                                               rtscts=False,
                                               write_timeout=None,
                                               dsrdtr=False)
-                    # self._logfile = mfg_lf.open()
-                    self._ser.setDTR(1)
-                    self._ser.setRTS(1)
-                    time.sleep(0.01)
-                    self._ser.setRTS(0)
-                    time.sleep(0.01)
-                    self._ser.setDTR(0)
+
+                    if self.mode == "bouffalo":
+                        self._ser.write(b"BOUFFALOLAB5555DTR0")
+                        time.sleep(0.01)
+                        self._ser.write(b"BOUFFALOLAB5555RTS0")
+                        time.sleep(0.01)
+                        self._ser.write(b"BOUFFALOLAB5555RTS1")
+                    else:   
+                        self._ser.setDTR(1)
+                        self._ser.setRTS(1)
+                        time.sleep(0.01)
+                        self._ser.setRTS(0)
+                        time.sleep(0.01)
+                        self._ser.setDTR(0)
+                                    
                     self._tx_queue = Queue()
                     self._rx_thread = threading.Thread(target=self._read)
                     self._rx_thread_running = True
