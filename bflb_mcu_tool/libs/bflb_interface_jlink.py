@@ -43,7 +43,7 @@ if python_version == 64:
     path_dll = os.path.join(app_path, "utils/jlink", "JLink_x64.dll")
 else:
     path_dll = os.path.join(app_path, "utils/jlink", "JLinkARM.dll")
-    
+
 
 class BflbJLinkPort(object):
 
@@ -56,6 +56,7 @@ class BflbJLinkPort(object):
         self._chiptype = "bl60x"
         self._chipname = "bl60x"
         self._jlink_run_addr = "22010000"
+        self._jlink = None
 
     def if_init(self, device, rate, chiptype="bl60x", chipname="bl60x"):
         if self._inited is False:
@@ -128,10 +129,12 @@ class BflbJLinkPort(object):
                 # jlink_cmd=r'C:/Keil_v5/ARM/Segger/JLink.exe -device Cortex-M4 -Speed 4000 -IF SWD  -JTAGConf -1,-1 -CommanderScript jlink.cmd'
                 if self._device:
                     jlink_cmd = self.jlink_path + ' -device RISC-V -Speed {0} -SelectEmuBySN {1} \
-                    -IF JTAG -jtagconf -1,-1 -autoconnect 1 -CommanderScript jlink.cmd'.format(str(self._speed), str(self._device))
+                    -IF JTAG -jtagconf -1,-1 -autoconnect 1 -CommanderScript jlink.cmd'.format(
+                        str(self._speed), str(self._device))
                 else:
                     jlink_cmd = self.jlink_path + ' -device RISC-V -Speed {0} \
-                    -IF JTAG -jtagconf -1,-1 -autoconnect 1 -CommanderScript jlink.cmd'.format(str(self._speed))
+                    -IF JTAG -jtagconf -1,-1 -autoconnect 1 -CommanderScript jlink.cmd'.format(
+                        str(self._speed))
                 bflb_utils.printf(jlink_cmd)
                 p = subprocess.Popen(jlink_cmd,
                                      shell=True,
@@ -271,8 +274,9 @@ class BflbJLinkPort(object):
         return "FL"
 
     def if_close(self):
-        self._jlink.close()
-        self._inited = False
+        if self._jlink:
+            self._jlink.close()
+            self._inited = False
 
     def if_deal_ack(self):
         success, ack = self.if_read(2)
@@ -321,6 +325,7 @@ class BflbJLinkPort(object):
         bflb_utils.printf(ack)
         return ack, None
 
+
 if __name__ == '__main__':
     try:
         eflash_loader_t = BflbJLinkPort()
@@ -329,6 +334,6 @@ if __name__ == '__main__':
         res = eflash_loader_t.reset_cpu(0, False)
         bflb_utils.printf(res)
     except Exception as e:
-            NUM_ERR = 5
-            bflb_utils.printf(e)
-            traceback.print_exc(limit=NUM_ERR, file=sys.stdout)
+        NUM_ERR = 5
+        bflb_utils.printf(e)
+        traceback.print_exc(limit=NUM_ERR, file=sys.stdout)

@@ -1,6 +1,5 @@
 # -*- coding:utf-8 -*-
 
-
 bootheader_len = 176
 
 bootheader_cfg_keys = {

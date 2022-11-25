@@ -1,33 +1,32 @@
 # -*- coding:utf-8 -*-
 
-
 clock_start_pos = 100
 bootcfg_start_pos = 120
 bootcfg_len = 48
-bootcpucfg_start_pos = bootcfg_start_pos+bootcfg_len # 168 0xA8
+bootcpucfg_start_pos = bootcfg_start_pos + bootcfg_len  # 168 0xA8
 bootcpucfg_len = 16
 bootcpucfg_m0_index = 0
 bootcpucfg_d0_index = 1
 bootcpucfg_lp_index = 2
 
-boot2_start_pos = bootcpucfg_start_pos+bootcpucfg_len * (bootcpucfg_m0_index + 1) # 184 0xB8
+boot2_start_pos = bootcpucfg_start_pos + bootcpucfg_len * (bootcpucfg_m0_index + 1)  # 184 0xB8
 boot2_len = 8
 
-flashcfg_table_start_pos = boot2_start_pos+boot2_len #192 0xC0
+flashcfg_table_start_pos = boot2_start_pos + boot2_len  #192 0xC0
 flashcfg_table_len = 8
 
-patch_on_read_start_pos = flashcfg_table_start_pos+flashcfg_table_len # 200 0xC8
+patch_on_read_start_pos = flashcfg_table_start_pos + flashcfg_table_len  # 200 0xC8
 patch_on_read_len = 24
 
-patch_on_jump_start_pos = patch_on_read_start_pos+patch_on_read_len # 224 0xE0
+patch_on_jump_start_pos = patch_on_read_start_pos + patch_on_read_len  # 224 0xE0
 patch_on_jump_len = 24
 
-rsvd_start_pos = patch_on_jump_start_pos+patch_on_jump_len # 248 0xF8
+rsvd_start_pos = patch_on_jump_start_pos + patch_on_jump_len  # 248 0xF8
 rsvd_len = 4
 
-crc32_start_pos = rsvd_start_pos+rsvd_len # 252 0xFC
+crc32_start_pos = rsvd_start_pos + rsvd_len  # 252 0xFC
 
-bootheader_len = crc32_start_pos+4 # 256 0x100
+bootheader_len = crc32_start_pos + 4  # 256 0x100
 
 bootheader_cfg_keys = {
     "magic_code": {
@@ -424,381 +423,381 @@ bootheader_cfg_keys = {
     # clk cfg
     # clock start=100
     "clkcfg_magic_code": {
-        "offset": str(int(clock_start_pos)+0),
+        "offset": str(int(clock_start_pos) + 0),
         "pos": "0",
         "bitlen": "32"
     },
     "xtal_type": {
-        "offset": str(int(clock_start_pos)+4),
+        "offset": str(int(clock_start_pos) + 4),
         "pos": "0",
         "bitlen": "8"
     },
     "mcu_clk": {
-        "offset": str(int(clock_start_pos)+4),
+        "offset": str(int(clock_start_pos) + 4),
         "pos": "8",
         "bitlen": "8"
     },
     "mcu_clk_div": {
-        "offset": str(int(clock_start_pos)+4),
+        "offset": str(int(clock_start_pos) + 4),
         "pos": "16",
         "bitlen": "8"
     },
     "mcu_bclk_div": {
-        "offset": str(int(clock_start_pos)+4),
+        "offset": str(int(clock_start_pos) + 4),
         "pos": "24",
         "bitlen": "8"
     },
     "mcu_pbclk_div": {
-        "offset": str(int(clock_start_pos)+8),
+        "offset": str(int(clock_start_pos) + 8),
         "pos": "0",
         "bitlen": "8"
     },
     "emi_clk": {
-        "offset": str(int(clock_start_pos)+8),
+        "offset": str(int(clock_start_pos) + 8),
         "pos": "8",
         "bitlen": "8"
     },
     "emi_clk_div": {
-        "offset": str(int(clock_start_pos)+8),
+        "offset": str(int(clock_start_pos) + 8),
         "pos": "16",
         "bitlen": "8"
     },
     "flash_clk_type": {
-        "offset": str(int(clock_start_pos)+8),
+        "offset": str(int(clock_start_pos) + 8),
         "pos": "24",
         "bitlen": "8"
     },
     "flash_clk_div": {
-        "offset": str(int(clock_start_pos)+12),
+        "offset": str(int(clock_start_pos) + 12),
         "pos": "0",
         "bitlen": "8"
     },
     "wifipll_pu": {
-        "offset": str(int(clock_start_pos)+12),
+        "offset": str(int(clock_start_pos) + 12),
         "pos": "8",
         "bitlen": "8"
     },
     "aupll_pu": {
-        "offset": str(int(clock_start_pos)+12),
+        "offset": str(int(clock_start_pos) + 12),
         "pos": "16",
         "bitlen": "8"
     },
     "rsvd0": {
-        "offset": str(int(clock_start_pos)+12),
+        "offset": str(int(clock_start_pos) + 12),
         "pos": "24",
         "bitlen": "8"
     },
     "clkcfg_crc32": {
-        "offset": str(int(clock_start_pos)+16),
+        "offset": str(int(clock_start_pos) + 16),
         "pos": "0",
         "bitlen": "32"
     },
     # bootcfg
     "sign": {
-        "offset": str(int(bootcfg_start_pos)+0),
+        "offset": str(int(bootcfg_start_pos) + 0),
         "pos": "0",
         "bitlen": "2"
     },
     "encrypt_type": {
-        "offset": str(int(bootcfg_start_pos)+0),
+        "offset": str(int(bootcfg_start_pos) + 0),
         "pos": "2",
         "bitlen": "2"
     },
     "key_sel": {
-        "offset": str(int(bootcfg_start_pos)+0),
+        "offset": str(int(bootcfg_start_pos) + 0),
         "pos": "4",
         "bitlen": "2"
     },
     "xts_mode": {
-        "offset": str(int(bootcfg_start_pos)+0),
+        "offset": str(int(bootcfg_start_pos) + 0),
         "pos": "6",
         "bitlen": "1"
     },
     "aes_region_lock": {
-        "offset": str(int(bootcfg_start_pos)+0),
+        "offset": str(int(bootcfg_start_pos) + 0),
         "pos": "7",
         "bitlen": "1"
     },
     "no_segment": {
-        "offset": str(int(bootcfg_start_pos)+0),
+        "offset": str(int(bootcfg_start_pos) + 0),
         "pos": "8",
         "bitlen": "1"
     },
     "boot2_enable": {
-        "offset": str(int(bootcfg_start_pos)+0),
+        "offset": str(int(bootcfg_start_pos) + 0),
         "pos": "9",
         "bitlen": "1"
     },
     "boot2_rollback": {
-        "offset": str(int(bootcfg_start_pos)+0),
+        "offset": str(int(bootcfg_start_pos) + 0),
         "pos": "10",
         "bitlen": "1"
     },
     "cpu_master_id": {
-        "offset": str(int(bootcfg_start_pos)+0),
+        "offset": str(int(bootcfg_start_pos) + 0),
         "pos": "11",
         "bitlen": "4"
     },
     "notload_in_bootrom": {
-        "offset": str(int(bootcfg_start_pos)+0),
+        "offset": str(int(bootcfg_start_pos) + 0),
         "pos": "15",
         "bitlen": "1"
     },
     "crc_ignore": {
-        "offset": str(int(bootcfg_start_pos)+0),
+        "offset": str(int(bootcfg_start_pos) + 0),
         "pos": "16",
         "bitlen": "1"
     },
     "hash_ignore": {
-        "offset": str(int(bootcfg_start_pos)+0),
+        "offset": str(int(bootcfg_start_pos) + 0),
         "pos": "17",
         "bitlen": "1"
     },
     "power_on_mm": {
-        "offset": str(int(bootcfg_start_pos)+0),
+        "offset": str(int(bootcfg_start_pos) + 0),
         "pos": "18",
         "bitlen": "1"
     },
     "em_sel": {
-        "offset": str(int(bootcfg_start_pos)+0),
+        "offset": str(int(bootcfg_start_pos) + 0),
         "pos": "19",
         "bitlen": "3"
     },
     "cmds_en": {
-        "offset": str(int(bootcfg_start_pos)+0),
+        "offset": str(int(bootcfg_start_pos) + 0),
         "pos": "22",
         "bitlen": "1"
     },
     "cmds_wrap_mode": {
-        "offset": str(int(bootcfg_start_pos)+0),
+        "offset": str(int(bootcfg_start_pos) + 0),
         "pos": "23",
         "bitlen": "2"
     },
     "cmds_wrap_len": {
-        "offset": str(int(bootcfg_start_pos)+0),
+        "offset": str(int(bootcfg_start_pos) + 0),
         "pos": "25",
         "bitlen": "4"
     },
     "icache_invalid": {
-        "offset": str(int(bootcfg_start_pos)+0),
+        "offset": str(int(bootcfg_start_pos) + 0),
         "pos": "29",
         "bitlen": "1"
     },
     "dcache_invalid": {
-        "offset": str(int(bootcfg_start_pos)+0),
+        "offset": str(int(bootcfg_start_pos) + 0),
         "pos": "30",
         "bitlen": "1"
     },
     "fpga_halt_release": {
-        "offset": str(int(bootcfg_start_pos)+0),
+        "offset": str(int(bootcfg_start_pos) + 0),
         "pos": "31",
         "bitlen": "1"
     },
     # flash controller offset
     "group_image_offset": {
-        "offset": str(int(bootcfg_start_pos)+4),
+        "offset": str(int(bootcfg_start_pos) + 4),
         "pos": "0",
         "bitlen": "32"
     },
     "aes_region_len": {
-        "offset": str(int(bootcfg_start_pos)+8),
+        "offset": str(int(bootcfg_start_pos) + 8),
         "pos": "0",
         "bitlen": "32"
     },
     # total image len or segment count
     "img_len_cnt": {
-        "offset": str(int(bootcfg_start_pos)+12),
+        "offset": str(int(bootcfg_start_pos) + 12),
         "pos": "0",
         "bitlen": "32"
     },
     # img hash
     "hash_0": {
-        "offset": str(int(bootcfg_start_pos)+16),
+        "offset": str(int(bootcfg_start_pos) + 16),
         "pos": "0",
         "bitlen": "32"
     },
     "hash_1": {
-        "offset": str(int(bootcfg_start_pos)+20),
+        "offset": str(int(bootcfg_start_pos) + 20),
         "pos": "0",
         "bitlen": "32"
     },
     "hash_2": {
-        "offset": str(int(bootcfg_start_pos)+24),
+        "offset": str(int(bootcfg_start_pos) + 24),
         "pos": "0",
         "bitlen": "32"
     },
     "hash_3": {
-        "offset": str(int(bootcfg_start_pos)+28),
+        "offset": str(int(bootcfg_start_pos) + 28),
         "pos": "0",
         "bitlen": "32"
     },
     "hash_4": {
-        "offset": str(int(bootcfg_start_pos)+32),
+        "offset": str(int(bootcfg_start_pos) + 32),
         "pos": "0",
         "bitlen": "32"
     },
     "hash_5": {
-        "offset": str(int(bootcfg_start_pos)+36),
+        "offset": str(int(bootcfg_start_pos) + 36),
         "pos": "0",
         "bitlen": "32"
     },
     "hash_6": {
-        "offset": str(int(bootcfg_start_pos)+40),
+        "offset": str(int(bootcfg_start_pos) + 40),
         "pos": "0",
         "bitlen": "32"
     },
     "hash_7": {
-        "offset": str(int(bootcfg_start_pos)+44),
+        "offset": str(int(bootcfg_start_pos) + 44),
         "pos": "0",
         "bitlen": "32"
     },
     # boot cpu m0 config
     "m0_config_enable": {
-        "offset": str(int(bootcpucfg_start_pos+bootcpucfg_len*bootcpucfg_m0_index)+0),
+        "offset": str(int(bootcpucfg_start_pos + bootcpucfg_len * bootcpucfg_m0_index) + 0),
         "pos": "0",
         "bitlen": "8"
     },
     "m0_halt_cpu": {
-        "offset": str(int(bootcpucfg_start_pos+bootcpucfg_len*bootcpucfg_m0_index)+0),
+        "offset": str(int(bootcpucfg_start_pos + bootcpucfg_len * bootcpucfg_m0_index) + 0),
         "pos": "8",
         "bitlen": "8"
     },
     "m0_cache_enable": {
-        "offset": str(int(bootcpucfg_start_pos+bootcpucfg_len*bootcpucfg_m0_index)+0),
+        "offset": str(int(bootcpucfg_start_pos + bootcpucfg_len * bootcpucfg_m0_index) + 0),
         "pos": "16",
         "bitlen": "1"
     },
     "m0_cache_wa": {
-        "offset": str(int(bootcpucfg_start_pos+bootcpucfg_len*bootcpucfg_m0_index)+0),
+        "offset": str(int(bootcpucfg_start_pos + bootcpucfg_len * bootcpucfg_m0_index) + 0),
         "pos": "17",
         "bitlen": "1"
     },
     "m0_cache_wb": {
-        "offset": str(int(bootcpucfg_start_pos+bootcpucfg_len*bootcpucfg_m0_index)+0),
+        "offset": str(int(bootcpucfg_start_pos + bootcpucfg_len * bootcpucfg_m0_index) + 0),
         "pos": "18",
         "bitlen": "1"
     },
     "m0_cache_wt": {
-        "offset": str(int(bootcpucfg_start_pos+bootcpucfg_len*bootcpucfg_m0_index)+0),
+        "offset": str(int(bootcpucfg_start_pos + bootcpucfg_len * bootcpucfg_m0_index) + 0),
         "pos": "19",
         "bitlen": "1"
     },
     "m0_cache_way_dis": {
-        "offset": str(int(bootcpucfg_start_pos+bootcpucfg_len*bootcpucfg_m0_index)+0),
+        "offset": str(int(bootcpucfg_start_pos + bootcpucfg_len * bootcpucfg_m0_index) + 0),
         "pos": "20",
         "bitlen": "4"
     },
     "m0_reserved": {
-        "offset": str(int(bootcpucfg_start_pos+bootcpucfg_len*bootcpucfg_m0_index)+0),
+        "offset": str(int(bootcpucfg_start_pos + bootcpucfg_len * bootcpucfg_m0_index) + 0),
         "pos": "24",
         "bitlen": "8"
     },
     "m0_image_address_offset": {
-        "offset": str(int(bootcpucfg_start_pos+bootcpucfg_len*bootcpucfg_m0_index)+4),
+        "offset": str(int(bootcpucfg_start_pos + bootcpucfg_len * bootcpucfg_m0_index) + 4),
         "pos": "0",
         "bitlen": "32"
     },
     "m0_boot_entry": {
-        "offset": str(int(bootcpucfg_start_pos+bootcpucfg_len*bootcpucfg_m0_index)+8),
+        "offset": str(int(bootcpucfg_start_pos + bootcpucfg_len * bootcpucfg_m0_index) + 8),
         "pos": "0",
         "bitlen": "32"
     },
     "m0_msp_val": {
-        "offset": str(int(bootcpucfg_start_pos+bootcpucfg_len*bootcpucfg_m0_index)+12),
+        "offset": str(int(bootcpucfg_start_pos + bootcpucfg_len * bootcpucfg_m0_index) + 12),
         "pos": "0",
         "bitlen": "32"
     },
     # boot2 config
     "boot2_pt_table_0": {
-        "offset": str(int(boot2_start_pos)+0),
+        "offset": str(int(boot2_start_pos) + 0),
         "pos": "0",
         "bitlen": "32"
     },
     "boot2_pt_table_1": {
-        "offset": str(int(boot2_start_pos)+4),
+        "offset": str(int(boot2_start_pos) + 4),
         "pos": "0",
         "bitlen": "32"
     },
     # flash config table
     "flashCfgTableAddr": {
-        "offset": str(int(flashcfg_table_start_pos)+0),
+        "offset": str(int(flashcfg_table_start_pos) + 0),
         "pos": "0",
         "bitlen": "32"
     },
     "flashCfgTableLen": {
-        "offset": str(int(flashcfg_table_start_pos)+4),
+        "offset": str(int(flashcfg_table_start_pos) + 4),
         "pos": "0",
         "bitlen": "32"
     },
     # patch config
     "patch_read_addr0": {
-        "offset": str(int(patch_on_read_start_pos)+0),
+        "offset": str(int(patch_on_read_start_pos) + 0),
         "pos": "0",
         "bitlen": "32"
     },
     "patch_read_value0": {
-        "offset": str(int(patch_on_read_start_pos)+4),
+        "offset": str(int(patch_on_read_start_pos) + 4),
         "pos": "0",
         "bitlen": "32"
     },
     "patch_read_addr1": {
-        "offset": str(int(patch_on_read_start_pos)+8),
+        "offset": str(int(patch_on_read_start_pos) + 8),
         "pos": "0",
         "bitlen": "32"
     },
     "patch_read_value1": {
-        "offset": str(int(patch_on_read_start_pos)+12),
+        "offset": str(int(patch_on_read_start_pos) + 12),
         "pos": "0",
         "bitlen": "32"
     },
     "patch_read_addr2": {
-        "offset": str(int(patch_on_read_start_pos)+16),
+        "offset": str(int(patch_on_read_start_pos) + 16),
         "pos": "0",
         "bitlen": "32"
     },
     "patch_read_value2": {
-        "offset": str(int(patch_on_read_start_pos)+20),
+        "offset": str(int(patch_on_read_start_pos) + 20),
         "pos": "0",
         "bitlen": "32"
     },
     "patch_jump_addr0": {
-        "offset": str(int(patch_on_jump_start_pos)+0),
+        "offset": str(int(patch_on_jump_start_pos) + 0),
         "pos": "0",
         "bitlen": "32"
     },
     "patch_jump_value0": {
-        "offset": str(int(patch_on_jump_start_pos)+4),
+        "offset": str(int(patch_on_jump_start_pos) + 4),
         "pos": "0",
         "bitlen": "32"
     },
     "patch_jump_addr1": {
-        "offset": str(int(patch_on_jump_start_pos)+8),
+        "offset": str(int(patch_on_jump_start_pos) + 8),
         "pos": "0",
         "bitlen": "32"
     },
     "patch_jump_value1": {
-        "offset": str(int(patch_on_jump_start_pos)+12),
+        "offset": str(int(patch_on_jump_start_pos) + 12),
         "pos": "0",
         "bitlen": "32"
     },
     "patch_jump_addr2": {
-        "offset": str(int(patch_on_jump_start_pos)+16),
+        "offset": str(int(patch_on_jump_start_pos) + 16),
         "pos": "0",
         "bitlen": "32"
     },
     "patch_jump_value2": {
-        "offset": str(int(patch_on_jump_start_pos)+20),
+        "offset": str(int(patch_on_jump_start_pos) + 20),
         "pos": "0",
         "bitlen": "32"
     },
     # rsvd config
     "reserved": {
-        "offset": str(int(rsvd_start_pos)+0),
+        "offset": str(int(rsvd_start_pos) + 0),
         "pos": "0",
         "bitlen": "32"
     },
     "crc32": {
-        "offset": str(int(crc32_start_pos)+0),
+        "offset": str(int(crc32_start_pos) + 0),
         "pos": "0",
         "bitlen": "32"
     },

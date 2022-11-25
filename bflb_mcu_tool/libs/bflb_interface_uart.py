@@ -19,7 +19,6 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #  SOFTWARE.
 
-
 import os
 import sys
 import time
@@ -100,7 +99,7 @@ class BflbUartPort(object):
                                           rtscts=False,
                                           write_timeout=None,
                                           dsrdtr=False)
-                self._ser.port = dev 
+                self._ser.port = dev
                 self._ser.dtr = False
                 self._ser.rts = False
                 self._ser.set_buffer_size(rx_size=12800, tx_size=12800)
@@ -113,7 +112,7 @@ class BflbUartPort(object):
             self._chipname = chipname
         except Exception as e:
             bflb_utils.printf("Error: %s" % e)
-        
+
     def flush_buffers(self):
         if self._ser:
             self._ser.flushInput()
@@ -153,11 +152,11 @@ class BflbUartPort(object):
     def if_raw_read(self):
         if self._ser:
             return self._ser.read(self._ser.in_waiting or 1)
-    
+
     def if_raw_read_tmall(self):
         if self._ser:
             return self._ser.read(self._ser.in_waiting or 200)
-    
+
     # this function return bytearray or bytes type
     def if_read(self, data_len):
         data = bytearray(0)
@@ -178,7 +177,7 @@ class BflbUartPort(object):
                 bflb_utils.printf("Error: %s" % e)
         else:
             return 0, data
-         
+
     def _if_get_sync_bytes(self, length):
         try:
             data = bytearray(length)
@@ -199,11 +198,9 @@ class BflbUartPort(object):
                 if self._shakehand_flag is True:
                     break
                 if self._chiptype == "bl702" or self._chiptype == "bl702l":
-                    self._ser.write(self._if_get_sync_bytes(
-                        int(0.003 * self._baudrate / 10)))
+                    self._ser.write(self._if_get_sync_bytes(int(0.003 * self._baudrate / 10)))
                 else:
-                    self._ser.write(self._if_get_sync_bytes(
-                        int(0.006 * self._baudrate / 10)))
+                    self._ser.write(self._if_get_sync_bytes(int(0.006 * self._baudrate / 10)))
         except Exception as e:
             bflb_utils.printf("Error: %s" % e)
 
@@ -227,12 +224,6 @@ class BflbUartPort(object):
             bflb_utils.printf("Error: %s" % e)
 
     def check_bl_usb_serial(self, dev):
-        try:
-            # pylint: disable=import-outside-toplevel
-            from serial.tools.list_ports import comports
-        except ImportError:
-            return None
-
         if sys.platform.startswith("win"):
             ports = []
             for p, d, h in comports():
@@ -285,7 +276,7 @@ class BflbUartPort(object):
                     fl_thrx = threading.Thread(target=self.if_send_55)
                     fl_thrx.setDaemon(True)
                     fl_thrx.start()
-    
+
                     bflb_utils.printf("Please Press Reset Key!")
                     # reset low
                     self._ser.setRTS(1)
@@ -293,10 +284,10 @@ class BflbUartPort(object):
                     time.sleep(0.2)
                     # reset high
                     self._ser.setRTS(0)
-    
+
                     time_stamp = time.time()
                     while time.time() - time_stamp < wait_timeout:
-                        if self._chiptype == "bl602"or self._chiptype == "bl702":
+                        if self._chiptype == "bl602" or self._chiptype == "bl702":
                             self._ser.timeout = 0.01
                             success, ack = self.if_read(3000)
                             if ack.find(b'Boot2 ISP Shakehand Suss') != -1:
@@ -344,13 +335,13 @@ class BflbUartPort(object):
                                         break
                             self._ser.timeout = tmp_timeout
                             break
-    
+
                     self._shakehand_flag = True
                     self._ser.timeout = timeout
                     # set actual baudrate
                     self.if_init(self._device, self._baudrate, self._chiptype, self._chipname)
                     time.sleep(2.2)
-    
+
                 if self.check_bl_usb_serial(self._device) and boot_load:
                     blusbserialwriteflag = True
                 while shake_hand_retry > 0:
@@ -424,7 +415,7 @@ class BflbUartPort(object):
                                 time.sleep(shake_hand_delay / 1000.0)
                             else:
                                 time.sleep(5 / 1000.0)
-    
+
                             # do reset agian to make sure boot pin is high
                             if reset_revert:
                                 # reset high
@@ -463,11 +454,9 @@ class BflbUartPort(object):
                     bflb_utils.printf("send sync")
                     # send keep 6ms ,N*10/baudrate=0.01
                     if self._chiptype == "bl702" or self._chiptype == "bl702l":
-                        self._ser.write(self._if_get_sync_bytes(
-                            int(0.003 * self._baudrate / 10)))
+                        self._ser.write(self._if_get_sync_bytes(int(0.003 * self._baudrate / 10)))
                     else:
-                        self._ser.write(self._if_get_sync_bytes(
-                            int(0.006 * self._baudrate / 10)))
+                        self._ser.write(self._if_get_sync_bytes(int(0.006 * self._baudrate / 10)))
                     if self._chipname == "bl808":
                         time.sleep(0.3)
                         self._ser.write(bflb_utils.hexstr_to_bytearray("5000080038F0002000000018"))
@@ -503,14 +492,14 @@ class BflbUartPort(object):
             return "FL"
 
     def if_toggle_boot(self,
-                     do_reset=False,
-                     reset_hold_time=100,
-                     shake_hand_delay=100,
-                     reset_revert=True,
-                     cutoff_time=0,
-                     shake_hand_retry=2,
-                     isp_timeout=0,
-                     boot_load=False):
+                       do_reset=False,
+                       reset_hold_time=100,
+                       shake_hand_delay=100,
+                       reset_revert=True,
+                       cutoff_time=0,
+                       shake_hand_retry=2,
+                       isp_timeout=0,
+                       boot_load=False):
         try:
             timeout = self._ser.timeout
             blusbserialwriteflag = False
@@ -689,8 +678,8 @@ class BflbUartPort(object):
                         time.sleep(5 / 1000.0)
                     reset_cnt -= 1
                 bflb_utils.printf("reset cnt: " + str(reset_cnt) + ", reset hold: " +
-                                    str(reset_hold_time / 1000.0) + ", shake hand delay: " +
-                                    str(shake_hand_delay / 1000.0))
+                                  str(reset_hold_time / 1000.0) + ", shake hand delay: " +
+                                  str(shake_hand_delay / 1000.0))
             if blusbserialwriteflag:
                 self.bl_usb_serial_write(cutoff_time, reset_revert)
             # clean buffer before start
@@ -704,7 +693,8 @@ class BflbUartPort(object):
 
     def if_close(self):
         if self._ser:
-            try:            
+            try:
+                self._ser.setDTR(1)
                 self._ser.close()
                 self._ser = None
             except Exception as e:
@@ -729,8 +719,7 @@ class BflbUartPort(object):
             if success == 0:
                 bflb_utils.printf("err code is ", str(binascii.hexlify(err_code)))
                 return "FL"
-            err_code_str = str(binascii.hexlify(
-                err_code[1:2] + err_code[0:1]).decode('utf-8'))
+            err_code_str = str(binascii.hexlify(err_code[1:2] + err_code[0:1]).decode('utf-8'))
             ack = "FL"
             try:
                 ret = ack + err_code_str + \
@@ -756,8 +745,7 @@ class BflbUartPort(object):
                 data_len = bflb_utils.bytearray_to_int(tmp)
                 success, data_bytes = self.if_read(data_len)
                 if success == 0 or len(data_bytes) != data_len:
-                    bflb_utils.printf(
-                        "Read data error,maybe not get excepted length")
+                    bflb_utils.printf("Read data error,maybe not get excepted length")
                     # bflb_utils.printf("ack is ", str(binascii.hexlify(data_bytes)))
                     return "Read data error,maybe not get excepted length", data_bytes
                 # bflb_utils.printf("ack is ", str(binascii.hexlify(data_bytes)))
@@ -794,7 +782,7 @@ class CliInfUart(object):
             return True
         else:
             return False
-        
+
     def set_baudrate(self, baudrate):
         self._baudrate = baudrate
         if self._ser:
@@ -820,13 +808,15 @@ class CliInfUart(object):
                         dev = dev_com[:dev_com.find(" (")]
                     else:
                         dev = dev_com
-                        
+
                     for p, d, h in comports():
                         if dev == p:
                             if "VID:PID=42BF:B210" in h or "VID:PID=FFFF:FFFF" in h:
-                                self.mode = "bouffalo"                                        
-                    bflb_utils.printf('serial type is ' + self.mode) 
-                    
+                                self.mode = "bouffalo"
+                            else:
+                                self.mode = "general"
+                    bflb_utils.printf('serial type is ' + self.mode)
+
                     if baudrate:
                         self._baudrate = baudrate
                     self._ser = serial.Serial(dev,
@@ -843,14 +833,14 @@ class CliInfUart(object):
                         self._ser.write(b"BOUFFALOLAB5555RTS0")
                         time.sleep(0.01)
                         self._ser.write(b"BOUFFALOLAB5555RTS1")
-                    else:   
-                        self._ser.setDTR(1)
+                    else:
+                        self._ser.setDTR(1)  # DTR拉低
                         self._ser.setRTS(1)
                         time.sleep(0.01)
                         self._ser.setRTS(0)
                         time.sleep(0.01)
-                        self._ser.setDTR(0)
-                                    
+                        #self._ser.setDTR(0) # DTR拉高
+
                     self._tx_queue = Queue()
                     self._rx_thread = threading.Thread(target=self._read)
                     self._rx_thread_running = True
@@ -904,7 +894,7 @@ class CliInfUart(object):
                 return 0
         except Exception as e:
             bflb_utils.printf("Error: %s" % e)
-        
+
     def read(self):
         time.sleep(0.1)
         return self.msg
@@ -989,29 +979,65 @@ class CliInfUart(object):
                                     cb.obs_handle(data)
                             # self._logfile.wrtiteline(data)
                         data = ''
+                    elif str(str_msg) != '\n':
+                        # data += str_msg.strip()
+                        data += str_msg
                     else:
-                        if str(str_msg) != '\n':
-                            # data += str_msg.strip()
-                            data += str_msg
+                        if data != '':
+                            bflb_utils.printf(data + '\n')
+                            data = ''
         except Exception as e:
             bflb_utils.printf("Error: %s" % e)
+
+    '''        
+    def _read(self):
+        try:
+            data = ''
+            self.msg = ''
+            while self._rx_thread_running:
+                try:
+                    byte_msg = self._ser.readline()
+                except serial.SerialException:
+                    try:
+                        self._ser.close()
+                    except Exception:
+                        pass
+                    self._ser = None
+                    self._rx_thread_running = False
+                    self._tx_thread_running = False
+                    self._tx_thread.join()
+                    self._tx_queue = None
+                except Exception:
+                    pass
+                else:
+                    try:
+                        str_msg = bytes.decode(byte_msg)
+                    except Exception:
+                        continue
+                    else:
+                        bflb_utils.printf(str_msg)
+        except Exception as e:
+            bflb_utils.printf("Error: %s" % e)
+        '''
 
     def open_listen(self, dev_com, baudrate):
         try:
             if not dev_com:
                 bflb_utils.printf("No Serial Port Found")
                 return False
-                   
+
             if " (" in dev_com:
                 dev = dev_com[:dev_com.find(" (")]
             else:
-                dev = dev_com   
-                         
+                dev = dev_com
+
             for p, d, h in comports():
                 if dev == p:
                     if "VID:PID=42BF:B210" in h or "VID:PID=FFFF:FFFF" in h:
-                        self.mode = "bouffalo"                                        
-            bflb_utils.printf('serial type is ' + self.mode) 
+                        self.mode = "bouffalo"
+                    else:
+                        self.mode = "general"
+            bflb_utils.printf('serial type is ' + self.mode)
 
             if self._ser is None:
                 try:
@@ -1026,25 +1052,25 @@ class CliInfUart(object):
                                               rtscts=False,
                                               write_timeout=None,
                                               dsrdtr=False)
-                    self._ser.port = dev 
+                    self._ser.port = dev
                     self._ser.dtr = False
                     self._ser.rts = False
-                    self._ser.open() 
-                    
+                    self._ser.open()
+
                     if self.mode == "bouffalo":
                         self._ser.write(b"BOUFFALOLAB5555DTR0")
                         time.sleep(0.01)
                         self._ser.write(b"BOUFFALOLAB5555RTS0")
                         time.sleep(0.01)
                         self._ser.write(b"BOUFFALOLAB5555RTS1")
-                    else:   
+                    else:
                         self._ser.setDTR(1)
                         self._ser.setRTS(1)
                         time.sleep(0.01)
                         self._ser.setRTS(0)
                         time.sleep(0.01)
                         self._ser.setDTR(0)
-                    
+
                     self._rx_thread = threading.Thread(target=self._read_listen)
                     self._rx_thread_running = True
                     self._rx_thread.setDaemon(True)

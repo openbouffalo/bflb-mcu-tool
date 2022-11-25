@@ -19,13 +19,11 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #  SOFTWARE.
 
-
 import os
 import time
 import binascii
 import subprocess
-
-
+import config as gol
 import cklink
 
 try:
@@ -36,6 +34,7 @@ from libs import bflb_utils
 from libs.bflb_utils import app_path
 
 dir_dll = os.path.join(app_path, "utils/cklink")
+
 
 class BflbCKLinkPort(object):
 
@@ -51,14 +50,15 @@ class BflbCKLinkPort(object):
         self._chipname = "bl808"
         self.vid = vid
         self.pid = pid
-        self.link = None
+        #self.link = None
+        self.link = gol.obj_cklink
 
     def if_init(self, device, sn, rate, chiptype="bl808", chipname="bl808"):
         if self._inited is False:
             dev = device.split("|")
             vid = int(dev[0].replace("0x", ""), 16)
             pid = int(dev[1].replace("0x", ""), 16)
-            serial = str(sn) 
+            serial = str(sn)
             bflb_utils.printf("SN is " + serial)
             sub_module = __import__("libs." + chiptype, fromlist=[chiptype])
             self._cklink_shake_hand_addr = sub_module.cklink_load_cfg.cklink_shake_hand_addr
@@ -70,17 +70,24 @@ class BflbCKLinkPort(object):
             self._inited = True
             self._chiptype = chiptype
             self._chipname = chipname
-            self.link = cklink.CKLink(dlldir=dir_dll, vid=self._cklink_vid, pid=self._cklink_pid, sn=serial, arch=2)
+            if not self.link:
+                self.link = cklink.CKLink(dlldir=dir_dll,
+                                          vid=self._cklink_vid,
+                                          pid=self._cklink_pid,
+                                          sn=serial,
+                                          arch=2,
+                                          cdi=0)
+                gol.obj_cklink = self.link
             #self.link.print_version()
             self.link.open()
             if self.link.connected():
-                self.link.reset(1)
+                self.link.reset(1)  # can not be set to 0
             return False
-        
+
     def if_close(self):
         if self.link:
             try:
-                self.link.halt()
+                #self.link.halt()
                 self.link.close()
             except Exception as e:
                 print(e)
@@ -98,12 +105,12 @@ class BflbCKLinkPort(object):
 
     def halt_cpu(self):
         return self.link.halt()
-    
+
     def resume_cpu(self):
         return self.link.resume()
 
     def reset_cpu(self):
-        return self.link.reset(1) 
+        return self.link.reset(1)
 
     def set_pc_msp(self, pc, msp):
         self.halt_cpu()
@@ -126,7 +133,7 @@ class BflbCKLinkPort(object):
         self.if_raw_write(self._cklink_data_addr, data_send)
         # write flag
         self.if_raw_write(self._cklink_shake_hand_addr, binascii.unhexlify("48524459"))
-        
+
     def if_read(self, data_len):
         start_time = (time.time() * 1000)
         while True:
@@ -144,7 +151,7 @@ class BflbCKLinkPort(object):
                 return 0, "waiting response time out".encode("utf-8")
             self.resume_cpu()
             time.sleep(0.001)
-        
+
         data = self.if_raw_read(self._cklink_data_addr, data_len)
         if len(data) != data_len:
             return 0, data

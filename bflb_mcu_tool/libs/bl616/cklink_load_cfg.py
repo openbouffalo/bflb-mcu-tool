@@ -1,6 +1,5 @@
 # -*- coding:utf-8 -*-
 
-
 cklink_shake_hand_addr = "2204BBEC"
 cklink_data_addr = "2204CC88"
 cklink_load_addr = "22010000"

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-
 from libs import bflb_utils
 
 keyslot0 = 28

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-
 import os
 
 import config as gol
@@ -31,7 +30,7 @@ def get_suitable_file_name(cfg_dir, flash_id):
 def update_flash_cfg_do(chipname, chiptype, flash_id, file=None, create=False, section=None):
     if conf_sign:
         cfg_dir = app_path + "/utils/flash/" + chipname + '/'
-    else:     
+    else:
         cfg_dir = app_path + "/utils/flash/" + gol.flash_dict[chipname] + '/'
     conf_name = get_suitable_file_name(cfg_dir, flash_id)
     value_key = []

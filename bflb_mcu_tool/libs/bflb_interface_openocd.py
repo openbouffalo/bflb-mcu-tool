@@ -19,7 +19,6 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #  SOFTWARE.
 
-
 import os
 import time
 import binascii
@@ -71,7 +70,7 @@ class ThreadOpenocdServer(threading.Thread):
             if self._chiptype == "bl602":
                 cmd = openocd_path + " -f " + \
                       app_path + "/utils/openocd/if_bflb_dbg.cfg" + cmd_ftdi_serial +\
-                      " -f " + app_path + "/utils/openocd/tgt_602.cfg" 
+                      " -f " + app_path + "/utils/openocd/tgt_602.cfg"
             else:
                 cmd = openocd_path + " -f " + \
                       app_path + "/utils/openocd/if_bflb_dbg.cfg" + cmd_ftdi_serial +\

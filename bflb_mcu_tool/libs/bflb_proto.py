@@ -49,17 +49,17 @@ def cli_proto_tx_11n(mcs, short_gi, mod_type, bw, coding=""):
     elif mod_type == 'HT-GF':
         mod = 'g'
 
-    if bw == 'HT20':
+    if bw == '20M':
         bandwidth = '2'
-    elif bw == 'HT40':
+    elif bw == '40M':
         bandwidth = '4'
 
     return 'm' + gi + mod + bandwidth + str(mcs) + str(coding)
 
 
-def cli_proto_tx_11ax_wb03(mcs, coding, heltf_gi):
-    mcs = "{:0>2s}".format(str(mcs if mcs < 10 else mcs+2))            
-    return 'Q{0}{1}{2}\r'.format(str(coding), str(heltf_gi), mcs)
+def cli_proto_tx_11ax_wb03(mcs, coding, heltf_gi, bw):
+    mcs = "{:0>2s}".format(str(mcs if mcs < 10 else mcs + 2))
+    return 'Q{0}{1}{2}{3}\r'.format(str(coding), str(heltf_gi), mcs, bw)
 
 
 def cli_ble_tx_power(tx_power):
@@ -67,7 +67,8 @@ def cli_ble_tx_power(tx_power):
 
 
 def cli_ble_tx_start(tx_channel, length_of_test_data, packet_payload):
-    return 'ET' + str(tx_channel).upper() + str(length_of_test_data).upper() + str(packet_payload).upper()
+    return 'ET' + str(tx_channel).upper() + str(length_of_test_data).upper() + str(
+        packet_payload).upper()
 
 
 def cli_ble_rx_start(rx_channel):

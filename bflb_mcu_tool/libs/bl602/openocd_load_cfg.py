@@ -1,6 +1,5 @@
 # -*- coding:utf-8 -*-
 
-
 openocd_shake_hand_addr = "4201BFF0"
 openocd_data_addr = "4201C000"
 openocd_load_addr = "22010000"

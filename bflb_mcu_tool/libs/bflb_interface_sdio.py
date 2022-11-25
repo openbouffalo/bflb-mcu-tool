@@ -19,7 +19,6 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #  SOFTWARE.
 
-
 import os
 import sys
 import time
@@ -161,6 +160,6 @@ if __name__ == '__main__':
         bflb_utils.printf("shakehand test")
         eflash_loader_t.if_shakehand()
     except Exception as e:
-            NUM_ERR = 5
-            bflb_utils.printf(e)
-            traceback.print_exc(limit=NUM_ERR, file=sys.stdout)
+        NUM_ERR = 5
+        bflb_utils.printf(e)
+        traceback.print_exc(limit=NUM_ERR, file=sys.stdout)

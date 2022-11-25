@@ -19,7 +19,6 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #  SOFTWARE.
 
-
 import os
 import binascii
 
@@ -55,14 +54,24 @@ def bl_dts2hex(dts):
     with open(dts, "r", encoding='utf-8') as f:
         tmp_dts = f.read()
     fdt_obj = fdt.parse_dts(tmp_dts)
-    
+
     xtal_mode = ""
     xtal = ""
     pwr_mode = ""
     pwr_table_11b = ""
     pwr_table_11g = ""
     pwr_table_11n = ""
-    pwr_offset = ""
+    pwr_table_11n_ht20 = ""
+    pwr_table_11n_ht40 = ""
+    pwr_table_11ac_vht20 = ""
+    pwr_table_11ac_vht40 = ""
+    pwr_table_11ac_vht80 = ""
+    pwr_table_11ax_he20 = ""
+    pwr_table_11ax_he40 = ""
+    pwr_table_11ax_he80 = ""
+    pwr_table_11ax_he160 = ""
+    pwr_offset_wifi = ""
+    pwr_offset_wifi_lp = ""
     en_tcal = ""
     linear_or_follow = ""
     tchannels = ""
@@ -70,15 +79,29 @@ def bl_dts2hex(dts):
     tchannel_os_low = ""
     troom_os = ""
     pwr_table_ble = ""
+    pwr_table_bt = ""
+    pwr_table_zigbee = ""
+    pwr_offset_bz = ""
+    country_code = ""
 
     if fdt_obj.exist_node("wifi/brd_rf"):
         xtal_mode = fdt_obj.get_property("xtal_mode", "wifi/brd_rf")
         xtal = fdt_obj.get_property("xtal", "wifi/brd_rf")
         pwr_mode = fdt_obj.get_property("pwr_mode", "wifi/brd_rf")
-        pwr_offset = fdt_obj.get_property("pwr_offset", "wifi/brd_rf")
+        pwr_offset_wifi = fdt_obj.get_property("pwr_offset", "wifi/brd_rf")
+        pwr_offset_wifi_lp = fdt_obj.get_property("pwr_offset_lp", "wifi/brd_rf")
         pwr_table_11b = fdt_obj.get_property("pwr_table_11b", "wifi/brd_rf")
         pwr_table_11g = fdt_obj.get_property("pwr_table_11g", "wifi/brd_rf")
         pwr_table_11n = fdt_obj.get_property("pwr_table_11n", "wifi/brd_rf")
+        pwr_table_11n_ht20 = fdt_obj.get_property("pwr_table_11n_ht20", "wifi/brd_rf")
+        pwr_table_11n_ht40 = fdt_obj.get_property("pwr_table_11n_ht40", "wifi/brd_rf")
+        pwr_table_11ac_vht20 = fdt_obj.get_property("pwr_table_11ac_vht20", "wifi/brd_rf")
+        pwr_table_11ac_vht40 = fdt_obj.get_property("pwr_table_11ac_vht40", "wifi/brd_rf")
+        pwr_table_11ac_vht80 = fdt_obj.get_property("pwr_table_11ac_vht80", "wifi/brd_rf")
+        pwr_table_11ax_he20 = fdt_obj.get_property("pwr_table_11ax_he20", "wifi/brd_rf")
+        pwr_table_11ax_he40 = fdt_obj.get_property("pwr_table_11ax_he40", "wifi/brd_rf")
+        pwr_table_11ax_he80 = fdt_obj.get_property("pwr_table_11ax_he80", "wifi/brd_rf")
+        pwr_table_11ax_he160 = fdt_obj.get_property("pwr_table_11ax_he160", "wifi/brd_rf")
     if fdt_obj.exist_node("wifi/rf_temp"):
         en_tcal = fdt_obj.get_property("en_tcal", "wifi/rf_temp")
         linear_or_follow = fdt_obj.get_property("linear_or_follow", "wifi/rf_temp")
@@ -88,6 +111,13 @@ def bl_dts2hex(dts):
         troom_os = fdt_obj.get_property("Troom_os", "wifi/rf_temp")
     if fdt_obj.exist_node("bluetooth/brd_rf"):
         pwr_table_ble = fdt_obj.get_property("pwr_table_ble", "bluetooth/brd_rf")
+    if fdt_obj.exist_node("bluetooth_zigbee/brd_rf"):
+        pwr_table_ble = fdt_obj.get_property("pwr_table_ble", "bluetooth_zigbee/brd_rf")
+        pwr_table_bt = fdt_obj.get_property("pwr_table_bt", "bluetooth_zigbee/brd_rf")
+        pwr_table_zigbee = fdt_obj.get_property("pwr_table_zigbee", "bluetooth_zigbee/brd_rf")
+        pwr_offset_bz = fdt_obj.get_property("pwr_offset", "bluetooth_zigbee/brd_rf")
+    if fdt_obj.exist_node("info/brd"):
+        country_code = fdt_obj.get_property("country_code", "info/brd")
 
     init_hex = little_endian(string_to_bytearray("k1bXkD6O").hex())
 
@@ -96,7 +126,7 @@ def bl_dts2hex(dts):
         xtal_mode_hex = "0100" + length + "00" + string_to_bytearray(xtal_mode[0]).hex()
     else:
         xtal_mode_hex = ""
-    
+
     if xtal:
         xtal_hex = "02001400"
         for item in xtal:
@@ -104,13 +134,13 @@ def bl_dts2hex(dts):
             xtal_hex += item_hex
     else:
         xtal_hex = ""
-    
+
     if pwr_mode:
         length = '%02x' % len(pwr_mode[0])
         pwr_mode_hex = "0300" + length + "00" + string_to_bytearray(pwr_mode[0]).hex()
     else:
         pwr_mode_hex = ""
-    
+
     if pwr_table_11b:
         pwr_table_11b_hex = "05000400"
         for item in pwr_table_11b:
@@ -135,19 +165,99 @@ def bl_dts2hex(dts):
     else:
         pwr_table_11n_hex = ""
 
-    if pwr_offset:
-        pwr_offset_hex = "08000e00"
-        for item in pwr_offset:
+    if pwr_table_11n_ht20:
+        pwr_table_11n_ht20_hex = "07000800"
+        for item in pwr_table_11n_ht20:
             item_hex = '%02x' % item
-            pwr_offset_hex += item_hex
+            pwr_table_11n_ht20_hex += item_hex
     else:
-        pwr_offset_hex = ""
-    
+        pwr_table_11n_ht20_hex = ""
+
+    if pwr_table_11n_ht40:
+        pwr_table_11n_ht40_hex = "09000800"
+        for item in pwr_table_11n_ht40:
+            item_hex = '%02x' % item
+            pwr_table_11n_ht40_hex += item_hex
+    else:
+        pwr_table_11n_ht40_hex = ""
+
+    if pwr_table_11ac_vht20:
+        pwr_table_11ac_vht20_hex = "0a000a00"
+        for item in pwr_table_11ac_vht20:
+            item_hex = '%02x' % item
+            pwr_table_11ac_vht20_hex += item_hex
+    else:
+        pwr_table_11ac_vht20_hex = ""
+
+    if pwr_table_11ac_vht40:
+        pwr_table_11ac_vht40_hex = "0b000a00"
+        for item in pwr_table_11ac_vht40:
+            item_hex = '%02x' % item
+            pwr_table_11ac_vht40_hex += item_hex
+    else:
+        pwr_table_11ac_vht40_hex = ""
+
+    if pwr_table_11ac_vht80:
+        pwr_table_11ac_vht80_hex = "0c000a00"
+        for item in pwr_table_11ac_vht80:
+            item_hex = '%02x' % item
+            pwr_table_11ac_vht80_hex += item_hex
+    else:
+        pwr_table_11ac_vht80_hex = ""
+
+    if pwr_table_11ax_he20:
+        pwr_table_11ax_he20_hex = "0d000c00"
+        for item in pwr_table_11ax_he20:
+            item_hex = '%02x' % item
+            pwr_table_11ax_he20_hex += item_hex
+    else:
+        pwr_table_11ax_he20_hex = ""
+
+    if pwr_table_11ax_he40:
+        pwr_table_11ax_he40_hex = "0e000c00"
+        for item in pwr_table_11ax_he40:
+            item_hex = '%02x' % item
+            pwr_table_11ax_he40_hex += item_hex
+    else:
+        pwr_table_11ax_he40_hex = ""
+
+    if pwr_table_11ax_he80:
+        pwr_table_11ax_he80_hex = "0f000c00"
+        for item in pwr_table_11ax_he80:
+            item_hex = '%02x' % item
+            pwr_table_11ax_he80_hex += item_hex
+    else:
+        pwr_table_11ax_he80_hex = ""
+
+    if pwr_table_11ax_he160:
+        pwr_table_11ax_he160_hex = "10000c00"
+        for item in pwr_table_11ax_he160:
+            item_hex = '%02x' % item
+            pwr_table_11ax_he160_hex += item_hex
+    else:
+        pwr_table_11ax_he160_hex = ""
+
+    if pwr_offset_wifi:
+        pwr_offset_wifi_hex = "08000e00"
+        for item in pwr_offset_wifi:
+            item_hex = '%02x' % item
+            pwr_offset_wifi_hex += item_hex
+    else:
+        pwr_offset_wifi_hex = ""
+
+    if pwr_offset_wifi_lp:
+        pwr_offset_wifi_lp_hex = "11000e00"
+        for item in pwr_offset_wifi_lp:
+            item_hex = '%02x' % item
+            pwr_offset_wifi_lp_hex += item_hex
+    else:
+        pwr_offset_wifi_lp_hex = ""
+
     if en_tcal:
         en_tcal_hex = "20000100%02x" % en_tcal[0]
     else:
         en_tcal_hex = ""
-    
+
     if linear_or_follow:
         linear_or_follow_hex = "21000100%02x" % linear_or_follow[0]
     else:
@@ -168,32 +278,59 @@ def bl_dts2hex(dts):
             tchannel_os_hex += item_hex
     else:
         tchannel_os_hex = ""
-        
+
     if tchannel_os_low:
         tchannel_os_low_hex = "24000a00"
         for item in tchannel_os_low:
             item_hex = little_endian('%04x' % item)
             tchannel_os_low_hex += item_hex
     else:
-        tchannel_os_low_hex = ""   
-    
+        tchannel_os_low_hex = ""
+
     if troom_os:
         troom_os_hex = "25000200" + little_endian("%04x" % troom_os[0])
     else:
         troom_os_hex = ""
-    
+
     if pwr_table_ble:
         pwr_table_ble_hex = "30000400" + little_endian("%08x" % pwr_table_ble[0])
     else:
         pwr_table_ble_hex = ""
-    
-    dts_hex = init_hex + \
-              xtal_mode_hex + xtal_hex + \
-              pwr_mode_hex + pwr_table_11b_hex + pwr_table_11g_hex + pwr_table_11n_hex + pwr_offset_hex + \
-              en_tcal_hex + linear_or_follow_hex + \
-              tchannels_hex + tchannel_os_hex + tchannel_os_low_hex + troom_os_hex + \
-              pwr_table_ble_hex
 
+    if pwr_table_bt:
+        pwr_table_bt_hex = "32000c00"
+        for item in pwr_table_bt:
+            item_hex = little_endian('%08x' % item)
+            pwr_table_bt_hex += item_hex
+    else:
+        pwr_table_bt_hex = ""
+
+    if pwr_table_zigbee:
+        pwr_table_zigbee_hex = "33000400" + little_endian("%08x" % pwr_table_zigbee[0])
+    else:
+        pwr_table_zigbee_hex = ""
+
+    if pwr_offset_bz:
+        pwr_offset_bz_hex = "31000500"
+        for item in pwr_offset_bz:
+            item_hex = '%02x' % item
+            pwr_offset_bz_hex += item_hex
+    else:
+        pwr_offset_bz_hex = ""
+
+    if country_code:
+        country_code_hex = "50000200" + little_endian("%04x" % country_code[0])
+    else:
+        country_code_hex = ""
+
+    dts_hex = init_hex + \
+              xtal_mode_hex + xtal_hex + pwr_mode_hex + \
+              pwr_table_11b_hex + pwr_table_11g_hex + pwr_table_11n_hex + pwr_offset_wifi_hex + pwr_offset_wifi_lp_hex + \
+              pwr_table_11n_ht20_hex + pwr_table_11n_ht40_hex + \
+              pwr_table_11ac_vht20_hex + pwr_table_11ac_vht40_hex + pwr_table_11ac_vht80_hex + \
+              pwr_table_11ax_he20_hex + pwr_table_11ax_he40_hex + pwr_table_11ax_he80_hex + pwr_table_11ax_he160_hex + \
+              en_tcal_hex + linear_or_follow_hex + tchannels_hex + tchannel_os_hex + tchannel_os_low_hex + troom_os_hex + \
+              pwr_table_ble_hex + pwr_offset_bz_hex + pwr_table_bt_hex + pwr_table_zigbee_hex + country_code_hex
     '''
     dts_hex_little_end = ""
     for item in [dts_hex[i:i+8] for i in range(0, len(dts_hex), 8)]:
@@ -201,4 +338,3 @@ def bl_dts2hex(dts):
     '''
 
     return dts_hex
-

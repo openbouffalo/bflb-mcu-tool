@@ -19,7 +19,6 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #  SOFTWARE.
 
-
 import sys
 import time
 import socket
@@ -164,7 +163,8 @@ def eflash_loader_worker(client_addr, client_data):
     try:
         parser = eflash_loader_parser_init()
         args = parser.parse_args(request.split(" "))
-        eflash_loader_t = bflb_eflash_loader.BflbEflashLoader(args.chipname, gol.dict_chip_cmd[args.chipname])
+        eflash_loader_t = bflb_eflash_loader.BflbEflashLoader(args.chipname,
+                                                              gol.dict_chip_cmd[args.chipname])
         ret = eflash_loader_t.efuse_flash_loader(args, None, None)
     finally:
         udp_socket_result = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -236,4 +236,3 @@ def eflash_loader_server_main():
 
 if __name__ == '__main__':
     eflash_loader_server_main()
-

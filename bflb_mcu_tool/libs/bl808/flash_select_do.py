@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-
 import os
 import csv
 from re import I
@@ -34,7 +33,7 @@ def get_suitable_file_name(cfg_dir, flash_id):
 def update_flash_cfg_do(chipname, chiptype, flash_id, file=None, create=False, section=None):
     if conf_sign:
         cfg_dir = app_path + "/utils/flash/" + chipname + '/'
-    else:     
+    else:
         cfg_dir = app_path + "/utils/flash/" + gol.flash_dict[chipname] + '/'
     conf_name = get_suitable_file_name(cfg_dir, flash_id)
     value_key = []
@@ -133,15 +132,15 @@ def create_flashcfg_table(start_addr):
                 cfgfile = os.path.join(app_path, "utils", "flash", "tg6210a", cfgfile)
             else:
                 cfgfile = os.path.join(app_path, "utils", "flash", "bl808", cfgfile)
-            data = create_flashcfg_data_from_cfg(single_flashcfg_len-8, cfgfile)
+            data = create_flashcfg_data_from_cfg(single_flashcfg_len - 8, cfgfile)
             flash_table_data += data
         for dict in table_list:
-            flash_table_list += bflb_utils.int_to_4bytearray_b(int(dict['jid']+'00', 16))
+            flash_table_list += bflb_utils.int_to_4bytearray_b(int(dict['jid'] + '00', 16))
             i = 0
             offset = 0
             for cfgfile in cfgfile_list:
                 if cfgfile == dict['cfgfile']:
-                    offset = start_addr+table_list_len+single_flashcfg_len*i
+                    offset = start_addr + table_list_len + single_flashcfg_len * i
                     break
                 i += 1
             flash_table_list += bflb_utils.int_to_4bytearray_l(offset)

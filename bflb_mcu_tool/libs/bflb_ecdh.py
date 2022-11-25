@@ -1,6 +1,5 @@
 # -*- coding:utf-8 -*-
 
-
 import binascii
 
 from ecdsa import ECDH, NIST256p

@@ -19,7 +19,6 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #  SOFTWARE.
 
-
 from libs import bflb_utils
 from libs import bflb_toml as toml
 
@@ -46,19 +45,27 @@ class PtCreater(object):
             entry_table[36 * entry_cnt + 0] = bflb_utils.int_to_2bytearray_l(entry_type)[0]
             if "activeindex" in item:
                 entry_activeindex = item["activeindex"]
-                entry_table[36 * entry_cnt + 2] = bflb_utils.int_to_2bytearray_l(entry_activeindex)[0]
+                entry_table[36 * entry_cnt +
+                            2] = bflb_utils.int_to_2bytearray_l(entry_activeindex)[0]
             if len(entry_name) >= 8:
                 bflb_utils.printf("%s entry name is too long!" % entry_name)
                 return False
-            entry_table[36 * entry_cnt + 3:36 * entry_cnt + 3 + len(entry_name)] = bytearray(entry_name, "utf-8") + bytearray(0) 
-            entry_table[36 * entry_cnt + 12:36 * entry_cnt + 16] = bflb_utils.int_to_4bytearray_l(entry_addr0)
-            entry_table[36 * entry_cnt + 16:36 * entry_cnt + 20] = bflb_utils.int_to_4bytearray_l(entry_addr1)
-            entry_table[36 * entry_cnt + 20:36 * entry_cnt + 24] = bflb_utils.int_to_4bytearray_l(entry_maxlen0)
-            entry_table[36 * entry_cnt + 24:36 * entry_cnt + 28] = bflb_utils.int_to_4bytearray_l(entry_maxlen1)
-            entry_table[36 * entry_cnt + 28:36 * entry_cnt + 32] = bflb_utils.int_to_4bytearray_l(entry_len)
+            entry_table[36 * entry_cnt + 3:36 * entry_cnt + 3 +
+                        len(entry_name)] = bytearray(entry_name, "utf-8") + bytearray(0)
+            entry_table[36 * entry_cnt + 12:36 * entry_cnt +
+                        16] = bflb_utils.int_to_4bytearray_l(entry_addr0)
+            entry_table[36 * entry_cnt + 16:36 * entry_cnt +
+                        20] = bflb_utils.int_to_4bytearray_l(entry_addr1)
+            entry_table[36 * entry_cnt + 20:36 * entry_cnt +
+                        24] = bflb_utils.int_to_4bytearray_l(entry_maxlen0)
+            entry_table[36 * entry_cnt + 24:36 * entry_cnt +
+                        28] = bflb_utils.int_to_4bytearray_l(entry_maxlen1)
+            entry_table[36 * entry_cnt + 28:36 * entry_cnt +
+                        32] = bflb_utils.int_to_4bytearray_l(entry_len)
             if "age" in item:
                 entry_age = item["age"]
-                entry_table[36 * entry_cnt + 32:36 * entry_cnt + 36] = bflb_utils.int_to_4bytearray_l(entry_age)
+                entry_table[36 * entry_cnt + 32:36 * entry_cnt +
+                            36] = bflb_utils.int_to_4bytearray_l(entry_age)
             entry_cnt += 1
         # partition table header
         # 0x54504642
@@ -69,7 +76,8 @@ class PtCreater(object):
         pt_table[3] = 0x54
         pt_table[6:8] = bflb_utils.int_to_2bytearray_l(int(entry_cnt))
         pt_table[12:16] = bflb_utils.get_crc32_bytearray(pt_table[0:12])
-        entry_table[36 * entry_cnt:36 * entry_cnt + 4] = bflb_utils.get_crc32_bytearray(entry_table[0:36 * entry_cnt])
+        entry_table[36 * entry_cnt:36 * entry_cnt + 4] = bflb_utils.get_crc32_bytearray(
+            entry_table[0:36 * entry_cnt])
         data = pt_table + entry_table[0:36 * entry_cnt + 4]
         fp = open(file, 'wb+')
         fp.write(data)
@@ -96,7 +104,8 @@ class PtCreater(object):
         parcel['pt_addr1'] = self.parsed_toml["pt_table"]["address1"]
         version_sign = 1
         try:
-            if "version" in self.parsed_toml["pt_table"] and self.parsed_toml["pt_table"]["version"] == 2:
+            if "version" in self.parsed_toml["pt_table"] and self.parsed_toml["pt_table"][
+                    "version"] == 2:
                 version_sign = 2
                 parcel["version"] = 2
         except:
@@ -152,8 +161,8 @@ class PtCreater(object):
                     parcel['kv_header'] = 0
                 elif name.lower() == 'yocboot':
                     parcel['yocboot_addr'] = tbl_item['address0']
-                    parcel['yocboot_len'] = tbl_item['size0']  
-                    parcel['yocboot_header'] = 1              
+                    parcel['yocboot_len'] = tbl_item['size0']
+                    parcel['yocboot_header'] = 1
                 elif name.lower() == 'mfg':
                     parcel['mfg_addr'] = tbl_item['address0']
                     parcel['mfg_len'] = tbl_item['size0']
@@ -179,22 +188,22 @@ class PtCreater(object):
                     parcel['dtb_len'] = tbl_item['size0']
                     parcel['dtb_header'] = 1
                 else:
-                    parcel[name+'_addr'] = tbl_item['address0']
-                    parcel[name+'_len'] = tbl_item['size0']
-                    parcel[name+'_header'] = 0
+                    parcel[name + '_addr'] = tbl_item['address0']
+                    parcel[name + '_len'] = tbl_item['size0']
+                    parcel[name + '_header'] = 0
                 name_list.append(name.lower())
         elif version_sign == 2:
             for tbl_item in self.parsed_toml["pt_entry"]:
-                name = tbl_item['name'].lower().replace(' ','_')
-                parcel[name+'_addr'] = tbl_item['address0']
-                parcel[name+'_len'] = tbl_item['size0']
-                parcel[name+'_header'] = tbl_item['header']
+                name = tbl_item['name'].lower().replace(' ', '_')
+                parcel[name + '_addr'] = tbl_item['address0']
+                parcel[name + '_len'] = tbl_item['size0']
+                parcel[name + '_header'] = tbl_item['header']
                 if name.startswith("fw"):
-                    parcel[name.replace("fw", "fw1")+'_addr'] = tbl_item['address1']
-                    parcel[name.replace("fw", "fw1")+'_len'] = tbl_item['size1']
+                    parcel[name.replace("fw", "fw1") + '_addr'] = tbl_item['address1']
+                    parcel[name.replace("fw", "fw1") + '_len'] = tbl_item['size1']
                 try:
                     if "security" in tbl_item:
-                        parcel[name+'_security'] = tbl_item['security']
+                        parcel[name + '_security'] = tbl_item['security']
                 except:
                     pass
                 name_list.append(name)

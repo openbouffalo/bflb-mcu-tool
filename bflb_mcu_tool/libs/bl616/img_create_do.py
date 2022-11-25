@@ -1,6 +1,5 @@
 # -*- coding:utf-8 -*-
 
-
 import os
 import sys
 import hashlib
@@ -24,54 +23,54 @@ from libs.bl616.bootheader_cfg_keys import bootcpucfg_lp_index as bootcpucfg_lp_
 from libs.bl616.bootheader_cfg_keys import bootcfg_start_pos as bootcfg_start
 from libs.bl616.bootheader_cfg_keys import bootheader_len as header_len
 
-keyslot0      = 28
-keyslot1      = keyslot0 + 16
-keyslot2      = keyslot1 + 16
-keyslot3      = keyslot2 + 16
-keyslot3_end  = keyslot3 + 16
-keyslot4      = 128
-keyslot5      = keyslot4 + 16
-keyslot6      = keyslot5 + 16
-keyslot7      = keyslot6 + 16
-keyslot8      = keyslot7 + 16
-keyslot9      = keyslot8 + 16
-keyslot10     = keyslot9 + 16
+keyslot0 = 28
+keyslot1 = keyslot0 + 16
+keyslot2 = keyslot1 + 16
+keyslot3 = keyslot2 + 16
+keyslot3_end = keyslot3 + 16
+keyslot4 = 128
+keyslot5 = keyslot4 + 16
+keyslot6 = keyslot5 + 16
+keyslot7 = keyslot6 + 16
+keyslot8 = keyslot7 + 16
+keyslot9 = keyslot8 + 16
+keyslot10 = keyslot9 + 16
 keyslot10_end = keyslot10 + 16
-keyslot11     = keyslot3_end + 16
+keyslot11 = keyslot3_end + 16
 keyslot11_end = keyslot11 + 16
 
-wr_lock_boot_mode   = 14
-wr_lock_dbg_pwd     = 15
-wr_lock_wifi_mac    = 16
-wr_lock_key_slot_0  = 17
-wr_lock_key_slot_1  = 18
-wr_lock_key_slot_2  = 19
-wr_lock_key_slot_3  = 20
-wr_lock_sw_usage_0  = 21
-wr_lock_sw_usage_1  = 22
-wr_lock_sw_usage_2  = 23
-wr_lock_sw_usage_3  = 24
+wr_lock_boot_mode = 14
+wr_lock_dbg_pwd = 15
+wr_lock_wifi_mac = 16
+wr_lock_key_slot_0 = 17
+wr_lock_key_slot_1 = 18
+wr_lock_key_slot_2 = 19
+wr_lock_key_slot_3 = 20
+wr_lock_sw_usage_0 = 21
+wr_lock_sw_usage_1 = 22
+wr_lock_sw_usage_2 = 23
+wr_lock_sw_usage_3 = 24
 wr_lock_key_slot_11 = 25
-rd_lock_dbg_pwd     = 26
-rd_lock_key_slot_0  = 27
-rd_lock_key_slot_1  = 28
-rd_lock_key_slot_2  = 29
-rd_lock_key_slot_3  = 30
+rd_lock_dbg_pwd = 26
+rd_lock_key_slot_0 = 27
+rd_lock_key_slot_1 = 28
+rd_lock_key_slot_2 = 29
+rd_lock_key_slot_3 = 30
 rd_lock_key_slot_11 = 31
 
-wr_lock_key_slot_4  = 15
-wr_lock_key_slot_5  = 16
-wr_lock_key_slot_6  = 17
-wr_lock_key_slot_7  = 18
-wr_lock_key_slot_8  = 19
-wr_lock_key_slot_9  = 20
+wr_lock_key_slot_4 = 15
+wr_lock_key_slot_5 = 16
+wr_lock_key_slot_6 = 17
+wr_lock_key_slot_7 = 18
+wr_lock_key_slot_8 = 19
+wr_lock_key_slot_9 = 20
 wr_lock_key_slot_10 = 21
-rd_lock_key_slot_4  = 25
-rd_lock_key_slot_5  = 26
-rd_lock_key_slot_6  = 27
-rd_lock_key_slot_7  = 28
-rd_lock_key_slot_8  = 29
-rd_lock_key_slot_9  = 30
+rd_lock_key_slot_4 = 25
+rd_lock_key_slot_5 = 26
+rd_lock_key_slot_6 = 27
+rd_lock_key_slot_7 = 28
+rd_lock_key_slot_8 = 29
+rd_lock_key_slot_9 = 30
 rd_lock_key_slot_10 = 31
 
 
@@ -82,8 +81,14 @@ def bytearray_data_merge(data1, data2, len):
 
 
 # update efuse info
-def img_update_efuse_group0(cfg, sign, pk_hash, flash_encryp_type, flash_key,
-                            sec_eng_key_sel, sec_eng_key):
+def img_update_efuse_group0(cfg,
+                            sign,
+                            pk_hash,
+                            flash_encryp_type,
+                            flash_key,
+                            sec_eng_key_sel,
+                            sec_eng_key,
+                            security=False):
     fp = open(cfg.get("Img_Group0_Cfg", "efuse_file"), 'rb')
     efuse_data = bytearray(fp.read()) + bytearray(0)
     fp.close()
@@ -100,7 +105,7 @@ def img_update_efuse_group0(cfg, sign, pk_hash, flash_encryp_type, flash_key,
         efuse_data[0] |= flash_encryp_type
     # Set ef_sw_usage_0 --> sign_cfg
     if sign > 0:
-        efuse_data[92] |= (sign<<7)
+        efuse_data[92] |= (sign << 7)
         efuse_mask_data[92] |= 0xff
     # Set ef_sboot_en
     if flash_encryp_type > 0:
@@ -262,6 +267,11 @@ def img_update_efuse_group0(cfg, sign, pk_hash, flash_encryp_type, flash_key,
     efuse_mask_data[252:256] = bytearray_data_merge(efuse_mask_data[252:256],\
                                                bflb_utils.int_to_4bytearray_l(rw_lock1), 4)
 
+    if security is True:
+        bflb_utils.printf("Encrypt efuse data")
+        security_key, security_iv = bflb_utils.get_security_key()
+        efuse_data = img_create_encrypt_data(efuse_data, security_key, security_iv, 0)
+        efuse_data = bytearray(4096) + efuse_data
     fp = open(cfg.get("Img_Group0_Cfg", "efuse_file"), 'wb+')
     fp.write(efuse_data)
     fp.close()
@@ -348,17 +358,18 @@ def img_get_one_group_img(d_addrs, d_files):
 
 # get hash ignore ignore
 def img_create_get_hash_ignore(bootheader_data):
-    return (bootheader_data[bootcfg_start+2] >> 1) & 0x1
+    return (bootheader_data[bootcfg_start + 2] >> 1) & 0x1
 
 
 # get crc ignore ignore
 def img_create_get_crc_ignore(bootheader_data):
-    return bootheader_data[bootcfg_start+2] & 0x1
+    return bootheader_data[bootcfg_start + 2] & 0x1
 
 
 def img_create_update_bootheader_if(bootheader_data, hash, seg_cnt):
     # update segment count
-    bootheader_data[bootcfg_start+12 : bootcfg_start+12+4] = bflb_utils.int_to_4bytearray_l(seg_cnt)
+    bootheader_data[bootcfg_start + 12:bootcfg_start + 12 +
+                    4] = bflb_utils.int_to_4bytearray_l(seg_cnt)
 
     # update hash
     sign = bootheader_data[bootcfg_start] & 0x3
@@ -366,31 +377,35 @@ def img_create_update_bootheader_if(bootheader_data, hash, seg_cnt):
     key_sel = ((bootheader_data[bootcfg_start] >> 4) & 0x3)
     xts_mode = ((bootheader_data[bootcfg_start] >> 6) & 0x1)
 
-    if ((bootheader_data[bootcfg_start+2] >> 1) & 0x1) == 1 and sign == 0:
+    if ((bootheader_data[bootcfg_start + 2] >> 1) & 0x1) == 1 and sign == 0:
         # do nothing
         bflb_utils.printf("Hash ignored")
     else:
-        bootheader_data[bootcfg_start+16 : bootcfg_start+16+32] = hash
+        bootheader_data[bootcfg_start + 16:bootcfg_start + 16 + 32] = hash
 
     # update header crc
-    if (bootheader_data[bootcfg_start+2] & 0x1) == 1:
+    if (bootheader_data[bootcfg_start + 2] & 0x1) == 1:
         # do nothing
         bflb_utils.printf("Header crc ignored")
     else:
-        hd_crcarray = bflb_utils.get_crc32_bytearray(bootheader_data[0 : header_len-4])
-        bootheader_data[header_len-4 : header_len] = hd_crcarray
+        hd_crcarray = bflb_utils.get_crc32_bytearray(bootheader_data[0:header_len - 4])
+        bootheader_data[header_len - 4:header_len] = hd_crcarray
         bflb_utils.printf("Header crc: ", binascii.hexlify(hd_crcarray))
     return bootheader_data
 
 
 # update boot header info
-def img_create_update_bootheader(bootheader_data, hash, seg_cnt, flashcfg_table_addr, flashcfg_table_len):
+def img_create_update_bootheader(bootheader_data, hash, seg_cnt, flashcfg_table_addr,
+                                 flashcfg_table_len):
     # update flashcfg table value
-    bootheader_data[flashcfg_table_start:flashcfg_table_start+4] = bflb_utils.int_to_4bytearray_l(flashcfg_table_addr)
-    bootheader_data[flashcfg_table_start+4:flashcfg_table_start+8] = bflb_utils.int_to_4bytearray_l(flashcfg_table_len)
+    bootheader_data[flashcfg_table_start:flashcfg_table_start +
+                    4] = bflb_utils.int_to_4bytearray_l(flashcfg_table_addr)
+    bootheader_data[flashcfg_table_start + 4:flashcfg_table_start +
+                    8] = bflb_utils.int_to_4bytearray_l(flashcfg_table_len)
 
     # update segment count
-    bootheader_data[bootcfg_start+12 : bootcfg_start+12+4] = bflb_utils.int_to_4bytearray_l(seg_cnt)
+    bootheader_data[bootcfg_start + 12:bootcfg_start + 12 +
+                    4] = bflb_utils.int_to_4bytearray_l(seg_cnt)
 
     # update hash
     sign, encrypt, key_sel, xts_mode = img_create_get_sign_encrypt_info(bootheader_data)
@@ -398,15 +413,15 @@ def img_create_update_bootheader(bootheader_data, hash, seg_cnt, flashcfg_table_
         # do nothing
         bflb_utils.printf("Hash ignored")
     else:
-        bootheader_data[bootcfg_start+16 : bootcfg_start+16+32] = hash
+        bootheader_data[bootcfg_start + 16:bootcfg_start + 16 + 32] = hash
 
     # update header crc
     if img_create_get_crc_ignore(bootheader_data) == 1:
         # do nothing
         bflb_utils.printf("Header crc ignored")
     else:
-        hd_crcarray = bflb_utils.get_crc32_bytearray(bootheader_data[0 : header_len-4])
-        bootheader_data[header_len-4 : header_len] = hd_crcarray
+        hd_crcarray = bflb_utils.get_crc32_bytearray(bootheader_data[0:header_len - 4])
+        bootheader_data[header_len - 4:header_len] = hd_crcarray
         bflb_utils.printf("Header crc: ", binascii.hexlify(hd_crcarray))
 
     return bootheader_data[0:header_len]
@@ -445,6 +460,7 @@ def reverse_iv(need_reverse_iv_bytearray):
     reverse_iv_bytearray = '00000000' + temp_reverse_iv_bytearray[0:24]
     return reverse_iv_bytearray
 
+
 def img_create_encrypt_data_xts(data_bytearray, key_bytearray, iv_bytearray, encrypt):
     counter = binascii.hexlify(iv_bytearray[4:16]).decode()
     # data unit number default value is 0
@@ -476,7 +492,7 @@ def img_create_encrypt_data_xts(data_bytearray, key_bytearray, iv_bytearray, enc
             # bflb_utils.printf(binascii.hexlify(cur_block))
             ciphertext += (cipher.encrypt(cur_block, tweak)[0:16])
         deal_len += 32
-        data_unit_number = (int(data_unit_number,16))
+        data_unit_number = (int(data_unit_number, 16))
         data_unit_number += 1
 
     # bflb_utils.printf("Result:")
@@ -544,7 +560,8 @@ def encrypt_loader_bin_do(file, sign, encrypt, createcfg):
             # encrypt body
             load_helper_bin_body = bflb_utils.add_to_16(load_helper_bin_body)
             if encrypt != 0:
-                encrypt_key = bflb_utils.hexstr_to_bytearray(cfg.get("Img_Group0_Cfg", "aes_key_org"))
+                encrypt_key = bflb_utils.hexstr_to_bytearray(
+                    cfg.get("Img_Group0_Cfg", "aes_key_org"))
                 encrypt_iv = bflb_utils.hexstr_to_bytearray(cfg.get("Img_Group0_Cfg", "aes_iv"))
                 iv_crcarray = bflb_utils.get_crc32_bytearray(encrypt_iv)
                 aesiv_data = encrypt_iv + iv_crcarray
@@ -565,8 +582,9 @@ def encrypt_loader_bin_do(file, sign, encrypt, createcfg):
                 data_tohash += load_helper_bin_body_encrypt
                 publickey_file = cfg.get("Img_Group0_Cfg", "publickey_file")
                 privatekey_file_uecc = cfg.get("Img_Group0_Cfg", "privatekey_file_uecc")
-                pk_data, pk_hash, signature = img_create_sign_data(data_tohash, privatekey_file_uecc,
-                    publickey_file)
+                pk_data, pk_hash, signature = img_create_sign_data(data_tohash,
+                                                                   privatekey_file_uecc,
+                                                                   publickey_file)
                 pk_data = pk_data + bflb_utils.get_crc32_bytearray(pk_data)
             data[offset:offset + 4] = bflb_utils.int_to_4bytearray_l(newval)
             load_helper_bin_header = data
@@ -578,12 +596,13 @@ def encrypt_loader_bin_do(file, sign, encrypt, createcfg):
             hash = bflb_utils.hexstr_to_bytearray(hashfun.hexdigest())
             # update hash & crc
             load_helper_bin_data = bytearray(load_helper_bin_encrypt)
-            load_helper_bin_encrypt = img_create_update_bootheader_if(load_helper_bin_data, hash, 1)
+            load_helper_bin_encrypt = img_create_update_bootheader_if(
+                load_helper_bin_data, hash, 1)
         return True, load_helper_bin_encrypt
     return False, None
 
 
-def img_creat_process(group_type, flash_img, cfg):
+def img_creat_process(group_type, flash_img, cfg, security=False):
     encrypt_blk_size = 16
     padding = bytearray(encrypt_blk_size)
     data_tohash = bytearray(0)
@@ -702,10 +721,10 @@ def img_creat_process(group_type, flash_img, cfg):
         if xts_mode != 0:
             # encrypt_iv = codecs.decode(reverse_iv(encrypt_iv), 'hex')
             data_toencrypt = img_create_encrypt_data_xts(data_toencrypt, encrypt_key, encrypt_iv,
-                                                    encrypt)
+                                                         encrypt)
         else:
             data_toencrypt = img_create_encrypt_data(data_toencrypt, encrypt_key, encrypt_iv,
-                                                    flash_img)
+                                                     flash_img)
         if unencrypt_mfg_data != bytearray(0):
             data_toencrypt = data_toencrypt[0:0x1000] + unencrypt_mfg_data + data_toencrypt[0x2000:]
     # get fw data
@@ -734,7 +753,8 @@ def img_creat_process(group_type, flash_img, cfg):
             flashCfgList, flashCfgTable, flashCfgListLen = create_flashcfg_table(flashCfgAddr)
 
     # update boot header and recalculate crc
-    bootheader_data = img_create_update_bootheader(bootheader_data, hash, seg_cnt, flashCfgAddr, flashCfgListLen)
+    bootheader_data = img_create_update_bootheader(bootheader_data, hash, seg_cnt, flashCfgAddr,
+                                                   flashCfgListLen)
 
     # write whole image
     if flash_img == 1:
@@ -768,10 +788,12 @@ def img_creat_process(group_type, flash_img, cfg):
             if xts_mode == 1:
                 # AES XTS mode
                 flash_encrypt_type += 3
-            img_update_efuse_fun(cfg, sign, pk_hash, flash_encrypt_type,
-                                 encrypt_key + bytearray(32 - len(encrypt_key)), key_sel, None)
+            img_update_efuse_fun(cfg, sign, pk_hash, flash_encrypt_type, \
+                                 encrypt_key + bytearray(32 - len(encrypt_key)), \
+                                 key_sel, None, security)
         else:
-            img_update_efuse_fun(cfg, sign, pk_hash, encrypt, None, key_sel, None)
+            img_update_efuse_fun(cfg, sign, pk_hash, encrypt, None, \
+                                 key_sel, None, security)
     else:
         bflb_utils.printf("Write if img")
         whole_img_file_name = cfg.get(cfg_section, "whole_img_file")
@@ -794,10 +816,12 @@ def img_creat_process(group_type, flash_img, cfg):
             if xts_mode == 1:
                 # AES XTS mode
                 if_encrypt_type += 3
-            img_update_efuse_fun(cfg, sign, pk_hash, if_encrypt_type, None,
-                                 key_sel, encrypt_key + bytearray(32 - len(encrypt_key)))
+            img_update_efuse_fun(cfg, sign, pk_hash, if_encrypt_type, None, \
+                                 key_sel, encrypt_key + bytearray(32 - len(encrypt_key)), \
+                                 security)
         else:
-            img_update_efuse_fun(cfg, sign, pk_hash, 0, None, key_sel, bytearray(32))
+            img_update_efuse_fun(cfg, sign, pk_hash, 0, None, key_sel, bytearray(32), \
+                                 security)
     return "OK", data_tohash
 
 
@@ -811,6 +835,7 @@ def img_create_do(args, img_dir_path=None, config_file=None):
     group_type = "all"
     img_type = "media"
     signer = "none"
+    security = False
     data_tohash = bytearray(0)
     try:
         if args.image:
@@ -819,6 +844,8 @@ def img_create_do(args, img_dir_path=None, config_file=None):
             group_type = args.group
         if args.signer:
             signer = args.signer
+        if args.security:
+            security = (args.security == "efuse")
     except Exception as e:
         # bflb_utils.printf(help information and exit:)
         # will  something like "option -a not recognized")
@@ -831,22 +858,24 @@ def img_create_do(args, img_dir_path=None, config_file=None):
     # deal image creation
     ret0 = ret1 = "OK"
     if group_type == "group0" or group_type == "all":
-        ret0, data_tohash0 = img_creat_process("group0", flash_img, cfg)
+        ret0, data_tohash0 = img_creat_process("group0", flash_img, cfg, security)
     else:
-        img_creat_process("", flash_img, cfg)
+        img_creat_process("", flash_img, cfg, security)
 
     if ret0 != "OK":
         bflb_utils.printf("Fail to create group0 images!")
-        return
+        return False
     if ret1 != "OK":
         bflb_utils.printf("Fail to create group1 images!")
+        return False
+    return True
 
 
-def create_sp_media_image(config, cpu_type=None):
+def create_sp_media_image(config, cpu_type=None, security=False):
     bflb_utils.printf("========= sp image create =========")
     cfg = BFConfigParser()
     cfg.read(config)
-    img_creat_process("group0", 1, cfg)
+    img_creat_process("group0", 1, cfg, security)
 
 
 if __name__ == '__main__':

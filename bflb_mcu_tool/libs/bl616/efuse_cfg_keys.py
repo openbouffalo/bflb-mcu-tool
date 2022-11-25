@@ -1,6 +1,5 @@
 # -*- coding:utf-8 -*-
 
-
 efuse_cfg_keys = {
     "ef_sf_aes_mode": {
         "offset": "0",

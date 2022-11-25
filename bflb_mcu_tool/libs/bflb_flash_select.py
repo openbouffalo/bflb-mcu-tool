@@ -88,13 +88,14 @@ def update_flash_para_from_cfg(config_keys, config_file):
 def update_flash_cfg_data_do(chipname, chiptype, flash_id):
     if conf_sign:
         cfg_dir = app_path + "/utils/flash/" + chipname + '/'
-    else:     
+    else:
         cfg_dir = app_path + "/utils/flash/" + gol.flash_dict[chipname] + '/'
     sub_module = __import__("libs." + chiptype, fromlist=[chiptype])
     conf_name = sub_module.flash_select_do.get_suitable_file_name(cfg_dir, flash_id)
     if os.path.isfile(cfg_dir + conf_name) == False:
         return None, None, None, None, None
-    return update_flash_para_from_cfg(sub_module.bootheader_cfg_keys.bootheader_cfg_keys, cfg_dir + conf_name)
+    return update_flash_para_from_cfg(sub_module.bootheader_cfg_keys.bootheader_cfg_keys,
+                                      cfg_dir + conf_name)
 
 
 def flash_bootheader_config_check(chipname, chiptype, flashid, file, parafile):
@@ -142,7 +143,8 @@ def update_flash_cfg_data(chipname, chiptype, flash_id, cfg, bh_cfg_file, cfg_ke
     flash_magic_code = cfg2.get(cfg_key, "flashcfg_magic_code")
     flash_magic_code = int(flash_magic_code, 16)
     sub_module = __import__("libs." + chiptype, fromlist=[chiptype])
-    offset, flashCfgLen, data, flashCrcOffset, crcOffset = update_flash_cfg_data_do(chipname, chiptype, flash_id)
+    offset, flashCfgLen, data, flashCrcOffset, crcOffset = update_flash_cfg_data_do(
+        chipname, chiptype, flash_id)
 
     para_file = cfg.get("FLASH_CFG", "flash_para")
     if para_file != "":
@@ -186,7 +188,8 @@ def update_flash_cfg(chipname, chiptype, flash_id, file=None, create=False, sect
     sub_module = __import__("libs." + chiptype, fromlist=[chiptype])
     if check_basic_flash_cfg(file, section):
         return True
-    if sub_module.flash_select_do.update_flash_cfg_do(chipname, chiptype, flash_id, file, create, section) == False:
+    if sub_module.flash_select_do.update_flash_cfg_do(chipname, chiptype, flash_id, file, create,
+                                                      section) == False:
         return False
     return True
 
@@ -194,5 +197,3 @@ def update_flash_cfg(chipname, chiptype, flash_id, file=None, create=False, sect
 def get_supported_flash(chiptype):
     sub_module = __import__("libs." + chiptype, fromlist=[chiptype])
     return sub_module.flash_select_do.get_supported_flash_do()
-
-

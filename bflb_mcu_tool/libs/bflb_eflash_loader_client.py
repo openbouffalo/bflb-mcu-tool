@@ -42,6 +42,7 @@ key = None
 
 
 class BLECDH:
+
     def __init__(self, curve=NIST256p):
         self.ecdh = ECDH(curve)
         self.local_public_key = None
@@ -61,6 +62,7 @@ class BLECDH:
         print(ret)
         return ret
 
+
 def eflash_loader_parser_init():
     parser = argparse.ArgumentParser(description="bouffalolab eflash loader client command")
     parser.add_argument("--usage", dest="usage", action="store_true", help="display usage")
@@ -68,6 +70,7 @@ def eflash_loader_parser_init():
     parser.add_argument("--key", dest="key", help="aes key for socket")
     parser.add_argument("--ecdh", dest="ecdh", action="store_true", help="open ecdh function")
     return parser
+
 
 def create_encrypt_data(data_bytearray, key_bytearray, iv_bytearray):
     cryptor = AES.new(key_bytearray, AES.MODE_CBC, iv_bytearray)

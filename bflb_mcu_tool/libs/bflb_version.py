@@ -19,8 +19,5 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #  SOFTWARE.
 
-
-version_text = "(V_2.4.2)"
-eflash_loader_version_text = "eflash_loader_v2.4.2"
-
-    
+version_text = "(V_2.4.3)"
+eflash_loader_version_text = "eflash_loader_v2.4.3"

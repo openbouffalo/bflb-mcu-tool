@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: bflb-mcu-tool
-Version: 1.8.0
+Version: 1.8.1
 Summary: Bouffalolab Mcu Tool
 Home-page: https://pypi.org/project/bflb-mcu-tool/
 Author: bouffalolab
@@ -52,5 +52,5 @@ Classifier: Operating System :: Unix
 Classifier: Environment :: Console
 Classifier: Topic :: Software Development :: Libraries :: Python Modules
 Classifier: Programming Language :: Python :: 3
-Requires-Python: >3.0,<4.0
+Requires-Python: >=3.6
 Description-Content-Type: text/markdown

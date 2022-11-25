@@ -19,7 +19,6 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #  SOFTWARE.
 
-
 import os
 import sys
 import re
@@ -60,7 +59,7 @@ if getattr(sys, "frozen", False):
 else:
     app_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 chip_path = os.path.join(app_path, "chips")
-    
+
 python_version = struct.calcsize("P") * 8
 if python_version == 64:
     path_dll = os.path.join(app_path, "utils/jlink", "JLink_x64.dll")
@@ -73,7 +72,7 @@ try:
 except ImportError:
     cgc = None
     conf_sign = False
-    
+
 PY2 = sys.version_info[0] == 2
 
 udp_clinet_dict = {}
@@ -97,7 +96,6 @@ error_code_num_task = ["FFFF", "FFFF", "FFFF", "FFFF", "FFFF", \
                        "FFFF"]
 local_log_en = True
 local_log_data = ""
-
 
 # all in hex mode
 if conf_sign:
@@ -255,15 +253,15 @@ if conf_sign:
         "0080": "ROMFS NOT SET",
         "0081": "MFG BIN NOT SET",
         "0082": "PT CHECK FAIL",
-        "0083": "D0 FW BIN NOT SET",  
-        "0084": "IMTB BIN NOT SET", 
+        "0083": "D0 FW BIN NOT SET",
+        "0084": "IMTB BIN NOT SET",
         "0085": "IMG LOADER BIN NOT SET",
         "0086": "SBI BIN NOT SET",
-        "0087": "KERNEL BIN NOT SET",  
-        "0088": "ROOTFS BIN NOT SET", 
-        "0089": "KV BIN NOT SET",  
+        "0087": "KERNEL BIN NOT SET",
+        "0088": "ROOTFS BIN NOT SET",
+        "0089": "KV BIN NOT SET",
         "0090": "YOCBOOT BIN NOT SET",
-        "0091": "DTB BIN NOT SET",         
+        "0091": "DTB BIN NOT SET",
         "FFFF": "BURN RETRY FAIL",
     }
 else:
@@ -421,13 +419,13 @@ else:
         "0080": "BFLB ROMFS NOT SET",
         "0081": "BFLB MFG BIN NOT SET",
         "0082": "BFLB PT CHECK FAIL",
-        "0083": "D0 FW BIN NOT SET",  
-        "0084": "IMTB BIN NOT SET",   
+        "0083": "D0 FW BIN NOT SET",
+        "0084": "IMTB BIN NOT SET",
         "0085": "IMG LOADER BIN NOT SET",
         "0086": "SBI BIN NOT SET",
-        "0087": "KERNEL BIN NOT SET",  
-        "0088": "ROOTFS BIN NOT SET", 
-        "0089": "KV BIN NOT SET",  
+        "0087": "KERNEL BIN NOT SET",
+        "0088": "ROOTFS BIN NOT SET",
+        "0089": "KV BIN NOT SET",
         "0090": "YOCBOOT BIN NOT SET",
         "FFFF": "BFLB BURN RETRY FAIL",
     }
@@ -494,9 +492,9 @@ def local_log_save(local_path="log", key_word=""):
             rq = time.strftime('%Y%m%d%H%M%S', time.localtime(time.time()))
             log_name = rq + '_' + key_word + '.log'
             log_path = os.path.join(log_dir, log_name)
-#             fp = open(log_path, 'w')
-#             fp.write(local_log_data)
-#             fp.close()
+            #             fp = open(log_path, 'w')
+            #             fp.write(local_log_data)
+            #             fp.close()
             with codecs.open(log_path, "w", encoding="utf-8") as fp:
                 fp.write(local_log_data)
         except Exception as e:
@@ -540,9 +538,23 @@ def errorcode_msg(task=None):
     global error_code_num
     global error_code_num_task
     global eflash_loader_error_code
+    '''
     if task != None:
-        return '{"ErrorCode": "' + error_code_num_task[task] + '", "ErrorMsg":"' + eflash_loader_error_code[error_code_num_task[task]] + '"}'
-    return '{"ErrorCode": "' + error_code_num + '", "ErrorMsg":"' + eflash_loader_error_code[error_code_num] + '"}'
+        return '{"ErrorCode": "' + error_code_num_task[task] + \
+            '", "ErrorMsg":"' + eflash_loader_error_code[error_code_num_task[task]] + '"}'
+    return '{"ErrorCode": "' + error_code_num + \
+        '", "ErrorMsg":"' + eflash_loader_error_code[error_code_num] + '"}'
+    '''
+    if task != None:
+        return "ErrorCode: " + error_code_num_task[task] + \
+            " ErrorMsg: " + eflash_loader_error_code[error_code_num_task[task]]
+    return "ErrorCode: " + error_code_num + ", ErrorMsg: " + eflash_loader_error_code[
+        error_code_num]
+
+
+def get_security_key():
+    return hexstr_to_bytearray("424F554646414C4F4C41424B45594956"), \
+           hexstr_to_bytearray("424F554646414C4F4C41424B00000000")
 
 
 # 12345678->0x12,0x34,0x56,0x78
@@ -653,7 +665,7 @@ def verify_hex_num(string):
     length = len(string)
     i = 0
     while True:
-        if re.match('\A[0-9a-fA-F]+\Z', string[i:i+1]) is None:
+        if re.match('\A[0-9a-fA-F]+\Z', string[i:i + 1]) is None:
             return False
         i += 1
         if i >= length:
@@ -731,7 +743,7 @@ def get_serial_ports():
         from serial.tools.list_ports import comports
     except ImportError:
         return None
-    
+
     WINDOWS = sys.platform.startswith("win")
     result = []
     for p, d, h in comports():
@@ -764,7 +776,7 @@ def serial_enumerate():
         for p, d, h in comports():
             if "Virtual" in d or not p:
                 if "STM" not in d:
-                    continue 
+                    continue
             if "PID=1D6B" in h.upper():
                 ser_value = h.split(" ")[2][4:]
                 if ser_value not in sdio_file_ser_dict:
@@ -773,38 +785,38 @@ def serial_enumerate():
                 else:
                     if "LOCATION" in h.upper():
                         file_dict[sdio_file_ser_dict[ser_value]] = p
-                        sdio_ports.append(sdio_file_ser_dict[ser_value]+" (SDIO)")
+                        sdio_ports.append(sdio_file_ser_dict[ser_value] + " (SDIO)")
                     else:
                         file_dict[p] = sdio_file_ser_dict[ser_value]
-                        sdio_ports.append(p+" (SDIO)")
+                        sdio_ports.append(p + " (SDIO)")
             else:
                 if "FACTORYAIOT_PROG" in h.upper() or "PID=42BF:B210" in h.upper():
-                    prog_ports.append(p+" (PROG)")
+                    prog_ports.append(p + " (PROG)")
                 else:
                     uart_ports.append(p)
         try:
             uart_ports = sorted(uart_ports, key=lambda x: int(re.match('COM(\d+)', x).group(1)))
         except Exception:
-            uart_ports = sorted(uart_ports)                    
+            uart_ports = sorted(uart_ports)
         ports = sorted(prog_ports) + sorted(sdio_ports) + uart_ports
     elif sys.platform.startswith('linux'):
         for p, d, h in comports():
             if not p:
-                continue        
+                continue
             if "PID=1D6B" in h.upper():
                 ser_value = h.split(" ")[2][4:]
                 if ser_value not in sdio_file_ser_dict:
                     sdio_file_ser_dict[ser_value] = p
                 else:
-                    if sdio_file_ser_dict[ser_value]>p:
+                    if sdio_file_ser_dict[ser_value] > p:
                         file_dict[p] = sdio_file_ser_dict[ser_value]
-                        sdio_ports.append(p+" (SDIO)")
+                        sdio_ports.append(p + " (SDIO)")
                     else:
                         file_dict[sdio_file_ser_dict[ser_value]] = p
-                        sdio_ports.append(sdio_file_ser_dict[ser_value]+" (SDIO)")
+                        sdio_ports.append(sdio_file_ser_dict[ser_value] + " (SDIO)")
             else:
                 if "FACTORYAIOT PROG" in h.upper():
-                    prog_ports.append(p+" (PROG)")
+                    prog_ports.append(p + " (PROG)")
                 else:
                     uart_ports.append(p)
         ports = sorted(prog_ports) + sorted(sdio_ports) + sorted(uart_ports)
@@ -825,12 +837,12 @@ def pylink_enumerate():
         return []
     else:
         return obj.connected_emulators()
-      
-      
+
+
 def cklink_openocd_enumerate():
     ports_cklink = []
     ports_openocd = []
-    if sys.platform.startswith("win"):     
+    if sys.platform.startswith("win"):
         for p, d, h in comports():
             if not p:
                 continue
@@ -838,24 +850,29 @@ def cklink_openocd_enumerate():
                 match1 = re.search("FACTORYAIOT_PROG_([a-zA-Z0-9]{6}) LOCATION", h.upper(), re.I)
                 match2 = re.search("FACTORYAIOT_PROG_([a-zA-Z0-9]{6})$", h.upper(), re.I)
                 if match1 is not None:
-                    ports_cklink.append(match1.group(1)) 
+                    ports_cklink.append(match1.group(1))
                 if match2 is not None:
-                    ports_openocd.append(match2.group(1)) 
-    elif sys.platform.startswith("linux"):     
+                    ports_openocd.append(match2.group(1))
+            else:
+                match = re.search("SER=([A-Z0-9]{1,23}) LOCATION", h.upper(), re.I)
+                if match is not None:
+                    ports_cklink.append(match.group(1))
+    elif sys.platform.startswith("linux"):
         for p, d, h in comports():
             if not p:
                 continue
             elif "FactoryAIOT Prog" in h:
                 match1 = re.search("FactoryAIOT Prog ([a-zA-Z0-9]{6}) LOCATION", h, re.I)
                 if match1 is not None:
-                    ports_cklink.append(match1.group(1)) 
+                    ports_cklink.append(match1.group(1))
     return ports_cklink, ports_openocd
-                 
-                 
+
+
 def image_create_parser_init():
     parser = argparse.ArgumentParser(description="bouffalolab image create command")
     parser.add_argument("--chipname", dest="chipname", help="chip name")
     parser.add_argument("--imgfile", dest="imgfile", help="image file")
+    parser.add_argument("--security", dest="security", help="security save efusedata")
     parser.add_argument("-i", "--image", dest="image", help="image type: media or if")
     parser.add_argument("-c", "--cpu", dest="cpu", help="cpu type: cpu0 cpu1 or all")
     parser.add_argument("-g", "--group", dest="group", help="group type")
@@ -871,14 +888,37 @@ def eflash_loader_parser_init():
     parser.add_argument("--flash", dest="flash", action="store_true", help="target is flash")
     parser.add_argument("--efuse", dest="efuse", action="store_true", help="target is efuse")
     parser.add_argument("--ram", dest="ram", action="store_true", help="target is ram")
-    parser.add_argument("-w", "--write", dest="write", action="store_true", help="write to flash/efuse")
+    parser.add_argument("--efusecheck",
+                        dest="efusecheck",
+                        action="store_true",
+                        help="efuse check data")
+    parser.add_argument("-w",
+                        "--write",
+                        dest="write",
+                        action="store_true",
+                        help="write to flash/efuse")
     parser.add_argument("-e", "--erase", dest="erase", action="store_true", help="erase flash")
-    parser.add_argument("-r", "--read", dest="read", action="store_true", help="read from flash/efuse")
-    parser.add_argument("-n", "--none", dest="none", action="store_true", help="eflash loader environment init")
+    parser.add_argument("-r",
+                        "--read",
+                        dest="read",
+                        action="store_true",
+                        help="read from flash/efuse")
+    parser.add_argument("-n",
+                        "--none",
+                        dest="none",
+                        action="store_true",
+                        help="eflash loader environment init")
     parser.add_argument("-p", "--port", dest="port", help="serial port to use")
-    parser.add_argument("-b", "--baudrate", dest="baudrate", type=int, help="the speed at which to communicate")
+    parser.add_argument("-b",
+                        "--baudrate",
+                        dest="baudrate",
+                        type=int,
+                        help="the speed at which to communicate")
     parser.add_argument("-c", "--config", dest="config", help="eflash loader config file")
-    parser.add_argument("-i", "--interface", dest="interface", help="interface type: uart/jlink/openocd")
+    parser.add_argument("-i",
+                        "--interface",
+                        dest="interface",
+                        help="interface type: uart/jlink/openocd")
     parser.add_argument("--xtal", dest="xtal", help="xtal type")
     parser.add_argument("--start", dest="start", help="start address")
     parser.add_argument("--end", dest="end", help="end address")
@@ -903,8 +943,9 @@ def eflash_loader_parser_init():
     parser.add_argument("--ecdh", dest="ecdh", action="store_true", help="open ecdh function")
     parser.add_argument("--echo", dest="echo", action="store_true", help="open local log echo")
     parser.add_argument("-a", "--auto", dest="auto", action="store_true", help="auto flash")
-    parser.add_argument("-v", "--version", dest="version", action="store_true", help="display version")
+    parser.add_argument("-v",
+                        "--version",
+                        dest="version",
+                        action="store_true",
+                        help="display version")
     return parser
-
-
-

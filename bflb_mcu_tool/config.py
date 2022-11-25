@@ -3,9 +3,19 @@
 import os
 import sys
 
-version = "1.7.6.005(非正式发布版本，严禁用于量产，请更新到1.8.0版本)"
+try:
+    from version import *
+except ImportError:
+    version = "1.8.1"
+
 chip_name = "tg7100c"
+obj_cklink = None
 ENABLE_HAIER = False
+ENABLE_AITHINKER = False
+NUM_ERROR_LOG = 0
+
+if ENABLE_AITHINKER:
+    version = version + " for AiThinker"
 
 # Get app path
 if getattr(sys, "frozen", False):
@@ -19,11 +29,11 @@ try:
 except ImportError:
     cgc = None
     conf_sign = False
-       
+
 if not conf_sign:
     back_color = "#B3DCFB"
-    list_chip = ["BL602/604", "BL702/704/706", "BL702L", "BL808", "BL606P", "BL616/618"]
-    list_chip = ["BL602/604", "BL702/704/706", "BL808", "BL606P", "BL616/618"]
+    list_chip = ["BL602/604", "BL702/704/706", "BL702L/704L", "BL808", "BL606P", "BL616/618"]
+    #list_chip = ["BL602/604", "BL702/704/706", "BL702L/704L", "BL808", "BL606P", "BL616/618", "BL628"]
     #list_chip = ["WB03"]
     type_chip = ("bl602", "bl602")
     dict_chip = {
@@ -32,12 +42,13 @@ if not conf_sign:
         "BL562/564": ("bl562", "bl602"),
         "BL602/604": ("bl602", "bl602"),
         "BL702/704/706": ("bl702", "bl702"),
-        "BL702L": ("bl702l", "bl702l"),
+        "BL702L/704L": ("bl702l", "bl702l"),
         "BL808": ("bl808", "bl808"),
         "BL606P": ("bl606p", "bl808"),
         "BL616/618": ("bl616", "bl616"),
+        "BL628": ("bl628", "bl628"),
         "WB03": ("wb03", "wb03"),
-    }    
+    }
     dict_chip_cmd = {
         "bl56x": "bl60x",
         "bl60x": "bl60x",
@@ -48,7 +59,8 @@ if not conf_sign:
         "bl808": "bl808",
         "bl606p": "bl808",
         "bl616": "bl616",
-        "wb03" : "wb03",
+        "bl628": "bl628",
+        "wb03": "wb03",
     }
     flash_dict = {
         "bl56x": "bl60x",
@@ -60,18 +72,19 @@ if not conf_sign:
         "bl808": "bl808",
         "bl606p": "bl808",
         "bl616": "bl616",
-        "wb03" : "wb03",
+        "bl628": "bl628",
+        "wb03": "wb03",
     }
-    bl_factory_params_file_prefix = 'bl_factory_params_'      
+    bl_factory_params_file_prefix = 'bl_factory_params_'
 else:
     dict_chip = cgc.dict_chip
     dict_chip_cmd = cgc.dict_chip_cmd
     list_chip = cgc.list_chip
     type_chip = cgc.type_chip
     back_color = cgc.back_color
-    bl_factory_params_file_prefix = cgc.show_text_first_value  
-  
-       
+    bl_factory_params_file_prefix = cgc.show_text_first_value
+
+
 def read_version_file(file_path):
     version_dict = {}
     with open(file_path, 'r', encoding='utf-8') as fp:
@@ -199,6 +212,21 @@ hash_ignore['bl616'] = ["False", "True"]
 img_type['bl616'] = ["SingleCPU", "RAW"]
 boot_src['bl616'] = ["Flash", "UART/USB"]
 
+# BL628
+xtal_type['bl628'] = ["None", "24M", "32M", "38.4M", "40M", "26M", "RC32M", "Auto"]
+xtal_type_['bl628'] = ["XTAL_" + item for item in xtal_type['bl628']]
+pll_clk['bl628'] = ["WIFIPLL 320M", "Manual"]
+encrypt_type['bl628'] = ["None", "AES CTR128", "AES CTR256", "AES CTR192", "AES XTS128", "AES XTS256", "AES XTS192"]
+key_sel['bl628'] = ["0", "1", "2", "3"]
+sign_type['bl628'] = ["None", "ECC"]
+cache_way_disable['bl628'] = ["None", "OneWay", "TwoWay", "ThreeWay", "FourWay"]
+flash_clk_type['bl628'] = ["XTAL", "Manual"]
+crc_ignore['bl628'] = ["False", "True"]
+hash_ignore['bl628'] = ["False", "True"]
+img_type['bl628'] = ["SingleCPU", "RAW"]
+boot_src['bl628'] = ["Flash", "UART/USB"]
+cpu_type['bl628'] = ["Group0", "Group1"]
+
 # WB03
 xtal_type['wb03'] = ["None", "24M", "32M", "38.4M", "40M", "26M", "RC32M", "Auto"]
 xtal_type_['wb03'] = ["XTAL_" + item for item in xtal_type['wb03']]
@@ -212,7 +240,6 @@ crc_ignore['wb03'] = ["False", "True"]
 hash_ignore['wb03'] = ["False", "True"]
 img_type['wb03'] = ["SingleCPU", "RAW"]
 boot_src['wb03'] = ["Flash", "UART/USB"]
-
 
 try:
     logo1 = '''iVBORw0KGgoAAAANSUhEUgAAANoAAADaCAYAAADAHVzbAAAACXBIWXMAAAsTAAALEwEAmpwYAAABNmlD
@@ -386,7 +413,7 @@ try:
 except Exception:
     logo1 = ""
     logo2 = ""
-    
+
 if conf_sign:
     about_tool = '''
             <html><body>

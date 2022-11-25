@@ -19,7 +19,6 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #  SOFTWARE.
 
-
 import re
 import os
 import sys
@@ -87,7 +86,8 @@ def compress_dir(chipname, zippath, efuse_load=False):
         bflb_utils.printf("PT Check Fail")
         set_error_code("0082")
         return False
-    factory_mode_set(os.path.join(chip_path, chipname, "eflash_loader/eflash_loader_cfg.ini"), "true")
+    factory_mode_set(os.path.join(chip_path, chipname, "eflash_loader/eflash_loader_cfg.ini"),
+                     "true")
     flash_file.append(os.path.join(chip_path, chipname, "eflash_loader/eflash_loader_cfg.ini"))
     if efuse_load:
         flash_file.append(cfg.get("EFUSE_CFG", "file"))
@@ -96,7 +96,8 @@ def compress_dir(chipname, zippath, efuse_load=False):
         i = 0
         try:
             while i < len(flash_file):
-                relpath = os.path.relpath(os.path.join(app_path, convert_path(flash_file[i])), chip_path)
+                relpath = os.path.relpath(os.path.join(app_path, convert_path(flash_file[i])),
+                                          chip_path)
                 dir = os.path.join(chip_path, chipname, relpath)
                 if os.path.isdir(os.path.dirname(dir)) is False:
                     os.makedirs(os.path.dirname(dir))
@@ -118,7 +119,8 @@ def compress_dir(chipname, zippath, efuse_load=False):
                 # z.write(os.path.relpath(os.path.join(dirpath, file), os.path.join(app_path, chipname)))
                 z.write(
                     os.path.join(dirpath, file),
-                    os.path.relpath(os.path.join(dirpath, file), os.path.join(chip_path, chipname)))
+                    os.path.relpath(os.path.join(dirpath, file), os.path.join(chip_path,
+                                                                              chipname)))
         z.close()
         shutil.rmtree(dir_path)
     except Exception as e:
@@ -133,14 +135,15 @@ def img_create(args, chipname="bl60x", chiptype="bl60x", img_dir=None, config_fi
     sub_module = __import__("libs." + chiptype, fromlist=[chiptype])
     img_dir_path = os.path.join(chip_path, chipname, "img_create_iot")
     if img_dir is None:
-        sub_module.img_create_do.img_create_do(args, img_dir_path, config_file)
+        res = sub_module.img_create_do.img_create_do(args, img_dir_path, config_file)
     else:
-        sub_module.img_create_do.img_create_do(args, img_dir, config_file)
+        res = sub_module.img_create_do.img_create_do(args, img_dir, config_file)
+    return res
 
 
-def create_sp_media_image_file(config, chiptype="bl60x", cpu_type=None):
+def create_sp_media_image_file(config, chiptype="bl60x", cpu_type=None, security=False):
     sub_module = __import__("libs." + chiptype, fromlist=[chiptype])
-    sub_module.img_create_do.create_sp_media_image(config, cpu_type)
+    sub_module.img_create_do.create_sp_media_image(config, cpu_type, security)
 
 
 def encrypt_loader_bin(chiptype, file, sign, encrypt, createcfg):
@@ -162,14 +165,16 @@ def run():
             "bl702": "bl702",
             "bl702l": "bl702l",
             "bl808": "bl808",
+            "bl628": "bl628",
             "bl606p": "bl808",
             "bl616": "bl616",
-            "wb03" : "wb03",
+            "wb03": "wb03",
         }
         chipname = args.chipname
         chiptype = chip_dict[chipname]
         img_create_path = os.path.join(chip_path, chipname, "img_create_mcu")
-        img_create_cfg = os.path.join(chip_path, chipname, "img_create_mcu") + "/img_create_cfg.ini"
+        img_create_cfg = os.path.join(chip_path, chipname,
+                                      "img_create_mcu") + "/img_create_cfg.ini"
         bh_cfg_file = img_create_path + "/efuse_bootheader_cfg.ini"
         bh_file = img_create_path + "/bootheader.bin"
         if args.imgfile:
@@ -178,8 +183,8 @@ def run():
             cfg.read(img_create_cfg)
             cfg.set('Img_Cfg', 'segdata_file', imgbin)
             cfg.write(img_create_cfg, 'w')
-        bflb_efuse_boothd_create.bootheader_create_process(chipname, chiptype, bh_cfg_file, bh_file,
-            img_create_path + "/bootheader_dummy.bin")
+        bflb_efuse_boothd_create.bootheader_create_process(
+            chipname, chiptype, bh_cfg_file, bh_file, img_create_path + "/bootheader_dummy.bin")
         img_create(args, chipname, chiptype, img_create_path, img_create_cfg)
     else:
         bflb_utils.printf("Please set chipname config, exit")
@@ -187,4 +192,3 @@ def run():
 
 if __name__ == '__main__':
     run()
-

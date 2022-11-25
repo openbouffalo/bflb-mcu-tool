@@ -19,10 +19,8 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #  SOFTWARE.
 
-
 import os
 import sys
-
 
 # Get app path
 if getattr(sys, "frozen", False):
@@ -31,5 +29,3 @@ else:
     app_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 sys.path.append(app_path)
-
-

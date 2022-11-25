@@ -1,6 +1,5 @@
 # -*- coding:utf-8 -*-
 
-
 import binascii
 from libs import bflb_utils
 
@@ -41,6 +40,7 @@ def check_pt_data(data):
          (bflb_utils.bytearray_to_int(data[10:11])<<16) + (bflb_utils.bytearray_to_int(data[11:12])<<24)
     return True, table_count, age
 
+
 def parse_pt_data(data):
     entry_type = []
     entry_addr = []
@@ -65,7 +65,8 @@ def parse_pt_data(data):
         return False, 0, 0
     ptdata = data[16:]
     for i in range(table_count):
-        if fireware_name == ptdata[i * 36 + 3:i * 36 + 3 + len(fireware_name)].decode(encoding="utf-8"):
+        if fireware_name == ptdata[i * 36 + 3:i * 36 + 3 +
+                                   len(fireware_name)].decode(encoding="utf-8"):
             addr_start = 0
             if bflb_utils.bytearray_to_int(ptdata[i * 36 + 2:i * 36 + 3]) != 0:
                 addr_start = i * 36 + 16
