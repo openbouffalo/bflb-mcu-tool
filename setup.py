@@ -55,7 +55,7 @@ entry_points = {'console_scripts': ['bflb-mcu-tool = bflb_mcu_tool.__main__:run_
 
 setup(
     name="bflb-mcu-tool",
-    version="1.8.1",
+    version="1.8.2",
     author="bouffalolab",
     author_email="jxtan@bouffalolab.com",
     description="Bouffalolab Mcu Tool",

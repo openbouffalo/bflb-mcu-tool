@@ -126,10 +126,10 @@ def flash_bootheader_config_check(chipname, chiptype, flashid, file, parafile):
                 flashCfg = rdata[i + offset:i + offset + flashCfgLen]
                 if data != None:
                     if data != flashCfg:
-                        if flashCfg[13:14] != b'\xff':
+                        if flashCfg[13:14] != b'\xff' and flashCfg[13:14] != b'\x00':
                             return False
                 else:
-                    if flashCfg[13:14] != b'\xff':
+                    if flashCfg[13:14] != b'\xff' and flashCfg[13:14] != b'\x00':
                         return False
         i += 4
     return True
@@ -177,9 +177,12 @@ def check_basic_flash_cfg(cfg_file, section):
     cfg.read(cfg_file)
     if cfg.has_option(section, "mfg_id"):
         if cfg.get(section, "mfg_id") == "0xff" or cfg.get(section, "mfg_id") == "0xFF":
-            cfg.set(section, "io_mode", "0x10")
+            cfg.set(section, "io_mode", "0x11")
             cfg.set(section, "cont_read_support", "0")
+            cfg.set(section, "cont_read_code", "0xff")
             cfg.write(cfg_file, "w+")
+            return True
+        if cfg.get(section, "mfg_id") == "0x00":
             return True
     return False
 

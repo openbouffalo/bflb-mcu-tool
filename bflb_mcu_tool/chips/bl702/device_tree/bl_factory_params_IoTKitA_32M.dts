@@ -34,8 +34,10 @@
             feature = "button";
             active = "Hi";
             mode = "multipress";
+            hbn_use = "disable";
             button {
                 debounce = <10>;
+                trig_level = "Lo";
                 short_press_ms {
                     start = <30>;
                     end = <4000>;
@@ -50,9 +52,7 @@
                     start = <10001>;
                     kevent = <4>;
                 };
-                trig_level = "Lo";
             };
-            hbn_use = "disable";
         };
     };
     uart {

@@ -759,7 +759,7 @@ class BflbUartPort(object):
 
 class CliInfUart(object):
 
-    def __init__(self, recv_cb_objs=None, baudrate=115200):
+    def __init__(self, recv_cb_objs=None, baudrate=115200, reset=0):
         self._baudrate = baudrate
         self._ser = None
         # self._logfile = None
@@ -775,6 +775,7 @@ class CliInfUart(object):
         self._boot = 0
         self.uart = ""
         self.mode = "general"
+        self.reset = reset
 
     def add_observer(self, recv_cb_obj):
         if recv_cb_obj is not None:
@@ -827,19 +828,20 @@ class CliInfUart(object):
                                               write_timeout=None,
                                               dsrdtr=False)
 
-                    if self.mode == "bouffalo":
-                        self._ser.write(b"BOUFFALOLAB5555DTR0")
-                        time.sleep(0.01)
-                        self._ser.write(b"BOUFFALOLAB5555RTS0")
-                        time.sleep(0.01)
-                        self._ser.write(b"BOUFFALOLAB5555RTS1")
-                    else:
-                        self._ser.setDTR(1)  # DTR拉低
-                        self._ser.setRTS(1)
-                        time.sleep(0.01)
-                        self._ser.setRTS(0)
-                        time.sleep(0.01)
-                        #self._ser.setDTR(0) # DTR拉高
+                    if not self.reset:
+                        if self.mode == "bouffalo":
+                            self._ser.write(b"BOUFFALOLAB5555DTR0")
+                            time.sleep(0.01)
+                            self._ser.write(b"BOUFFALOLAB5555RTS0")
+                            time.sleep(0.01)
+                            self._ser.write(b"BOUFFALOLAB5555RTS1")
+                        else:
+                            self._ser.setDTR(1)  # DTR拉低
+                            self._ser.setRTS(1)
+                            time.sleep(0.01)
+                            self._ser.setRTS(0)
+                            time.sleep(0.01)
+                            #self._ser.setDTR(0) # DTR拉高
 
                     self._tx_queue = Queue()
                     self._rx_thread = threading.Thread(target=self._read)
@@ -862,6 +864,7 @@ class CliInfUart(object):
                     return True
         except Exception as e:
             bflb_utils.printf("Error: %s" % e)
+            return False
 
     def close(self):
         try:
@@ -881,8 +884,10 @@ class CliInfUart(object):
                 self._tx_queue = None
                 self._boot = 0
                 bflb_utils.printf("Close %s Success" % (port))
+                return True
         except Exception as e:
             bflb_utils.printf("Error: %s" % e)
+            return False
 
     def write(self, data_send):
         try:
@@ -972,7 +977,8 @@ class CliInfUart(object):
                                 if self._recv_cb_objs is not None and len(self._recv_cb_objs) != 0:
                                     for cb in self._recv_cb_objs:
                                         time.sleep(1)
-                                        cb.on_boot(self.uart)
+                                        if not self.reset:
+                                            cb.on_boot(self.uart)
 
                             if self._recv_cb_objs is not None and len(self._recv_cb_objs) != 0:
                                 for cb in self._recv_cb_objs:
@@ -1090,6 +1096,7 @@ class CliInfUart(object):
                     return True
         except Exception as e:
             bflb_utils.printf("Error: %s" % e)
+            return False
 
     def close_listen(self):
         try:

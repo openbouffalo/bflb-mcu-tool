@@ -83,6 +83,9 @@ def bl_dts2hex(dts):
     pwr_table_zigbee = ""
     pwr_offset_bz = ""
     country_code = ""
+    en_cap_temp = ""
+    cap_temp = ""
+    capcode = ""
 
     if fdt_obj.exist_node("wifi/brd_rf"):
         xtal_mode = fdt_obj.get_property("xtal_mode", "wifi/brd_rf")
@@ -118,7 +121,11 @@ def bl_dts2hex(dts):
         pwr_offset_bz = fdt_obj.get_property("pwr_offset", "bluetooth_zigbee/brd_rf")
     if fdt_obj.exist_node("info/brd"):
         country_code = fdt_obj.get_property("country_code", "info/brd")
-
+    if fdt_obj.exist_node("wifi/cap_temp"):
+        en_cap_temp = fdt_obj.get_property("en_cap_temp", "wifi/cap_temp")
+        cap_temp = fdt_obj.get_property("temp", "wifi/cap_temp")
+        capcode = fdt_obj.get_property("capcode", "wifi/cap_temp")
+        
     init_hex = little_endian(string_to_bytearray("k1bXkD6O").hex())
 
     if xtal_mode:
@@ -311,7 +318,8 @@ def bl_dts2hex(dts):
         pwr_table_zigbee_hex = ""
 
     if pwr_offset_bz:
-        pwr_offset_bz_hex = "31000500"
+        length = '%02x' % len(pwr_offset_bz) 
+        pwr_offset_bz_hex = "3100" + length + "00"
         for item in pwr_offset_bz:
             item_hex = '%02x' % item
             pwr_offset_bz_hex += item_hex
@@ -322,6 +330,27 @@ def bl_dts2hex(dts):
         country_code_hex = "50000200" + little_endian("%04x" % country_code[0])
     else:
         country_code_hex = ""
+        
+    if en_cap_temp:        
+        en_cap_temp_hex = "60000100%02x" % en_cap_temp[0]   
+    else:   
+        en_cap_temp_hex = ""
+    
+    if cap_temp:
+        cap_temp_hex = "61000a00"
+        for item in cap_temp:
+            item_hex = '%02x' % item
+            cap_temp_hex += item_hex
+    else:
+        cap_temp_hex = ""
+        
+    if capcode:
+        capcode_hex = "62000b00"
+        for item in capcode:
+            item_hex = '%02x' % item
+            capcode_hex += item_hex     
+    else:  
+        capcode_hex = ""
 
     dts_hex = init_hex + \
               xtal_mode_hex + xtal_hex + pwr_mode_hex + \
@@ -330,11 +359,11 @@ def bl_dts2hex(dts):
               pwr_table_11ac_vht20_hex + pwr_table_11ac_vht40_hex + pwr_table_11ac_vht80_hex + \
               pwr_table_11ax_he20_hex + pwr_table_11ax_he40_hex + pwr_table_11ax_he80_hex + pwr_table_11ax_he160_hex + \
               en_tcal_hex + linear_or_follow_hex + tchannels_hex + tchannel_os_hex + tchannel_os_low_hex + troom_os_hex + \
-              pwr_table_ble_hex + pwr_offset_bz_hex + pwr_table_bt_hex + pwr_table_zigbee_hex + country_code_hex
+              pwr_table_ble_hex + pwr_offset_bz_hex + pwr_table_bt_hex + pwr_table_zigbee_hex + country_code_hex + \
+              en_cap_temp_hex + cap_temp_hex + capcode_hex
     '''
     dts_hex_little_end = ""
     for item in [dts_hex[i:i+8] for i in range(0, len(dts_hex), 8)]:
         dts_hex_little_end += little_endian(item.ljust(8, '0'))
     '''
-
     return dts_hex

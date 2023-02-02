@@ -134,6 +134,12 @@ def img_update_efuse(cfg,
     return efuse_data
 
 
+# get img offset
+def img_create_get_img_offset(bootheader_data):
+    return bflb_utils.bytearray_to_int(bflb_utils.bytearray_reverse(
+           bootheader_data[128 : 128 + 4]))
+
+
 # get sign and encrypt info
 def img_create_get_sign_encrypt_info(bootheader_data):
     sign = bootheader_data[116] & 0x3
@@ -484,6 +490,26 @@ def img_creat_process(flash_img, cfg, security=False):
         if len(seg_data) % encrypt_blk_size != 0:
             padding_size = encrypt_blk_size - len(seg_data) % encrypt_blk_size
             seg_data += padding[0:padding_size]
+
+        magic_code = 0x504e4642
+        if seg_data[0:4] == bflb_utils.int_to_4bytearray_l(magic_code):
+            bflb_utils.printf("img already have bootheader")
+            encrypt_flag = ((seg_data[116] >> 2) & 0x3)
+            img_offset = img_create_get_img_offset(seg_data)
+            if encrypt_flag == 0 and encrypt > 0:
+                # segdata not encrypted and need encrypt, create bootheader and encrypt
+                seg_data = seg_data[img_offset:]
+            else:
+                bflb_utils.printf("Write flash img direct")
+                bootinfo_file_name = cfg.get(cfg_section, "bootinfo_file")
+                fp = open(bootinfo_file_name, 'wb+')
+                fp.write(seg_data[:img_offset])
+                fp.close()
+                fw_file_name = cfg.get(cfg_section, "img_file")
+                fp = open(fw_file_name, 'wb+')
+                fp.write(seg_data[img_offset:])
+                fp.close()
+                return "OK", data_tohash
         if seg_data[len(seg_data) - 16:len(seg_data) - 12] == bytearray("0mfg".encode("utf-8")):
             mfgBin = True
         if mfgBin:
@@ -493,6 +519,7 @@ def img_creat_process(flash_img, cfg, security=False):
         seg_cnt = len(data_toencrypt)
         if mfgBin:
             seg_cnt += 16
+
     # do encrypt
     if encrypt != 0:
         data_toencrypt = img_create_encrypt_data(data_toencrypt, encrypt_key, encrypt_iv,

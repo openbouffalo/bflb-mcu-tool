@@ -687,6 +687,9 @@ class BflbMcuTool(object):
                 if values["pll_clk"] == "144M":
                     bflb_utils.update_cfg(cfg, section, "pll_clk", "4")
                     bflb_utils.update_cfg(cfg, section, "bclk_div", "1")
+                elif values["pll_clk"] == "128M":
+                    bflb_utils.update_cfg(cfg, section, "pll_clk", "5")
+                    bflb_utils.update_cfg(cfg, section, "bclk_div", "1")
             elif chiptype == "bl60x":
                 if values["pll_clk"] == "160M":
                     bflb_utils.update_cfg(cfg, section, "pll_clk", "2")
@@ -1138,20 +1141,7 @@ class BflbMcuTool(object):
 
         bflb_utils.update_cfg(cfg, group0_section, "boot2_enable", "0")
         bflb_utils.update_cfg(cfg, group1_section, "boot2_enable", "0")
-        #         if "xtal_type" in values.keys():
-        #             bflb_utils.update_cfg(cfg, group0_section, "xtal_type",
-        #                                   self.xtal_type_.index(values["xtal_type"]))
-        if "mcu_clk" in values.keys():
-            if values["mcu_clk"] == "WIFIPLL 320M":
-                bflb_utils.update_cfg(cfg, group0_section, "mcu_clk", "4")
-                bflb_utils.update_cfg(cfg, group0_section, "mcu_clk_div", "0")
-        if "flash_clk_type" in values.keys():
-            if values["flash_clk_type"] == "XTAL":
-                bflb_utils.update_cfg(cfg, group0_section, "flash_clk_type", "1")
-                bflb_utils.update_cfg(cfg, group0_section, "flash_clk_div", "0")
-                # Set flash clock delay = 1T
-                bflb_utils.update_cfg(cfg, group0_section, "sfctrl_clk_delay", "1")
-                bflb_utils.update_cfg(cfg, group0_section, "sfctrl_clk_invert", "0x01")
+
         if "sign_type-group0" in values.keys():
             bflb_utils.update_cfg(cfg, group0_section, "sign",
                                   self.sign_type.index(values["sign_type-group0"]))
@@ -2051,7 +2041,7 @@ class BflbMcuTool(object):
                         whole_img_data = group1_filedata
                         group1_fw_with_bootinfo = True
                     else:
-                        whole_img_data[0x1000:len(group1_bootinfo_filedata
+                        whole_img_data[0x1000:0x1000 + len(group1_bootinfo_filedata
                                                  )] = group1_bootinfo_filedata
                         whole_img_data[group1_img_offset+group1_img_start : \
                                     group1_img_offset+len(group1_filedata)+group1_img_start] = group1_filedata

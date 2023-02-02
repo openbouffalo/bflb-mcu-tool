@@ -865,6 +865,8 @@ def cklink_openocd_enumerate():
                 match1 = re.search("FactoryAIOT Prog ([a-zA-Z0-9]{6}) LOCATION", h, re.I)
                 if match1 is not None:
                     ports_cklink.append(match1.group(1))
+    ports_openocd.sort()
+    ports_cklink.sort()
     return ports_cklink, ports_openocd
 
 
@@ -879,6 +881,26 @@ def image_create_parser_init():
     parser.add_argument("-s", "--signer", dest="signer", help="signer")
     return parser
 
+def firmware_post_proc_parser_init():
+    parser = argparse.ArgumentParser(description="bouffalolab image create command")
+    parser.add_argument("--chipname", dest="chipname", help="chip name")
+    parser.add_argument("--cpuid", dest="cpuid", help="cpu id")
+    parser.add_argument("--brdcfgdir", dest="brdcfgdir", help="board config dir contains boot2,partition,etc.")
+    parser.add_argument("--imgfile", dest="imgfile", help="image file")
+    parser.add_argument("--hd_append", dest="hd_append", help="header append file")
+    parser.add_argument("--fw_append", dest="fw_append", help="firmware append file")
+    parser.add_argument("--key", dest="aeskey", help="AES Key")
+    parser.add_argument("--iv", dest="aesiv", help="AES IV")
+    parser.add_argument("--xtsmode", dest="xtsmode", help="xts mode enable")
+    parser.add_argument("--publickey", dest="publickey", help="ECC public key")
+    parser.add_argument("--privatekey", dest="privatekey", help="ECC private key")
+    return parser
+
+def firmware_auxiliary_parser_init():
+    parser = argparse.ArgumentParser(description="bouffalolab image auxiliary command")
+    parser.add_argument("--wdir", dest="wdir", help="sdk work directory")
+    parser.add_argument("--imgfile", dest="imgfile", help="image file")
+    return parser
 
 def eflash_loader_parser_init():
     parser = argparse.ArgumentParser(description="bouffalolab eflash loader command")

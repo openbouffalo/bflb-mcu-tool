@@ -11,3 +11,4 @@ from . import cklink_load_cfg
 from . import openocd_load_cfg
 from . import partition_cfg_do
 from . import chiptype_patch
+from . import firmware_post_process_do

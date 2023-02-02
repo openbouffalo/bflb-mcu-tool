@@ -217,6 +217,16 @@ efuse_cfg_keys = {
         "pos": "0",
         "bitlen": "32"
     },
+    "ef_sw_usage_0": {
+        "offset": "92",
+        "pos": "0",
+        "bitlen": "32"
+    },
+    "ef_sw_usage_1": {
+        "offset": "96",
+        "pos": "0",
+        "bitlen": "32"
+    },
     "bootrom_protect": {
         "offset": "92",
         "pos": "0",

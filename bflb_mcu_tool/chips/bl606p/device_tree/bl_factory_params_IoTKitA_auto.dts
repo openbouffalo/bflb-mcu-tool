@@ -1,5 +1,4 @@
 /dts-v1/;
-/include/ "bl602_base.dtsi";
 // version: 17
 // last_comp_version: 16
 // boot_cpuid_phys: 0x0
@@ -13,18 +12,18 @@
         #address-cells = <1>;
         #size-cells = <1>;
         max_num = <40>;
-        gpio0 {                                  
-            status = "okay";                     
-            pin  = <5>;                          
-            feature = "led";                     
+        gpio0 {
+            status = "okay";
+            pin  = <5>;
+            feature = "led";
             active = "Hi"; //Hi or Lo
             mode = "blink"; //blink or hearbeat
             time = <100>; //duration for this mode
         };
-        gpio1 {                                  
-            status = "disable";                     
-            pin  = <6>;                          
-            feature = "led";                     
+        gpio1 {
+            status = "disable";
+            pin  = <6>;
+            feature = "led";
             active = "Hi"; //Hi or Lo
             mode = "blink"; //blink or hearbeat
             time = <100>; //duration for this mode
@@ -35,8 +34,10 @@
             feature = "button";
             active = "Hi";
             mode = "multipress";
+            hbn_use = "disable";
             button {
                 debounce = <10>;
+                trig_level = "Hi";
                 short_press_ms {
                     start = <100>;
                     end = <3000>;
@@ -51,9 +52,7 @@
                     start = <15000>;
                     kevent = <4>;
                 };
-                trig_level = "Hi";
             };
-            hbn_use = "disable";
         };
     };
     i2s {
@@ -326,7 +325,7 @@
             pwr_table_11b = <20 20 20 18>;//1Mbps 2Mbps 5.5Mbps 11Mbps
             pwr_table_11g = <18 18 18 18 18 18 14 14>; //6Mbps 9Mbps 12Mbps 18MBps 24Mbps 36Mbps 48Mbps 54Mbps
             pwr_table_11n = <18 18 18 18 18 16 14 14>; //MCS0 MCS1 MCS2 MCS3 MCS4 MCS5 MCS6 MCS7
-            pwr_offset = <16 16 16 16 16 16 16 16 16 16 16 16 16 16>;//due to the limit of current DTC, negative value is used. So we work around by adding all the poweroffset with 16. 
+            pwr_offset = <16 16 16 16 16 16 16 16 16 16 16 16 16 16>;//due to the limit of current DTC, negative value is used. So we work around by adding all the poweroffset with 16.
             //so 14 represents -0.5dBm; 16 represents 0dBm; 20 represents 1dBm;(step is 0.25dBm)
         };
         rf_temp {
@@ -344,6 +343,9 @@
         #size-cells = <1>;
         brd_rf {
             pwr_table_ble = <13>;  //range:0~15dbm
+			pwr_table_bt = <10 8 8>; //BR 1M,EDR 2M,EDR 3M
+            pwr_table_zigbee = <13>; //range:0~15dbm
+            pwr_offset = <16 16 16 16 16>; //step is 0.25dBm
         };
     };
 };
