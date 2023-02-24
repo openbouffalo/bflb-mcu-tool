@@ -116,6 +116,7 @@ class PtCreater(object):
                 if name.upper() == 'FW_CPU0':
                     parcel['fw_cpu0_addr'] = tbl_item['address0']
                     parcel['fw_cpu0_len'] = tbl_item['size0']
+                    parcel['fw_cpu0_header'] = 1
                     parcel['fw1_cpu0_addr'] = tbl_item['address1']
                     parcel['fw1_cpu0_len'] = tbl_item['size1']
                     parcel['fw1_cpu0_header'] = 1

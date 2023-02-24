@@ -72,6 +72,22 @@ def bl_dts2hex(dts):
     pwr_table_11ax_he160 = ""
     pwr_offset_wifi = ""
     pwr_offset_wifi_lp = ""
+    
+    pwr_limit_2g_ch1 = ""
+    pwr_limit_2g_ch2 = ""
+    pwr_limit_2g_ch3 = ""
+    pwr_limit_2g_ch4 = ""
+    pwr_limit_2g_ch5 = ""
+    pwr_limit_2g_ch6 = ""
+    pwr_limit_2g_ch7 = ""
+    pwr_limit_2g_ch8 = ""
+    pwr_limit_2g_ch9 = ""
+    pwr_limit_2g_ch10 = ""
+    pwr_limit_2g_ch11 = ""
+    pwr_limit_2g_ch12 = ""
+    pwr_limit_2g_ch13 = ""
+    pwr_limit_2g_ch14 = ""
+    
     en_tcal = ""
     linear_or_follow = ""
     tchannels = ""
@@ -105,6 +121,20 @@ def bl_dts2hex(dts):
         pwr_table_11ax_he40 = fdt_obj.get_property("pwr_table_11ax_he40", "wifi/brd_rf")
         pwr_table_11ax_he80 = fdt_obj.get_property("pwr_table_11ax_he80", "wifi/brd_rf")
         pwr_table_11ax_he160 = fdt_obj.get_property("pwr_table_11ax_he160", "wifi/brd_rf")
+        pwr_limit_2g_ch1 = fdt_obj.get_property("pwr_limit_2g_ch1", "wifi/brd_rf")
+        pwr_limit_2g_ch2 = fdt_obj.get_property("pwr_limit_2g_ch2", "wifi/brd_rf")
+        pwr_limit_2g_ch3 = fdt_obj.get_property("pwr_limit_2g_ch3", "wifi/brd_rf")
+        pwr_limit_2g_ch4 = fdt_obj.get_property("pwr_limit_2g_ch4", "wifi/brd_rf")
+        pwr_limit_2g_ch5 = fdt_obj.get_property("pwr_limit_2g_ch5", "wifi/brd_rf")
+        pwr_limit_2g_ch6 = fdt_obj.get_property("pwr_limit_2g_ch6", "wifi/brd_rf")
+        pwr_limit_2g_ch7 = fdt_obj.get_property("pwr_limit_2g_ch7", "wifi/brd_rf")
+        pwr_limit_2g_ch8 = fdt_obj.get_property("pwr_limit_2g_ch8", "wifi/brd_rf")
+        pwr_limit_2g_ch9 = fdt_obj.get_property("pwr_limit_2g_ch9", "wifi/brd_rf")
+        pwr_limit_2g_ch10 = fdt_obj.get_property("pwr_limit_2g_ch10", "wifi/brd_rf")
+        pwr_limit_2g_ch11 = fdt_obj.get_property("pwr_limit_2g_ch11", "wifi/brd_rf")
+        pwr_limit_2g_ch12 = fdt_obj.get_property("pwr_limit_2g_ch12", "wifi/brd_rf")
+        pwr_limit_2g_ch13 = fdt_obj.get_property("pwr_limit_2g_ch13", "wifi/brd_rf")
+        pwr_limit_2g_ch14 = fdt_obj.get_property("pwr_limit_2g_ch14", "wifi/brd_rf")
     if fdt_obj.exist_node("wifi/rf_temp"):
         en_tcal = fdt_obj.get_property("en_tcal", "wifi/rf_temp")
         linear_or_follow = fdt_obj.get_property("linear_or_follow", "wifi/rf_temp")
@@ -259,7 +289,119 @@ def bl_dts2hex(dts):
             pwr_offset_wifi_lp_hex += item_hex
     else:
         pwr_offset_wifi_lp_hex = ""
-
+        
+    if pwr_limit_2g_ch1:
+        pwr_limit_2g_ch1_hex = "40000400"
+        for item in pwr_limit_2g_ch1:
+            item_hex = '%02x' % item
+            pwr_limit_2g_ch1_hex += item_hex
+    else:
+        pwr_limit_2g_ch1_hex = ""
+        
+    if pwr_limit_2g_ch2:
+        pwr_limit_2g_ch2_hex = "41000400"
+        for item in pwr_limit_2g_ch2:
+            item_hex = '%02x' % item
+            pwr_limit_2g_ch2_hex += item_hex
+    else:
+        pwr_limit_2g_ch2_hex = ""
+        
+    if pwr_limit_2g_ch3:
+        pwr_limit_2g_ch3_hex = "42000400"
+        for item in pwr_limit_2g_ch3:
+            item_hex = '%02x' % item
+            pwr_limit_2g_ch3_hex += item_hex
+    else:
+        pwr_limit_2g_ch3_hex = ""
+        
+    if pwr_limit_2g_ch4:
+        pwr_limit_2g_ch4_hex = "43000400"
+        for item in pwr_limit_2g_ch4:
+            item_hex = '%02x' % item
+            pwr_limit_2g_ch4_hex += item_hex
+    else:
+        pwr_limit_2g_ch4_hex = ""
+        
+    if pwr_limit_2g_ch5:
+        pwr_limit_2g_ch5_hex = "44000400"
+        for item in pwr_limit_2g_ch5:
+            item_hex = '%02x' % item
+            pwr_limit_2g_ch5_hex += item_hex
+    else:
+        pwr_limit_2g_ch5_hex = ""
+        
+    if pwr_limit_2g_ch6:
+        pwr_limit_2g_ch6_hex = "45000400"
+        for item in pwr_limit_2g_ch6:
+            item_hex = '%02x' % item
+            pwr_limit_2g_ch6_hex += item_hex
+    else:
+        pwr_limit_2g_ch6_hex = ""
+        
+    if pwr_limit_2g_ch7:
+        pwr_limit_2g_ch7_hex = "46000400"
+        for item in pwr_limit_2g_ch7:
+            item_hex = '%02x' % item
+            pwr_limit_2g_ch7_hex += item_hex
+    else:
+        pwr_limit_2g_ch7_hex = ""
+        
+    if pwr_limit_2g_ch8:
+        pwr_limit_2g_ch8_hex = "47000400"
+        for item in pwr_limit_2g_ch8:
+            item_hex = '%02x' % item
+            pwr_limit_2g_ch8_hex += item_hex
+    else:
+        pwr_limit_2g_ch8_hex = ""
+        
+    if pwr_limit_2g_ch9:
+        pwr_limit_2g_ch9_hex = "48000400"
+        for item in pwr_limit_2g_ch9:
+            item_hex = '%02x' % item
+            pwr_limit_2g_ch9_hex += item_hex
+    else:
+        pwr_limit_2g_ch9_hex = ""
+        
+    if pwr_limit_2g_ch10:
+        pwr_limit_2g_ch10_hex = "49000400"
+        for item in pwr_limit_2g_ch10:
+            item_hex = '%02x' % item
+            pwr_limit_2g_ch10_hex += item_hex
+    else:
+        pwr_limit_2g_ch10_hex = ""
+        
+    if pwr_limit_2g_ch11:
+        pwr_limit_2g_ch11_hex = "4a000400"
+        for item in pwr_limit_2g_ch11:
+            item_hex = '%02x' % item
+            pwr_limit_2g_ch11_hex += item_hex
+    else:
+        pwr_limit_2g_ch11_hex = ""
+        
+    if pwr_limit_2g_ch12:
+        pwr_limit_2g_ch12_hex = "4b000400"
+        for item in pwr_limit_2g_ch12:
+            item_hex = '%02x' % item
+            pwr_limit_2g_ch12_hex += item_hex
+    else:
+        pwr_limit_2g_ch12_hex = ""
+        
+    if pwr_limit_2g_ch13:
+        pwr_limit_2g_ch13_hex = "4c000400"
+        for item in pwr_limit_2g_ch13:
+            item_hex = '%02x' % item
+            pwr_limit_2g_ch13_hex += item_hex
+    else:
+        pwr_limit_2g_ch13_hex = ""
+        
+    if pwr_limit_2g_ch14:
+        pwr_limit_2g_ch14_hex = "4d000400"
+        for item in pwr_limit_2g_ch14:
+            item_hex = '%02x' % item
+            pwr_limit_2g_ch14_hex += item_hex
+    else:
+        pwr_limit_2g_ch14_hex = ""
+        
     if en_tcal:
         en_tcal_hex = "20000100%02x" % en_tcal[0]
     else:
@@ -332,14 +474,14 @@ def bl_dts2hex(dts):
         country_code_hex = ""
         
     if en_cap_temp:        
-        en_cap_temp_hex = "60000100%02x" % en_cap_temp[0]   
+        en_cap_temp_hex = "60000100%02x" % (en_cap_temp[0]%256)   
     else:   
         en_cap_temp_hex = ""
     
     if cap_temp:
         cap_temp_hex = "61000a00"
         for item in cap_temp:
-            item_hex = '%02x' % item
+            item_hex = '%02x' % (item%256)
             cap_temp_hex += item_hex
     else:
         cap_temp_hex = ""
@@ -347,7 +489,7 @@ def bl_dts2hex(dts):
     if capcode:
         capcode_hex = "62000b00"
         for item in capcode:
-            item_hex = '%02x' % item
+            item_hex = '%02x' % (item%256)
             capcode_hex += item_hex     
     else:  
         capcode_hex = ""
@@ -360,7 +502,12 @@ def bl_dts2hex(dts):
               pwr_table_11ax_he20_hex + pwr_table_11ax_he40_hex + pwr_table_11ax_he80_hex + pwr_table_11ax_he160_hex + \
               en_tcal_hex + linear_or_follow_hex + tchannels_hex + tchannel_os_hex + tchannel_os_low_hex + troom_os_hex + \
               pwr_table_ble_hex + pwr_offset_bz_hex + pwr_table_bt_hex + pwr_table_zigbee_hex + country_code_hex + \
-              en_cap_temp_hex + cap_temp_hex + capcode_hex
+              en_cap_temp_hex + cap_temp_hex + capcode_hex + \
+              pwr_limit_2g_ch1_hex + pwr_limit_2g_ch2_hex + pwr_limit_2g_ch3_hex + pwr_limit_2g_ch4_hex + \
+              pwr_limit_2g_ch5_hex + pwr_limit_2g_ch6_hex + pwr_limit_2g_ch7_hex + pwr_limit_2g_ch8_hex + \
+              pwr_limit_2g_ch9_hex + pwr_limit_2g_ch10_hex + pwr_limit_2g_ch11_hex + pwr_limit_2g_ch12_hex + \
+              pwr_limit_2g_ch13_hex + pwr_limit_2g_ch14_hex
+              
     '''
     dts_hex_little_end = ""
     for item in [dts_hex[i:i+8] for i in range(0, len(dts_hex), 8)]:

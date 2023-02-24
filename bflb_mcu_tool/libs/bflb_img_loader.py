@@ -366,6 +366,10 @@ class BflbImgLoader(object):
         bflb_utils.printf(
             "########################################################################")
 
+    def img_load_interface_init(self, comnum, sh_baudrate):
+        self.bflb_boot_if.if_init(comnum, sh_baudrate, self._chip_type, self._chip_name)
+        self.boot_install_cmds_callback()
+
     def img_load_shake_hand(self,
                             comnum,
                             sh_baudrate,
@@ -378,9 +382,6 @@ class BflbImgLoader(object):
                             shake_hand_retry=2,
                             isp_timeout=0,
                             boot_load=True):
-        self.bflb_boot_if.if_init(comnum, sh_baudrate, self._chip_type, self._chip_name)
-
-        self.boot_install_cmds_callback()
         if self._chip_type == "wb03":
             self.bflb_boot_if.if_toggle_boot(do_reset, reset_hold_time, shake_hand_delay,
                                              reset_revert, cutoff_time, shake_hand_retry,
@@ -582,6 +583,7 @@ class BflbImgLoader(object):
                            shake_hand_retry=2):
         success = True
         bflb_utils.printf("efuse_read_process")
+        self.img_load_interface_init(comnum, sh_baudrate)
         ret = self.img_load_shake_hand(comnum, sh_baudrate, wk_baudrate, do_reset, reset_hold_time,
                                        shake_hand_delay, reset_revert, cutoff_time,
                                        shake_hand_retry)
@@ -623,6 +625,16 @@ class BflbImgLoader(object):
                          isp_timeout=0,
                          boot_load=True):
         bflb_utils.printf("========= image get bootinfo =========")
+        self.img_load_interface_init(comnum, sh_baudrate)
+
+        # get bootinfo first, maybe shake hand is
+        ret, data_read = self.boot_process_one_section("get_boot_info", 0)
+        if ret.startswith("OK") is True:
+            # check with image file
+            data_read = binascii.hexlify(data_read)
+            bflb_utils.printf("data read is ", data_read)
+            return True, data_read
+
         ret = self.img_load_shake_hand(comnum, sh_baudrate, wk_baudrate, do_reset, reset_hold_time,
                                        shake_hand_delay, reset_revert, cutoff_time,
                                        shake_hand_retry, isp_timeout, boot_load)
@@ -668,13 +680,17 @@ class BflbImgLoader(object):
         success = True
         bootinfo = None
         try:
-            ret = self.img_load_shake_hand(comnum, sh_baudrate, wk_baudrate, do_reset,
-                                           reset_hold_time, shake_hand_delay, reset_revert,
-                                           cutoff_time, shake_hand_retry, isp_timeout, boot_load)
-            if ret == "shake hand fail" or ret == "change rate fail":
-                bflb_utils.printf("shake hand fail")
-                self.bflb_boot_if.if_close()
-                return False, bootinfo, ret
+            self.img_load_interface_init(comnum, sh_baudrate)
+            # get bootinfo first, maybe shake hand is
+            ret, data_read = self.boot_process_one_section("get_boot_info", 0)
+            if ret.startswith("OK") is not True:
+                ret = self.img_load_shake_hand(comnum, sh_baudrate, wk_baudrate, do_reset,
+                                            reset_hold_time, shake_hand_delay, reset_revert,
+                                            cutoff_time, shake_hand_retry, isp_timeout, boot_load)
+                if ret == "shake hand fail" or ret == "change rate fail":
+                    bflb_utils.printf("shake hand fail")
+                    self.bflb_boot_if.if_close()
+                    return False, bootinfo, ret
             time.sleep(0.01)
             if file1 is not None and file1 != "":
                 res, bootinfo = self.img_load_main_process(file1, 0, self._create_cfg, callback,
@@ -683,7 +699,7 @@ class BflbImgLoader(object):
                     if res.startswith("repeat_burn") is True:
                         return False, bootinfo, res
                     else:
-                        bflb_utils.printf("Img load fail")
+                        bflb_utils.printf("Error: Image load fail")
                         if res.startswith("error_shakehand") is True:
                             bflb_utils.printf("shakehand with eflash loader found")
                         return False, bootinfo, res
@@ -694,7 +710,7 @@ class BflbImgLoader(object):
                     if res.startswith("repeat_burn") is True:
                         return False, bootinfo, res
                     else:
-                        bflb_utils.printf("Img load fail")
+                        bflb_utils.printf("Error: Image load fail")
                         if res.startswith("error_shakehand") is True:
                             bflb_utils.printf("shakehand with eflash loader found")
                         return False, bootinfo, res

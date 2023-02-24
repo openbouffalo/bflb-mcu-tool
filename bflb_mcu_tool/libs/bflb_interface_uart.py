@@ -59,7 +59,7 @@ class BflbUartPort(object):
                     dev = device
                 self._device = dev.upper()
 
-                for i in range(5):
+                for i in range(2):
                     try:
                         self._ser = serial.Serial(dev,
                                                   rate,
@@ -463,7 +463,7 @@ class BflbUartPort(object):
                     if self._602a0_dln_fix:
                         time.sleep(4)
                     success, ack = self.if_read(1000)
-                    bflb_utils.printf("ack is ", binascii.hexlify(ack))
+                    bflb_utils.printf("ack is ", binascii.hexlify(ack).decode("utf-8"))
                     if ack.find(b'\x4F') != -1 or ack.find(b'\x4B') != -1:
                         self._ser.timeout = timeout
                         if self._602a0_dln_fix:
@@ -705,8 +705,8 @@ class BflbUartPort(object):
         try:
             success, ack = self.if_read(2)
             if success == 0:
-                bflb_utils.printf("ack is ", str(binascii.hexlify(ack)))
-                return ack.decode("utf-8")
+                bflb_utils.printf("ack is ", str(binascii.hexlify(ack).decode("utf-8")))
+                return str(binascii.hexlify(ack).decode("utf-8"))
             if ack.find(b'\x4F') != -1 or ack.find(b'\x4B') != -1:
                 # if dmy_data:
                 #    success, ack = self.if_read(14)

@@ -621,7 +621,7 @@ def get_random_hexstr(n_bytes):
     hextring = ""
     i = 0
     while i < n_bytes:
-        hextring = hextring + str(binascii.hexlify(random.randint(0, 255)))
+        hextring = hextring + "%02X" % random.randint(0,255)
         i = i + 1
     return hextring
 
@@ -945,7 +945,7 @@ def eflash_loader_parser_init():
     parser.add_argument("--start", dest="start", help="start address")
     parser.add_argument("--end", dest="end", help="end address")
     parser.add_argument("--addr", dest="addr", help="address to write")
-    parser.add_argument("--mac", dest="mac", help="mac address to write")
+    parser.add_argument("--mac", dest="mac", nargs='?', const=True, default=False)
     parser.add_argument("--file", dest="file", help="file to store read data or file to write")
     parser.add_argument("--skip", dest="skip", help="skip write file to flash")
     parser.add_argument("--packet", dest="packet", help=" import packet to replace burn file")
@@ -962,6 +962,11 @@ def eflash_loader_parser_init():
     parser.add_argument("--isp", dest="isp", action="store_true", help="isp config")
     parser.add_argument("--createcfg", dest="createcfg", help="img create cfg file")
     parser.add_argument("--key", dest="key", help="aes key for socket")
+    parser.add_argument("--encrypt", dest="encrypt", action="store_true", help="encrypt select")
+    parser.add_argument("--publickey", dest="publickey", help="signature public key")
+    parser.add_argument("--privatekey", dest="privatekey", help="signature private key")
+    parser.add_argument("--dac", dest="dac", help="dac value")
+    parser.add_argument("--dacaddr", dest="dacaddr", help="dac program addr")
     parser.add_argument("--ecdh", dest="ecdh", action="store_true", help="open ecdh function")
     parser.add_argument("--echo", dest="echo", action="store_true", help="open local log echo")
     parser.add_argument("-a", "--auto", dest="auto", action="store_true", help="auto flash")

@@ -4,18 +4,34 @@ import os
 import sys
 
 try:
-    from version import *
+    from version import VERSION
 except ImportError:
-    version = "1.8.1"
+    VERSION = "1.8.3"
+    
+try:
+    from midea import ENABLE_MIDEA
+except ImportError:
+    ENABLE_MIDEA = False    
+if ENABLE_MIDEA:
+    VERSION = VERSION + " for Midea"
+
+try:
+    from aithinker import ENABLE_AITHINKER
+except ImportError:
+    ENABLE_AITHINKER = False   
+if ENABLE_AITHINKER:
+    VERSION = VERSION + " for AiThinker"
+    
+try:
+    from haier import ENABLE_HAIER
+except ImportError:
+    ENABLE_HAIER = False   
+if ENABLE_HAIER:
+    VERSION = VERSION + " for Haier"
 
 chip_name = "tg7100c"
 obj_cklink = None
-ENABLE_HAIER = False
-ENABLE_AITHINKER = False
 NUM_ERROR_LOG = 0
-
-if ENABLE_AITHINKER:
-    version = version + " for AiThinker"
 
 # Get app path
 if getattr(sys, "frozen", False):
@@ -35,6 +51,8 @@ if not conf_sign:
     list_chip = ["BL602/604", "BL702/704/706", "BL702L/704L", "BL808", "BL606P", "BL616/618"]
     #list_chip = ["BL602/604", "BL702/704/706", "BL702L/704L", "BL808", "BL606P", "BL616/618", "BL628"]
     #list_chip = ["WB03"]
+    if ENABLE_MIDEA:
+        list_chip = ["BL602/604"]
     type_chip = ("bl602", "bl602")
     dict_chip = {
         "BL561/563": ("bl56x", "bl60x"),
@@ -156,7 +174,7 @@ boot_src['bl702'] = ["Flash", "UART/USB"]
 # BL702L
 xtal_type['bl702l'] = ["None", "32M", "RC32M"]
 xtal_type_['bl702l'] = ["XTAL_" + item for item in xtal_type['bl702l']]
-pll_clk['bl702l'] = ["144M", "Manual"]
+pll_clk['bl702l'] = ["128M", "Manual"]
 encrypt_type['bl702l'] = ["None", "AES128", "AES256", "AES192"]
 #key_sel['bl702l'] = ["0", "1", "2", "3"]
 key_sel['bl702l'] = ["1"]
@@ -422,7 +440,7 @@ if conf_sign:
             <td align="center"><font face="微软雅黑" color=\"grey\"><h2>{}</h2></font></td>
             </tr>
             <tr>
-            <td align="center"><font face="微软雅黑" color=\"grey\" size=2>version: '''.format(cgc.title) + version + '''</font></td>
+            <td align="center"><font face="微软雅黑" color=\"grey\" size=2>version: '''.format(cgc.title) + VERSION + '''</font></td>
             </tr>
             </table>
             <br><br><br>
@@ -449,7 +467,7 @@ else:
                 <td align="center"><font face="微软雅黑" color=\"grey\"><h2>Bouffalo Lab Dev Cube</h2></font></td>
                 </tr>
                 <tr>
-                <td align="center"><font face="微软雅黑" color=\"grey\" size=2>version: ''' + version + '''</font></td>
+                <td align="center"><font face="微软雅黑" color=\"grey\" size=2>version: ''' + VERSION + '''</font></td>
                 </tr>
                 <tr>
                 <td align="center"><font face="微软雅黑" color=\"grey\" size=2>jxtan@bouffalolab.com</font></td>

@@ -704,7 +704,10 @@ class BflbMcuTool(object):
                     bflb_utils.update_cfg(cfg, section, "sfctrl_clk_invert", "0x01")
             elif chiptype == "bl702" or chiptype == "bl702l":
                 if values["flash_clk_type"] == "XCLK":
-                    bflb_utils.update_cfg(cfg, section, "flash_clk_type", "1")
+                    if chiptype == "bl702":
+                        bflb_utils.update_cfg(cfg, section, "flash_clk_type", "1")
+                    else:
+                        bflb_utils.update_cfg(cfg, section, "flash_clk_type", "0")
                     bflb_utils.update_cfg(cfg, section, "flash_clk_div", "0")
                     # Set flash clock delay = 1T
                     bflb_utils.update_cfg(cfg, section, "sfctrl_clk_delay", "1")
