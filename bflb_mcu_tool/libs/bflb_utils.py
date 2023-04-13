@@ -65,6 +65,8 @@ if python_version == 64:
     path_dll = os.path.join(app_path, "utils/jlink", "JLink_x64.dll")
 else:
     path_dll = os.path.join(app_path, "utils/jlink", "JLinkARM.dll")
+    
+path_dylib = os.path.join(app_path, "utils/jlink", "libjlinkarm.dylib")
 
 try:
     import changeconf as cgc
@@ -222,6 +224,7 @@ if conf_sign:
         "0042": "FLASH SWITCH BANK FAIL",
         "0043": "FLASH IDENTIFY FAIL",
         "0044": "FLASH CHIPERASE CONFLICT WITH SKIP MODE",
+        "0045": "FLASH SIZE OVER FLOW",
         "0050": "IMG LOAD SHAKEHAND FAIL",
         "0051": "IMG LOAD BOOT CHECK FAIL",
         "0060": "IMG CREATE FAIL",
@@ -388,6 +391,7 @@ else:
         "0042": "BFLB FLASH SWITCH BANK FAIL",
         "0043": "BFLB FLASH IDENTIFY FAIL",
         "0044": "BFLB FLASH CHIPERASE CONFLICT WITH SKIP MODE",
+        "0045": "BFLB FLASH SIZE OVER FLOW",
         "0050": "BFLB IMG LOAD SHAKEHAND FAIL",
         "0051": "BFLB IMG LOAD BOOT CHECK FAIL",
         "0060": "BFLB IMG CREATE FAIL",
@@ -831,6 +835,9 @@ def pylink_enumerate():
         if sys.platform == 'win32':
             obj_dll = pylink.Library(dllpath=path_dll)
             obj = pylink.JLink(lib=obj_dll)
+        elif sys.platform.startswith('darwin'):
+            obj_dylib = pylink.Library(dllpath=path_dylib)
+            obj = pylink.JLink(lib=obj_dylib)   
         else:
             obj = pylink.JLink()
     except Exception:
@@ -894,6 +901,8 @@ def firmware_post_proc_parser_init():
     parser.add_argument("--xtsmode", dest="xtsmode", help="xts mode enable")
     parser.add_argument("--publickey", dest="publickey", help="ECC public key")
     parser.add_argument("--privatekey", dest="privatekey", help="ECC private key")
+    parser.add_argument("--checkpartition", dest="checkpartition", help="check partition in whole_flash_data.bin")
+    parser.add_argument("--releasenote", dest="releasenote", action="store_false", help="dump release note")
     return parser
 
 def firmware_auxiliary_parser_init():
@@ -961,12 +970,10 @@ def eflash_loader_parser_init():
     parser.add_argument("--para", dest="para", help="efuse para")
     parser.add_argument("--isp", dest="isp", action="store_true", help="isp config")
     parser.add_argument("--createcfg", dest="createcfg", help="img create cfg file")
-    parser.add_argument("--key", dest="key", help="aes key for socket")
-    parser.add_argument("--encrypt", dest="encrypt", action="store_true", help="encrypt select")
+    parser.add_argument("--key", dest="key", help="encrypt aes key")
+    parser.add_argument("--iv", dest="iv", help="encrypt aes iv")
     parser.add_argument("--publickey", dest="publickey", help="signature public key")
     parser.add_argument("--privatekey", dest="privatekey", help="signature private key")
-    parser.add_argument("--dac", dest="dac", help="dac value")
-    parser.add_argument("--dacaddr", dest="dacaddr", help="dac program addr")
     parser.add_argument("--ecdh", dest="ecdh", action="store_true", help="open ecdh function")
     parser.add_argument("--echo", dest="echo", action="store_true", help="open local log echo")
     parser.add_argument("-a", "--auto", dest="auto", action="store_true", help="auto flash")

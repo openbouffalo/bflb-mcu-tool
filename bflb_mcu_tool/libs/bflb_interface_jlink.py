@@ -43,6 +43,8 @@ if python_version == 64:
     path_dll = os.path.join(app_path, "utils/jlink", "JLink_x64.dll")
 else:
     path_dll = os.path.join(app_path, "utils/jlink", "JLinkARM.dll")
+    
+path_dylib = os.path.join(app_path, "utils/jlink", "libjlinkarm.dylib")
 
 
 class BflbJLinkPort(object):
@@ -65,10 +67,14 @@ class BflbJLinkPort(object):
             sub_module = __import__("libs." + chiptype, fromlist=[chiptype])
             self._jlink_shake_hand_addr = sub_module.jlink_load_cfg.jlink_shake_hand_addr
             self._jlink_data_addr = sub_module.jlink_load_cfg.jlink_data_addr
-            if sys.platform == 'win32':
+            if sys.platform.startswith("win"):
                 obj_dll = pylink.Library(dllpath=path_dll)
                 self._jlink = pylink.JLink(lib=obj_dll)
                 self.jlink_path = os.path.join(app_path, "utils/jlink", "JLink.exe")
+            elif sys.platform.startswith('darwin'):
+                obj_dylib = pylink.Library(dllpath=path_dylib)
+                self._jlink = pylink.JLink(lib=obj_dylib) 
+                self.jlink_path = "JLinkExe" 
             else:
                 self._jlink = pylink.JLink()
                 self.jlink_path = "JLinkExe"
@@ -94,6 +100,9 @@ class BflbJLinkPort(object):
 
     def if_set_rx_timeout(self, val):
         self._rx_timeout = val * 1000
+
+    def if_get_rx_timeout(self):
+        return self._rx_timeout/1000
 
     def if_get_rate(self):
         return self._speed

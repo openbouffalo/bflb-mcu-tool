@@ -89,12 +89,15 @@ def img_update_efuse_group0(cfg,
                             sec_eng_key_sel,
                             sec_eng_key,
                             security=False):
-    fp = open(cfg.get("Img_Group0_Cfg", "efuse_file"), 'rb')
-    efuse_data = bytearray(fp.read()) + bytearray(0)
-    fp.close()
-    fp = open(cfg.get("Img_Group0_Cfg", "efuse_mask_file"), 'rb')
-    efuse_mask_data = bytearray(fp.read()) + bytearray(0)
-    fp.close()
+    efuse_data = bytearray(256)
+    efuse_mask_data = bytearray(256)
+    if cfg != None:
+        fp = open(cfg.get("Img_Group0_Cfg", "efuse_file"), 'rb')
+        efuse_data = bytearray(fp.read()) + bytearray(0)
+        fp.close()
+        fp = open(cfg.get("Img_Group0_Cfg", "efuse_mask_file"), 'rb')
+        efuse_mask_data = bytearray(fp.read()) + bytearray(0)
+        fp.close()
 
     mask_4bytes = bytearray.fromhex("FFFFFFFF")
 
@@ -267,17 +270,21 @@ def img_update_efuse_group0(cfg,
     efuse_mask_data[252:256] = bytearray_data_merge(efuse_mask_data[252:256],\
                                                bflb_utils.int_to_4bytearray_l(rw_lock1), 4)
 
-    if security is True:
-        bflb_utils.printf("Encrypt efuse data")
-        security_key, security_iv = bflb_utils.get_security_key()
-        efuse_data = img_create_encrypt_data(efuse_data, security_key, security_iv, 0)
-        efuse_data = bytearray(4096) + efuse_data
-    fp = open(cfg.get("Img_Group0_Cfg", "efuse_file"), 'wb+')
-    fp.write(efuse_data)
-    fp.close()
-    fp = open(cfg.get("Img_Group0_Cfg", "efuse_mask_file"), 'wb+')
-    fp.write(efuse_mask_data)
-    fp.close()
+    if cfg != None:
+        efuse_data_encrypt = efuse_data
+        if security is True:
+            bflb_utils.printf("Encrypt efuse data")
+            security_key, security_iv = bflb_utils.get_security_key()
+            efuse_data_encrypt = img_create_encrypt_data(efuse_data, security_key, security_iv, 0)
+            efuse_data_encrypt = bytearray(4096) + efuse_data_encrypt
+        fp = open(cfg.get("Img_Group0_Cfg", "efuse_file"), 'wb+')
+        fp.write(efuse_data_encrypt)
+        fp.close()
+        fp = open(cfg.get("Img_Group0_Cfg", "efuse_mask_file"), 'wb+')
+        fp.write(efuse_mask_data)
+        fp.close()
+
+    return efuse_data, efuse_mask_data
 
 
 def img_update_efuse_group1(cfg,
@@ -288,12 +295,15 @@ def img_update_efuse_group1(cfg,
                             sec_eng_key_sel,
                             sec_eng_key,
                             security=False):
-    fp = open(cfg.get("Img_Group1_Cfg", "efuse_file"), 'rb')
-    efuse_data = bytearray(fp.read()) + bytearray(0)
-    fp.close()
-    fp = open(cfg.get("Img_Group1_Cfg", "efuse_mask_file"), 'rb')
-    efuse_mask_data = bytearray(fp.read()) + bytearray(0)
-    fp.close()
+    efuse_data = bytearray(256)
+    efuse_mask_data = bytearray(256)
+    if cfg != None:
+        fp = open(cfg.get("Img_Group1_Cfg", "efuse_file"), 'rb')
+        efuse_data = bytearray(fp.read()) + bytearray(0)
+        fp.close()
+        fp = open(cfg.get("Img_Group1_Cfg", "efuse_mask_file"), 'rb')
+        efuse_mask_data = bytearray(fp.read()) + bytearray(0)
+        fp.close()
 
     mask_4bytes = bytearray.fromhex("FFFFFFFF")
 
@@ -472,17 +482,21 @@ def img_update_efuse_group1(cfg,
     efuse_mask_data[252:256] = bytearray_data_merge(efuse_mask_data[252:256],\
                                                bflb_utils.int_to_4bytearray_l(rw_lock1), 4)
 
-    if security is True:
-        bflb_utils.printf("Encrypt efuse data")
-        security_key, security_iv = bflb_utils.get_security_key()
-        efuse_data = img_create_encrypt_data(efuse_data, security_key, security_iv, 0)
-        efuse_data = bytearray(4096) + efuse_data
-    fp = open(cfg.get("Img_Group1_Cfg", "efuse_file"), 'wb+')
-    fp.write(efuse_data)
-    fp.close()
-    fp = open(cfg.get("Img_Group1_Cfg", "efuse_mask_file"), 'wb+')
-    fp.write(efuse_mask_data)
-    fp.close()
+    if cfg != None:
+        efuse_data_encrypt = efuse_data
+        if security is True:
+            bflb_utils.printf("Encrypt efuse data")
+            security_key, security_iv = bflb_utils.get_security_key()
+            efuse_data_encrypt = img_create_encrypt_data(efuse_data, security_key, security_iv, 0)
+            efuse_data_encrypt = bytearray(4096) + efuse_data_encrypt
+        fp = open(cfg.get("Img_Group1_Cfg", "efuse_file"), 'wb+')
+        fp.write(efuse_data_encrypt)
+        fp.close()
+        fp = open(cfg.get("Img_Group1_Cfg", "efuse_mask_file"), 'wb+')
+        fp.write(efuse_mask_data)
+        fp.close()
+
+    return efuse_data, efuse_mask_data
 
 
 # get img offset
@@ -723,9 +737,12 @@ def img_create_encrypt_data_xts(data_bytearray, key_bytearray, iv_bytearray, enc
 # sign image(hash code)
 def img_create_sign_data(data_bytearray, privatekey_file_uecc, publickey_file):
     sk = ecdsa.SigningKey.from_pem(open(privatekey_file_uecc).read())
-    vk = ecdsa.VerifyingKey.from_pem(open(publickey_file).read())
+    if publickey_file:
+         vk = ecdsa.VerifyingKey.from_pem(open(publickey_file).read())
+    else:
+        vk = sk.get_verifying_key()
     pk_data = vk.to_string()
-    bflb_utils.printf("Private key: ", binascii.hexlify(sk.to_string()))
+    #bflb_utils.printf("Private key: ", binascii.hexlify(sk.to_string()))
     bflb_utils.printf("Public key: ", binascii.hexlify(pk_data))
     pk_hash = img_create_sha256_data(pk_data)
     bflb_utils.printf("Public key hash=", binascii.hexlify(pk_hash))
@@ -751,7 +768,7 @@ def img_create_read_file_append_crc(file, crc):
     return read_data + crcarray
 
 
-def encrypt_loader_bin_do(file, sign, encrypt, createcfg):
+def encrypt_loader_bin_do(file, sign, encrypt, key, iv, publickey, privatekey):
     if encrypt != 0 or sign != 0:
         encrypt_key = bytearray(0)
         encrypt_iv = bytearray(0)
@@ -767,9 +784,6 @@ def encrypt_loader_bin_do(file, sign, encrypt, createcfg):
         aesiv_data = bytearray(0)
         data_tohash = bytearray(0)
 
-        cfg = BFConfigParser()
-        cfg.read(createcfg)
-
         with open(file, "rb") as fp:
             load_helper_bin = fp.read()
             load_helper_bin_header = load_helper_bin[0:header_len]
@@ -779,9 +793,8 @@ def encrypt_loader_bin_do(file, sign, encrypt, createcfg):
             # encrypt body
             load_helper_bin_body = bflb_utils.add_to_16(load_helper_bin_body)
             if encrypt != 0:
-                encrypt_key = bflb_utils.hexstr_to_bytearray(
-                    cfg.get("Img_Group0_Cfg", "aes_key_org"))
-                encrypt_iv = bflb_utils.hexstr_to_bytearray(cfg.get("Img_Group0_Cfg", "aes_iv"))
+                encrypt_key = bflb_utils.hexstr_to_bytearray(key)
+                encrypt_iv = bflb_utils.hexstr_to_bytearray(iv)
                 iv_crcarray = bflb_utils.get_crc32_bytearray(encrypt_iv)
                 aesiv_data = encrypt_iv + iv_crcarray
                 data_tohash = data_tohash + aesiv_data
@@ -799,8 +812,8 @@ def encrypt_loader_bin_do(file, sign, encrypt, createcfg):
             if sign != 0:
                 newval = (newval | (1 << sign_pos))
                 data_tohash += load_helper_bin_body_encrypt
-                publickey_file = cfg.get("Img_Group0_Cfg", "publickey_file")
-                privatekey_file_uecc = cfg.get("Img_Group0_Cfg", "privatekey_file_uecc")
+                publickey_file = publickey
+                privatekey_file_uecc = privatekey
                 pk_data, pk_hash, signature = img_create_sign_data(data_tohash,
                                                                    privatekey_file_uecc,
                                                                    publickey_file)
@@ -879,7 +892,7 @@ def img_creat_process(group_type, flash_img, cfg, security=False):
                 encrypt_key = encrypt_key_org[0:24]
             else:
                 encrypt_key = encrypt_key_org[0:24]
-        bflb_utils.printf("Key= ", binascii.hexlify(encrypt_key))
+        #bflb_utils.printf("Key= ", binascii.hexlify(encrypt_key))
         iv_value = cfg.get(cfg_section, "aes_iv")
         if xts_mode == 1:
             iv_value = iv_value[24:32] + iv_value[:24]
@@ -894,6 +907,7 @@ def img_creat_process(group_type, flash_img, cfg, security=False):
         bflb_utils.printf("Segheader count and segdata count not match")
         return "FAIL", data_tohash
     data_toencrypt = bytearray(0)
+    data_encrypted = 0
     if flash_img == 0:
         i = 0
         seg_header_list = []
@@ -930,6 +944,19 @@ def img_creat_process(group_type, flash_img, cfg, security=False):
                 cnt += 1
             i += 1
         seg_cnt = cnt
+
+        magic_code = 0x504e4642
+        data_buff = seg_data_list[0]
+        if data_buff[0:4] == bflb_utils.int_to_4bytearray_l(magic_code):
+            bflb_utils.printf("img already have bootheader")
+            encrypt_flag = ((data_buff[bootcfg_start] >> 2) & 0x3)
+            img_offset = header_len + 16
+            if encrypt_flag == 0 and encrypt > 0:
+                # segdata not encrypted and need encrypt, create bootheader and encrypt
+                data_buff = data_buff[img_offset:]
+            else:
+                seg_data = seg_data[img_offset:]
+                data_encrypted = 1
     else:
         seg_data = img_get_one_group_img(boot_entry, segdata_file)
         padding_size = 0
@@ -946,16 +973,8 @@ def img_creat_process(group_type, flash_img, cfg, security=False):
                 # segdata not encrypted and need encrypt, create bootheader and encrypt
                 seg_data = seg_data[img_offset:]
             else:
-                bflb_utils.printf("Write flash img direct")
-                bootinfo_file_name = cfg.get(cfg_section, "bootinfo_file")
-                fp = open(bootinfo_file_name, 'wb+')
-                fp.write(seg_data[:img_offset])
-                fp.close()
-                fw_file_name = cfg.get(cfg_section, "img_file")
-                fp = open(fw_file_name, 'wb+')
-                fp.write(seg_data[img_offset:])
-                fp.close()
-                return "OK", data_tohash
+                seg_data = seg_data[img_offset:]
+                data_encrypted = 1
         data_toencrypt += seg_data
         seg_cnt = len(data_toencrypt)
 
@@ -965,13 +984,14 @@ def img_creat_process(group_type, flash_img, cfg, security=False):
         if seg_cnt >= 0x2000:
             if data_toencrypt[0x1000:0x1004] == bytearray("0mfg".encode("utf-8")):
                 unencrypt_mfg_data = data_toencrypt[0x1000:0x2000]
-        if xts_mode != 0:
-            # encrypt_iv = codecs.decode(reverse_iv(encrypt_iv), 'hex')
-            data_toencrypt = img_create_encrypt_data_xts(data_toencrypt, encrypt_key, encrypt_iv,
-                                                         encrypt)
-        else:
-            data_toencrypt = img_create_encrypt_data(data_toencrypt, encrypt_key, encrypt_iv,
-                                                     flash_img)
+        if data_encrypted == 0:
+            if xts_mode != 0:
+                # encrypt_iv = codecs.decode(reverse_iv(encrypt_iv), 'hex')
+                data_toencrypt = img_create_encrypt_data_xts(data_toencrypt, encrypt_key, encrypt_iv,
+                                                            encrypt)
+            else:
+                data_toencrypt = img_create_encrypt_data(data_toencrypt, encrypt_key, encrypt_iv,
+                                                        flash_img)
         if unencrypt_mfg_data != bytearray(0):
             data_toencrypt = data_toencrypt[0:0x1000] + unencrypt_mfg_data + data_toencrypt[0x2000:]
     # get fw data
@@ -1123,7 +1143,7 @@ def img_create_do(args, img_dir_path=None, config_file=None):
     return True
 
 
-def create_sp_media_image(config, cpu_type=None, security=False):
+def create_sp_media_image(config, cpu_type=None, security=False, **kwargs):
     bflb_utils.printf("========= sp image create =========")
     cfg = BFConfigParser()
     cfg.read(config)

@@ -6,7 +6,7 @@ import sys
 try:
     from version import VERSION
 except ImportError:
-    VERSION = "1.8.3"
+    VERSION = "1.8.4"
     
 try:
     from midea import ENABLE_MIDEA

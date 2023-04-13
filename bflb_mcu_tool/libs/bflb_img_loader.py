@@ -37,6 +37,7 @@ from libs import bflb_security
 from libs import bflb_img_create
 from libs import bflb_interface_uart
 from libs import bflb_interface_sdio
+from libs.bflb_configobj import BFConfigParser
 import config as gol
 
 try:
@@ -61,6 +62,10 @@ class BflbImgLoader(object):
         self._chip_type = chiptype
         self._chip_name = chipname
         self._create_cfg = createcfg
+        self._key = ""
+        self._iv = ""
+        self._publickey = ""
+        self._privatekey = ""
 
         if interface == "uart":
             self.bflb_boot_if = bflb_interface_uart.BflbUartPort()
@@ -366,6 +371,27 @@ class BflbImgLoader(object):
         bflb_utils.printf(
             "########################################################################")
 
+    def img_load_set_sec_cfg(self, key, iv, publickey, privatekey):
+        self._key = key
+        self._iv = iv
+        self._publickey = publickey
+        self._privatekey = privatekey
+
+    def img_load_get_sec_cfg(self):
+        if self._create_cfg != None and self._create_cfg != "":
+            create_cfg = BFConfigParser()
+            create_cfg.read(self._create_cfg)
+            img_create_section = "Img_Cfg"
+            if self._chip_type == "bl808":
+                img_create_section = "Img_Group0_Cfg"
+            key = create_cfg.get(img_create_section, "aes_key_org")
+            iv = create_cfg.get(img_create_section, "aes_iv")
+            publickey = create_cfg.get(img_create_section, "publickey_file")
+            privatekey = create_cfg.get(img_create_section, "privatekey_file_uecc")
+            return key, iv, publickey, privatekey
+        else:
+            return self._key, self._iv, self._publickey, self._privatekey
+
     def img_load_interface_init(self, comnum, sh_baudrate):
         self.bflb_boot_if.if_init(comnum, sh_baudrate, self._chip_type, self._chip_name)
         self.boot_install_cmds_callback()
@@ -482,10 +508,12 @@ class BflbImgLoader(object):
             encrypt = int(data_read[10:12], 16)
         bflb_utils.printf("sign is ", sign, " encrypt is ", encrypt)
 
+        key, iv, publickey, privatekey = self.img_load_get_sec_cfg()
+
         # encrypt eflash loader helper bin
-        if createcfg != None and createcfg != "":
-            ret, encrypted_data = bflb_img_create.encrypt_loader_bin(self._chip_type, file, sign,
-                                                                     encrypt, createcfg)
+        if (key != "" and iv != "") or (publickey != "" and privatekey != ""):
+            ret, encrypted_data = bflb_img_create.encrypt_loader_bin(self._chip_type, \
+                file, sign, encrypt, key, iv, publickey, privatekey)
             if ret == True:
                 # create new eflash loader helper bin
                 filename, ext = os.path.splitext(file)
@@ -628,7 +656,10 @@ class BflbImgLoader(object):
         self.img_load_interface_init(comnum, sh_baudrate)
 
         # get bootinfo first, maybe shake hand is
+        timeout = self.bflb_boot_if.if_get_rx_timeout()
+        self.bflb_boot_if.if_set_rx_timeout(0.1)
         ret, data_read = self.boot_process_one_section("get_boot_info", 0)
+        self.bflb_boot_if.if_set_rx_timeout(timeout)
         if ret.startswith("OK") is True:
             # check with image file
             data_read = binascii.hexlify(data_read)
@@ -682,7 +713,10 @@ class BflbImgLoader(object):
         try:
             self.img_load_interface_init(comnum, sh_baudrate)
             # get bootinfo first, maybe shake hand is
+            timeout = self.bflb_boot_if.if_get_rx_timeout()
+            self.bflb_boot_if.if_set_rx_timeout(0.1)
             ret, data_read = self.boot_process_one_section("get_boot_info", 0)
+            self.bflb_boot_if.if_set_rx_timeout(timeout)
             if ret.startswith("OK") is not True:
                 ret = self.img_load_shake_hand(comnum, sh_baudrate, wk_baudrate, do_reset,
                                             reset_hold_time, shake_hand_delay, reset_revert,

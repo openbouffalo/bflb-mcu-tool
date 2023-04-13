@@ -63,6 +63,9 @@ class BflbSdioPort(object):
     def if_set_rx_timeout(self, val):
         self._rx_timeout = val * 1000
 
+    def if_get_rx_timeout(self):
+        return self._rx_timeout/1000
+
     def if_get_rate(self):
         return self._speed
 

@@ -129,6 +129,11 @@ class BflbUartPort(object):
         if self._ser:
             self._ser.timeout = val
 
+    def if_get_rx_timeout(self):
+        if self._ser:
+            return self._ser.timeout
+        return 0
+
     def if_set_dtr(self, val):
         if self._ser:
             self._ser.setDTR(val)
@@ -286,10 +291,12 @@ class BflbUartPort(object):
                     self._ser.setRTS(0)
 
                     time_stamp = time.time()
+                    ack = bytearray(0)
                     while time.time() - time_stamp < wait_timeout:
                         if self._chiptype == "bl602" or self._chiptype == "bl702":
                             self._ser.timeout = 0.01
-                            success, ack = self.if_read(3000)
+                            success, data = self.if_read(3000)
+                            ack += data
                             if ack.find(b'Boot2 ISP Shakehand Suss') != -1:
                                 self._shakehand_flag = True
                                 if ack.find(b'Boot2 ISP Ready') != -1:
@@ -298,7 +305,8 @@ class BflbUartPort(object):
                                     self._ser.timeout = timeout
                                     return "OK"
                         else:
-                            success, ack = self.if_read(3000)
+                            success, data = self.if_read(3000)
+                            ack += data
                             if ack.find(b'Boot2 ISP Ready') != -1:
                                 bflb_utils.printf("isp ready")
                                 self._shakehand_flag = True
@@ -309,7 +317,7 @@ class BflbUartPort(object):
                             if self._chiptype == "bl602" or self._chiptype == "bl702":
                                 self._ser.timeout = 0.5
                                 # read 15 byte key word
-                                ack = self._ser.read(15)
+                                ack += self._ser.read(15)
                                 # reduce timeout and read 15 byte again, make sure recv all key word
                                 self._ser.timeout = 0.005
                                 ack += self._ser.read(15)
@@ -320,6 +328,7 @@ class BflbUartPort(object):
                                     return "FL"
                                 else:
                                     self.if_write(bytearray.fromhex("a0000000"))
+                                    time.sleep(0.002)
                                     return "OK"
                             else:
                                 while True:

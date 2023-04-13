@@ -86,8 +86,7 @@ def compress_dir(chipname, zippath, efuse_load=False):
         bflb_utils.printf("PT Check Fail")
         set_error_code("0082")
         return False
-    factory_mode_set(os.path.join(chip_path, chipname, "eflash_loader/eflash_loader_cfg.ini"),
-                     "true")
+    factory_mode_set(os.path.join(chip_path, chipname, "eflash_loader/eflash_loader_cfg.ini"), "true")
     flash_file.append(os.path.join(chip_path, chipname, "eflash_loader/eflash_loader_cfg.ini"))
     if efuse_load:
         flash_file.append(cfg.get("EFUSE_CFG", "file"))
@@ -131,6 +130,80 @@ def compress_dir(chipname, zippath, efuse_load=False):
     return True
 
 
+def compress_dir_iot(chipname, outdir, efuse_load=False):
+    zip_file = os.path.join(outdir, "whole_img.pack")
+    dir_path = os.path.join(outdir, chipname)
+    cfg_file = os.path.join(chip_path, chipname, "eflash_loader/eflash_loader_cfg.ini")
+    cfg = BFConfigParser()
+    cfg.read(cfg_file)
+    flash_file = re.compile('\s+').split(cfg.get("FLASH_CFG", "file"))
+    address = re.compile('\s+').split(cfg.get("FLASH_CFG", "address"))
+    if check_pt_file(flash_file, address) is not True:
+        bflb_utils.printf("PT Check Fail")
+        set_error_code("0082")
+        return False
+    factory_mode_set(os.path.join(chip_path, chipname, "eflash_loader", "eflash_loader_cfg.ini"), "true")
+    flash_file.append(os.path.join(chip_path, chipname, "eflash_loader", "eflash_loader_cfg.ini"))
+    if efuse_load:
+        flash_file.append(cfg.get("EFUSE_CFG", "file"))
+        flash_file.append(cfg.get("EFUSE_CFG", "maskfile"))
+    if len(flash_file) > 0:
+        i = 0
+        try:
+            while i < len(flash_file):
+                filedir = convert_path(flash_file[i])
+                filename = os.path.basename(filedir)
+                suffix  = filedir.split(".")[-1]
+                if suffix == "bin" and filename not in ["partition.bin", "efusedata.bin", "efusedata_mask.bin"]:
+                    dir = os.path.join(outdir, chipname, "img_create_iot", filename)
+                else:
+                    relpath = os.path.relpath(os.path.join(app_path, convert_path(flash_file[i])), chip_path)    
+                    dir = os.path.join(outdir, relpath)
+                if os.path.isdir(os.path.dirname(dir)) is False:
+                    os.makedirs(os.path.dirname(dir))
+                shutil.copyfile(os.path.join(app_path, convert_path(flash_file[i])), dir)
+                if filename in ["efusedata.bin", "efusedata_mask.bin"]:
+                    shutil.copyfile(os.path.join(app_path, convert_path(flash_file[i])), os.path.join(outdir, filename))
+                i += 1
+            verfile = os.path.join(dir_path, "version.txt")
+            with open(verfile, mode="w") as f:
+                f.write(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+        except Exception as e:
+            bflb_utils.printf(e)
+            factory_mode_set(os.path.join(chipname, "eflash_loader/eflash_loader_cfg.ini"), "false")
+            return False
+
+    try:
+        z = zipfile.ZipFile(zip_file, 'w')
+        for dirpath, dirnames, filenames in os.walk(dir_path):
+            for file in filenames:
+                if file == "eflash_loader_cfg.ini":
+                    cfg_file = os.path.join(dirpath, file)
+                    cfg = BFConfigParser()
+                    cfg.read(cfg_file)
+                    flash_file = re.compile('\s+').split(cfg.get("FLASH_CFG", "file"))
+                    list_file = []
+                    for item in flash_file:
+                        filedir = convert_path(item)
+                        filename = os.path.basename(filedir)
+                        suffix  = filedir.split(".")[-1]
+                        if suffix == "bin" and filename != "partition.bin":
+                            item = "chips/" + chipname + "/img_create_iot/" + filename
+                        list_file.append(item)
+                    files_str = " ".join(list_file)
+                    cfg.set('FLASH_CFG', 'file', files_str)
+                    cfg.write(cfg_file, 'w')
+                z.write(os.path.join(dirpath, file), os.path.relpath(os.path.join(dirpath, file), outdir))
+        z.close()
+        shutil.rmtree(dir_path)
+    except Exception as e:
+        bflb_utils.printf(e)
+        factory_mode_set(os.path.join(chipname, "eflash_loader", "eflash_loader_cfg.ini"), "false")
+        return False
+    factory_mode_set(os.path.join(chipname, "eflash_loader", "eflash_loader_cfg.ini"), "false")
+    return True
+
+
 def img_create(args, chipname="bl60x", chiptype="bl60x", img_dir=None, config_file=None):
     sub_module = __import__("libs." + chiptype, fromlist=[chiptype])
     img_dir_path = os.path.join(chip_path, chipname, "img_create_iot")
@@ -141,14 +214,20 @@ def img_create(args, chipname="bl60x", chiptype="bl60x", img_dir=None, config_fi
     return res
 
 
-def create_sp_media_image_file(config, chiptype="bl60x", cpu_type=None, security=False):
+def create_sp_media_image_file(config, chiptype="bl60x", cpu_type=None, security=False, **kwargs):
     sub_module = __import__("libs." + chiptype, fromlist=[chiptype])
-    sub_module.img_create_do.create_sp_media_image(config, cpu_type, security)
+    sub_module.img_create_do.create_sp_media_image(config, cpu_type, security, **kwargs)
 
 
-def encrypt_loader_bin(chiptype, file, sign, encrypt, createcfg):
+def get_img_offset(chiptype="bl60x",bootheader_data=None):
     sub_module = __import__("libs." + chiptype, fromlist=[chiptype])
-    return sub_module.img_create_do.encrypt_loader_bin_do(file, sign, encrypt, createcfg)
+    return sub_module.img_create_do.img_create_get_img_offset(bootheader_data)
+
+
+def encrypt_loader_bin(chiptype, file, sign, encrypt, key, iv, publickey, privatekey):
+    sub_module = __import__("libs." + chiptype, fromlist=[chiptype])
+    return sub_module.img_create_do.encrypt_loader_bin_do(file, sign, encrypt, \
+                                                          key, iv, publickey, privatekey)
 
 
 def run():

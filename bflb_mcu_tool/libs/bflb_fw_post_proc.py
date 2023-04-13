@@ -24,6 +24,8 @@ import os
 import sys
 import time
 import shutil
+import hashlib
+import lzma
 
 try:
     import bflb_path
@@ -32,9 +34,28 @@ except ImportError:
 from libs import bflb_utils
 from libs import bflb_pt_creater as partition
 from libs import bflb_ro_params_device_tree as bl_ro_device_tree
+from libs import bflb_fw_check_partition as pt_check
+
+version_str="V1.2.1"
 
 chip_dict = ("bl602", "bl604", "bl702", "bl704", "bl706", "bl702l", "bl704l", "bl606p", "bl808", "bl616", "bl618")
 
+def dump_release_note():
+    ################################
+    vxxx_rn='''
+    ---V1.2.1---
+    Feature:
+        1. support checkpartition option
+    '''
+    ################################
+    bflb_utils.printf()
+    vxxx_rn+='''
+    ---V1.2.0---
+    Feature:
+        1. support all chip image create with bootheader update
+        2. support all chip encrypt and sign
+    '''
+    bflb_utils.printf(vxxx_rn)
 
 def get_nicky_name(chipname):
     if chipname == "bl604":
@@ -116,7 +137,7 @@ def parse_rfpa(bin, dts_bytearray):
             bin_bytearray = bytearray(content)
             if content[0:4] == b'BFNP' and (content[0 + 4096:4 + 4096] == b'BFAP' or
                                             content[0 + 4096:4 + 4096] == b'BFNP') and content[1024 + 8192:1032 + 8192] == b'BLRFPARA':
-                bflb_utils.printf("8K header found,append dts file")
+                bflb_utils.printf("8K header found,append dts file for")
                 bin_bytearray[1032 + 8192:1032 + 8192 + length] = dts_bytearray
                 with open(bin, "wb") as fp:
                     fp.write(bin_bytearray)
@@ -185,7 +206,8 @@ def append_dts_file(search_dir, imgfile):
     if len(files) > 1:
         bflb_utils.printf("[Error] More than one dts file found in ", search_dir, ",go on next steps")
         return
-    bflb_utils.printf("Create dts using ", files[0])
+    bflb_utils.printf("Create dts for ",imgfile)
+    bflb_utils.printf("Create dts using ",files[0])
     try:
         dts_hex = bl_ro_device_tree.bl_dts2hex(os.path.join(search_dir, files[0]))
         dts_bytearray = bflb_utils.hexstr_to_bytearray(dts_hex)
@@ -243,10 +265,122 @@ def firmware_post_process(args, chipname="bl60x"):
     sub_module = __import__("libs." + chipname, fromlist=[chipname])
     sub_module.firmware_post_process_do.firmware_post_proc(args)
 
+def bl60x_mfg_ota_header(chipname, file_bytearray, use_xz):
+    header_len = 512
+    header = bytearray()
+    file_len = len(file_bytearray)
+    m = hashlib.sha256()
+
+    # 16 Bytes header
+    data = b'BL60X_OTA_Ver1.0'
+    #bflb_utils.printf(data.decode('utf-8'))
+    for b in data:
+        header.append(b)
+    # 4 Byte ota file type
+    if use_xz:
+        data = b'XZ  '
+    else:
+        data = b'RAW '
+    for b in data:
+        header.append(b)
+
+    # 4 Bytes file length
+    file_len_bytes = file_len.to_bytes(4, byteorder='little')
+    for b in file_len_bytes:
+        header.append(b)
+
+    # 8 Bytes pad
+    header.append(0x01)
+    header.append(0x02)
+    header.append(0x03)
+    header.append(0x04)
+    header.append(0x05)
+    header.append(0x06)
+    header.append(0x07)
+    header.append(0x08)
+
+    # 16 Bytes Hardware version
+    data = b'BFL_Module_v1.1' #bytearray(parsed_toml["ota"]["version_hardware"].encode('utf-8'))
+    data_len = 16 - len(data)
+    for b in data:
+        header.append(b)
+    while data_len > 0:
+        header.append(0x00)
+        data_len = data_len - 1
+
+    # 16 Bytes firmware version
+    data =  b'EVENT_V1.1.1' #bytearray(parsed_toml["ota"]["version_software"].encode('utf-8'))
+    data_len = 16 - len(data)
+    for b in data:
+        header.append(b)
+    while data_len > 0:
+        header.append(0x00)
+        data_len = data_len - 1
+
+    # 32 Bytes SHA256
+    m.update(file_bytearray)
+    hash_bytes = m.digest()
+    for b in hash_bytes:
+        header.append(b)
+    header_len = header_len - len(header)
+    while header_len > 0:
+        header.append(0xFF)
+        header_len = header_len - 1
+    return header
+
+def firmware_create_ota_file(chipname,fw_file):
+    try:
+        bl60x_xz_filters = [
+            {
+                "id": lzma.FILTER_LZMA2,
+                "dict_size": 32768
+            },
+        ]
+        with open(fw_file, "rb") as fp:
+            fw_raw_data = fp.read()
+            fp.close()
+
+        #create .ota file
+        ota_file_name=fw_file.replace(".bin",".bin.ota")
+        bflb_utils.printf("create OTA file:",ota_file_name)
+        fw_ota_bin_header = bl60x_mfg_ota_header(chipname, fw_raw_data, use_xz=0)
+        for b in fw_raw_data:
+            fw_ota_bin_header.append(b)
+        with open(ota_file_name, "wb+") as fp:
+            fp.write(fw_ota_bin_header)
+            fp.close()
+
+        #create .xz file
+        xz_file_name=fw_file.replace(".bin",".xz")
+        bflb_utils.printf("create XZ file:",xz_file_name)
+        with lzma.open(xz_file_name, mode="wb", check=lzma.CHECK_CRC32,
+                    filters=bl60x_xz_filters) as xz_f:
+            xz_f.write(fw_raw_data)
+        with open(xz_file_name, mode="rb") as f:
+            fw_xz_data = f.read()
+            f.close()
+
+        #create .xz.ota file
+        xz_ota_file_name=fw_file.replace(".bin",".xz.ota")
+        bflb_utils.printf("create XZ OTA file:",xz_ota_file_name)
+        fw_ota_bin_header = bl60x_mfg_ota_header(chipname, fw_xz_data, use_xz=1)
+        for b in fw_xz_data:
+            fw_ota_bin_header.append(b)
+        with open(xz_ota_file_name, "wb+") as fp:
+            fp.write(fw_ota_bin_header)
+            fp.close()
+    except Exception as e:
+        bflb_utils.printf(e)
+        bflb_utils.printf("[Error] create OTA file fail")
+    return False
 
 def run():
     parser = bflb_utils.firmware_post_proc_parser_init()
     args = parser.parse_args()
+    if args.releasenote != True:
+        dump_release_note()
+        return
+    bflb_utils.printf("bflb firmware post process : %s" % version_str)
     # args = parser_image.parse_args("--image=media", "--signer=none")
     bflb_utils.printf("Chipname: %s" % args.chipname)
     if args.aesiv != None:
@@ -258,6 +392,10 @@ def run():
             return
 
     if args.chipname.lower() in chip_dict:
+        if args.checkpartition != None:
+            chipname = get_nicky_name(args.chipname.lower())
+            pt_check.dump_partiton(chipname,args.checkpartition)
+            return
         #get image files
         img_file_list = None
         if args.imgfile != None:
@@ -271,7 +409,8 @@ def run():
             if ret!=None:
                 img_file_list.append(ret)
             ret=copy_mfg_file(args.brdcfgdir, img_file_list[0])
-            if ret!=None:
+            if ret!=None:                
+                append_dts_file(args.brdcfgdir, ret)
                 img_file_list.append(ret)
         #deal files
         for img_file in img_file_list:
@@ -281,6 +420,9 @@ def run():
                 bflb_utils.printf("[Warning] No boot header found,skip!!!")
                 break
             firmware_post_process(args, args.chipname)
+        #create ota file,xz file and xz.ota file
+        firmware_create_ota_file(args.chipname,img_file_list[0])
+        
     else:
         bflb_utils.printf("[Error] Please set correct chipname config, exit!!!")
 

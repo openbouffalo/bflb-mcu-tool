@@ -56,7 +56,6 @@ from libs import bflb_utils
 from libs import bflb_ecdh
 from libs.bflb_utils import app_path, chip_path, open_file, eflash_loader_parser_init, convert_path
 from libs.bflb_configobj import BFConfigParser
-from libs.bflb_encrypt_sign_data import BflbFlashEncryptSign
 
 try:
     import changeconf as cgc
@@ -96,7 +95,7 @@ except ImportError:
 
 class BflbEflashLoader(object):
 
-    def __init__(self, chipname="bl60x", chiptype="bl60x"):
+    def __init__(self, chipname="bl60x", chiptype="bl60x", outdir="img_create_iot"):
         self._bflb_auto_download = False
         # img loader class
         self._bflb_com_img_loader = None
@@ -144,11 +143,12 @@ class BflbEflashLoader(object):
         self._ecdh_shared_key = None
         self._ecdh_public_key = None
         self._ecdh_private_key = None
+        self._flash_size = 64*1024*1024
         # flash2 cfg
         self._flash2_en = False
-        self._flash1_size = 0
-        self._flash2_size = 0
         self._flash2_select = False
+        self._flash2_size = 64*1024*1024
+        self._outdir = outdir
 
         self._com_cmds = {
             "change_rate": {
@@ -859,14 +859,20 @@ class BflbEflashLoader(object):
             fp = open_file(file, 'rb')
             efuse_data = bytearray(fp.read()) + bytearray(0)
             fp.close()
-            fp = open_file(maskfile, 'rb')
-            mask_data = bytearray(fp.read()) + bytearray(0)
-            fp.close()
             if len(efuse_data) > 4096:
                 bflb_utils.printf("Decrypt efuse data")
                 efuse_data = efuse_data[4096:]
                 security_key, security_iv = bflb_utils.get_security_key()
                 efuse_data = bflb_utils.aes_decrypt_data(efuse_data, security_key, security_iv, 0)
+            try:
+                bflb_utils.printf("Open "+maskfile)
+                fp = open_file(maskfile, 'rb')
+                mask_data = bytearray(fp.read()) + bytearray(0)
+                fp.close()
+            except:
+                bflb_utils.printf(maskfile+" open fail")
+                bflb_utils.printf("Create efuse mask data")
+                mask_data = self.efuse_create_mask_data(efuse_data)
         else:
             efuse_data = self._efuse_data
             mask_data = self._efuse_mask_data
@@ -986,6 +992,61 @@ class BflbEflashLoader(object):
                 if ret is True and self.efuse_compare(read_data,
                                                       bytearray(12) + mask_data[252:256],
                                                       bytearray(12) + efuse_data[252:256]):
+                    bflb_utils.printf("Verify success")
+                else:
+                    bflb_utils.printf("Verify fail")
+                    self.error_code_print("0022")
+        if len(efuse_data) > 256:
+            bflb_utils.printf("Load efuse remainder")
+            # load normal data
+            if security_write:
+                cmd_name = "efuse_security_write"
+            else:
+                cmd_name = "efuse_write"
+            cmd_id = bflb_utils.hexstr_to_bytearray(self._com_cmds.get(cmd_name)["cmd_id"])
+            data_send = efuse_data[256:508] + bytearray(4)
+            if security_write:
+                data_send = self.ecdh_encrypt_data(data_send)
+            data_send = bflb_utils.int_to_4bytearray_l(256) + data_send
+            ret, dmy = self.com_process_one_cmd(cmd_name, cmd_id, data_send)
+            if ret.startswith("OK") is False:
+                bflb_utils.printf("Write Fail")
+                self.error_code_print("0021")
+                return False
+            # verify
+            if verify >= 1:
+                ret, read_data = self.efuse_read_main_process(256,
+                                                              252,
+                                                              shakehand=0,
+                                                              file=None,
+                                                              security_read=security_write)
+                if ret is True and self.efuse_compare(read_data, mask_data[256:508] + bytearray(4),
+                                                      efuse_data[256:508] + bytearray(4)):
+                    bflb_utils.printf("Verify success")
+                else:
+                    bflb_utils.printf("Verify fail")
+                    self.error_code_print("0022")
+                    return False
+            # load read write protect data
+            data_send = bytearray(12) + efuse_data[508:512]
+            if security_write:
+                data_send = self.ecdh_encrypt_data(data_send)
+            data_send = bflb_utils.int_to_4bytearray_l(508 - 12) + data_send
+            ret, dmy = self.com_process_one_cmd(cmd_name, cmd_id, data_send)
+            if ret.startswith("OK") is False:
+                bflb_utils.printf("Write Fail")
+                self.error_code_print("0021")
+                return False
+            # verify
+            if verify >= 1:
+                ret, read_data = self.efuse_read_main_process(508 - 12,
+                                                              16,
+                                                              shakehand=0,
+                                                              file=None,
+                                                              security_read=security_write)
+                if ret is True and self.efuse_compare(read_data,
+                                                      bytearray(12) + mask_data[508:512],
+                                                      bytearray(12) + efuse_data[508:512]):
                     bflb_utils.printf("Verify success")
                 else:
                     bflb_utils.printf("Verify fail")
@@ -1305,53 +1366,65 @@ class BflbEflashLoader(object):
                 self.error_code_print("0022")
                 return False
 
-    def flash_efuse_dac_encrypt_data_create(self, value, whole_bin, encrypt,
-                                            publickey, privatekey):
-        whole_flash_bin = whole_bin
-        dac_file = os.path.join(app_path, "dacfile.bin")
-        tlv_data = bytearray(0)
-        efuse_data = bytearray(0)
-        mask_data = bytearray(0)
-        encrypt_key_str = bflb_utils.get_random_hexstr(16)
-        encrypt_iv_str = bflb_utils.get_random_hexstr(12) + "00000000"
-        dac_data = value.split(",")
-        dac_count = len(dac_data)
+    def efuse_create_encrypt_sign_data(self, cfg,
+                                             sign,
+                                             pk_hash,
+                                             flash_encryp_type,
+                                             flash_key,
+                                             sec_eng_key_sel,
+                                             sec_eng_key,
+                                             security=False):
+        try:
+            img_update_efuse_fun = None
+            if self._chip_type == "bl602" or \
+            self._chip_type == "bl702" or \
+            self._chip_type == "bl702l":
+                sub_module = __import__("libs." + self._chip_type, fromlist=[self._chip_type])
+                img_update_efuse_fun = sub_module.img_create_do.img_update_efuse
+            elif self._chip_type == "bl808" or \
+                self._chip_type == "bl616" or \
+                self._chip_type == "bl628":
+                sub_module = __import__("libs." + self._chip_type, fromlist=[self._chip_type])
+                img_update_efuse_fun = sub_module.img_create_do.img_update_efuse_group0
+            else:
+                bflb_utils.printf("Unrecognized chiptype")
+                return bytearray(0), bytearray(0)
+            efuse_data, mask_data = img_update_efuse_fun(cfg,
+                                                        sign,
+                                                        pk_hash,
+                                                        flash_encryp_type,
+                                                        flash_key,
+                                                        sec_eng_key_sel,
+                                                        sec_eng_key,
+                                                        security)
+        except Exception as e:
+            bflb_utils.printf(e)
+            traceback.print_exc(limit=NUM_ERR, file=sys.stdout)
+        return efuse_data, mask_data
 
-        for i in range(dac_count):
-            data = dac_data[i]
-            data_len = int(len(data)/2)
-            tlv_data += bflb_utils.int_to_2bytearray_l(i + 1)
-            tlv_data += bflb_utils.int_to_2bytearray_l(data_len)
-            tlv_data+= bflb_utils.hexstr_to_bytearray(data)
+    def efuse_create_mask_data(self, efuse_data):
+        efuse_len = len(efuse_data)
+        mask_data = bytearray(efuse_len)
+        for i in range(0, efuse_len):
+            if efuse_data[i] != 0:
+                mask_data[i] |= 0xff
+        return mask_data
 
-        tlv_data = bflb_utils.add_to_16(tlv_data)
-        tlv_len = len(tlv_data)
-        bflb_utils.printf("tlv data len ", tlv_len)
-        bflb_utils.printf(binascii.hexlify(tlv_data).decode("utf-8"))
-
-        encrypt_key = bflb_utils.hexstr_to_bytearray(encrypt_key_str)
-        encrypt_iv = bflb_utils.hexstr_to_bytearray(encrypt_iv_str)
-        tlv_data = bflb_utils.img_create_encrypt_data(tlv_data, encrypt_key, encrypt_iv, 0)
-        crcarray = bflb_utils.get_crc32_bytearray(tlv_data)
-
-        tlv_data = bflb_utils.int_to_4bytearray_l(tlv_len) + tlv_data + crcarray
-
-        encrypt_sign_obj = BflbFlashEncryptSign(self._chip_name, self._chip_type)
-        if encrypt is True:
-            flash_data, efuse_data, mask_data = encrypt_sign_obj.encrypt_sign_flash_data(
-                whole_bin, encrypt_key_str, encrypt_iv_str, publickey, privatekey)
-            whole_flash_bin = whole_flash_bin.replace(".bin", "_encrypt.bin")
-            fp = open(os.path.join(whole_flash_bin), 'wb+')
-            fp.write(flash_data)
-            fp.close()
-        else:
-            efuse_data, mask_data = encrypt_sign_obj.create_security_efuse(encrypt_key, 1)
-        
-        fp = open(dac_file, 'wb+')
-        fp.write(tlv_data)
-        fp.close()
-
-        return whole_flash_bin, dac_file, efuse_data, mask_data
+    def flash_get_size(self, jedec_id):
+        flash_size = 64*1024*1024
+        flash_cfg_csv = app_path + "/utils/flash/" + self._chip_type + '/flashcfg_list.csv'
+        if conf_sign:
+            flash_cfg_csv = app_path + "/utils/flash/" + cgc.lower_name + '/flashcfg_list.csv'
+        with open(flash_cfg_csv, "r", encoding="utf-8-sig") as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                if row.get("flashJedecID", "") == jedec_id:
+                    if row.get("flashSize", "") == "0.5":
+                        flash_size = 512*1024
+                    else:
+                        flash_size = int(row.get("flashSize", ""), 10) * 1024 * 1024
+                    return flash_size
+        return flash_size
 
     def flash_read_jedec_id_process(self, callback=None):
         bflb_utils.printf("========= flash read jedec ID =========")
@@ -1659,7 +1732,7 @@ class BflbEflashLoader(object):
                                     shakehand=0,
                                     file=None,
                                     callback=None):
-        bflb_utils.printf("========= flash read =========")
+        bflb_utils.printf("========= flash xip read =========")
         i = 0
         cur_len = 0
         readdata = bytearray(0)
@@ -1866,6 +1939,15 @@ class BflbEflashLoader(object):
         flash_data = bytearray(fp.read())
         fp.close()
         flash_data_len = len(flash_data)
+        flash_size = self._flash_size
+        if self._flash2_select is True:
+            flash_size = self._flash2_size
+        if flash_size < start_addr + flash_data_len:
+            bflb_utils.printf(
+                "program %s file to 0x%08X, but it overflow with flash size 0x%08X"
+                    % (file, start_addr, flash_size))
+            self.error_code_print("0045")
+            return False
         i = 0
         cur_len = 0
         if erase == 1:
@@ -2046,7 +2128,7 @@ class BflbEflashLoader(object):
             if self.img_load_shake_hand() is False:
                 return False
         if self._flash2_select is True:
-            start_addr -= self._flash1_size
+            start_addr -= self._flash_size
         if self._chip_type == "bl808":
             if self._mass_opt is False:
                 fp = open_file(file, 'rb')
@@ -2142,40 +2224,48 @@ class BflbEflashLoader(object):
                 addr = self._skip_addr + self._skip_len
                 data = flash_data[self._skip_addr + self._skip_len - start_addr:]
                 filename, ext = os.path.splitext(file)
-                file_temp = os.path.join(app_path, filename + '_skip' + ext)
+                file_temp = os.path.join(app_path, filename + '_skip_' + \
+                                         self._bflb_com_device.replace("/", "_") + ext)
                 fp = open(file_temp, 'wb')
                 fp.write(data)
                 fp.close()
                 ret = self.flash_load_opt(file_temp, addr, erase, verify, shakehand, callback)
+                os.remove(file_temp)
             elif self._skip_addr > start_addr and \
                  self._skip_addr + self._skip_len < start_addr + flash_data_len:
                 addr = start_addr
                 data = flash_data[:self._skip_addr - start_addr]
                 filename, ext = os.path.splitext(file)
-                file_temp = os.path.join(app_path, filename + '_skip1' + ext)
+                file_temp = os.path.join(app_path, filename + '_skip1_' + \
+                                         self._bflb_com_device.replace("/", "_") + ext)
                 fp = open(file_temp, 'wb')
                 fp.write(data)
                 fp.close()
                 ret = self.flash_load_opt(file_temp, addr, erase, verify, shakehand, callback)
+                os.remove(file_temp)
                 addr = self._skip_addr + self._skip_len
                 data = flash_data[self._skip_addr + self._skip_len - start_addr:]
                 filename, ext = os.path.splitext(file)
-                file_temp = os.path.join(app_path, filename + '_skip2' + ext)
+                file_temp = os.path.join(app_path, filename + '_skip2_' + \
+                                         self._bflb_com_device.replace("/", "_") + ext)
                 fp = open(file_temp, 'wb')
                 fp.write(data)
                 fp.close()
                 ret = self.flash_load_opt(file_temp, addr, erase, verify, shakehand, callback)
+                os.remove(file_temp)
             elif self._skip_addr > start_addr and \
                  self._skip_addr < start_addr + flash_data_len and \
                  self._skip_addr + self._skip_len >= start_addr + flash_data_len:
                 addr = start_addr
                 data = flash_data[:self._skip_addr - start_addr]
                 filename, ext = os.path.splitext(file)
-                file_temp = os.path.join(app_path, filename + '_skip' + ext)
+                file_temp = os.path.join(app_path, filename + '_skip_' + \
+                                         self._bflb_com_device.replace("/", "_") + ext)
                 fp = open(file_temp, 'wb')
                 fp.write(data)
                 fp.close()
                 ret = self.flash_load_opt(file_temp, addr, erase, verify, shakehand, callback)
+                os.remove(file_temp)
             elif self._skip_addr <= start_addr and \
                  self._skip_addr + self._skip_len >= start_addr + flash_data_len:
                 return True
@@ -2290,7 +2380,7 @@ class BflbEflashLoader(object):
 
     def load_romfs_data(self, data, addr, verify, shakehand=1, callback=None):
         romfs_path = os.path.join(chip_path, self._chip_name, "romfs")
-        dst_img_name = os.path.join(chip_path, self._chip_name, "img_create_iot/media.bin")
+        dst_img_name = os.path.join(chip_path, self._chip_name, self._outdir, "media.bin")
         if not os.path.exists(romfs_path):
             os.makedirs(romfs_path)
         private_key_file = os.path.join(romfs_path, "private_key")
@@ -2372,6 +2462,32 @@ class BflbEflashLoader(object):
                 list_product_secret = []
                 list_product_id = []
                 for row in reader:
+                    if 'ProductKey' in row and \
+                       'DeviceName' in row and \
+                       'DeviceSecret' in row and \
+                       'ProductSecret' in row and \
+                       'ProductID' in row:
+                        if 'Burned' in row:
+                            if len(row) == 6:
+                                pass
+                            else:
+                                bflb_utils.printf("csv file format error!!!")
+                                self._csv_data = None
+                                self._csv_file = None
+                                return False, None
+                        else:
+                            if len(row) == 5:
+                                pass
+                            else:
+                                bflb_utils.printf("csv file format error!!")
+                                self._csv_data = None
+                                self._csv_file = None
+                                return False, None
+                    else:
+                        bflb_utils.printf("csv file format error!")
+                        self._csv_data = None
+                        self._csv_file = None
+                        return False, None
                     list_product_secret.append(info_dict['ProductSecret'])
                     list_product_id.append(info_dict['ProductID'])
                     if 'Burned' not in row:
@@ -2587,6 +2703,34 @@ class BflbEflashLoader(object):
             fp.close()
         return flash_para
 
+    def csv_file_save(self, csv_data, csv_file, state):
+        if csv_data and csv_file:
+            lock_file = open("lock.txt", 'w+')
+            portalocker.lock(lock_file, portalocker.LOCK_EX)
+            with open(csv_file, 'r') as csvf:
+                reader = csv.DictReader(csvf)
+                list_csv = []
+                for row in reader:
+                    if row.get('DeviceName', "") == csv_data:
+                        if row.get('Burned', "") == 'P':
+                            if state is True:
+                                row['Burned'] = 'Y'
+                            else:
+                                row['Burned'] = ''
+                        else:
+                            bflb_utils.printf(csv_data + " status not programing")
+                    list_csv.append(row)
+                with open(csv_file, 'w', newline='') as f:
+                    headers = [
+                        'ProductKey', 'DeviceName', 'DeviceSecret', 
+                        'ProductSecret', 'ProductID', 'Burned'
+                    ]
+                    f_csv = csv.DictWriter(f, headers)
+                    f_csv.writeheader()
+                    f_csv.writerows(list_csv)
+            lock_file.close()
+            os.remove("lock.txt")
+
     def efuse_flash_loader(self,
                            args,
                            eflash_loader_cfg,
@@ -2642,29 +2786,7 @@ class BflbEflashLoader(object):
                         if self._bflb_com_if is not None:
                             self._bflb_com_if.if_close()
                             bflb_utils.printf("close interface")
-                        if self._csv_data and self._csv_file:
-                            lock_file = open("lock.txt", 'w+')
-                            portalocker.lock(lock_file, portalocker.LOCK_EX)
-                            with open(self._csv_file, 'r') as csvf:
-                                reader = csv.DictReader(csvf)
-                                list_csv = []
-                                for row in reader:
-                                    if row.get('DeviceName', "") == self._csv_data:
-                                        if row.get('Burned', "") == 'P':
-                                            row['Burned'] = 'Y'
-                                        else:
-                                            bflb_utils.printf(self._csv_data + " status not programing")
-                                    list_csv.append(row)
-                                with open(self._csv_file, 'w', newline='') as f:
-                                    headers = [
-                                        'ProductKey', 'DeviceName', 'DeviceSecret',
-                                        'ProductSecret', 'ProductID', 'Burned'
-                                    ]
-                                    f_csv = csv.DictWriter(f, headers)
-                                    f_csv.writeheader()
-                                    f_csv.writerows(list_csv)
-                            lock_file.close()
-                            os.remove("lock.txt")
+                        self.csv_file_save(self._csv_data, self._csv_file, True)
                         bflb_utils.printf("[All Success]")
                         bflb_utils.local_log_save("log", self._input_macaddr)
                     return True
@@ -2675,29 +2797,7 @@ class BflbEflashLoader(object):
                     if retry <= 0:
                         break
             bflb_utils.printf("Burn return with retry fail")
-            if self._csv_data and self._csv_file:
-                lock_file = open("lock.txt", 'w+')
-                portalocker.lock(lock_file, portalocker.LOCK_EX)
-                with open(self._csv_file, 'r') as csvf:
-                    reader = csv.DictReader(csvf)
-                    list_csv = []
-                    for row in reader:
-                        if row.get('DeviceName', "") == self._csv_data:
-                            if row.get('Burned', "") == 'P':
-                                row['Burned'] = ''
-                            else:
-                                bflb_utils.printf(self._csv_data + " status not programing")
-                        list_csv.append(row)
-                    with open(self._csv_file, 'w', newline='') as f:
-                        headers = [
-                            'ProductKey', 'DeviceName', 'DeviceSecret', 
-                            'ProductSecret', 'ProductID', 'Burned'
-                        ]
-                        f_csv = csv.DictWriter(f, headers)
-                        f_csv.writeheader()
-                        f_csv.writerows(list_csv)
-                lock_file.close()
-                os.remove("lock.txt")
+            self.csv_file_save(self._csv_data, self._csv_file, False)
             bflb_utils.local_log_save("log", self._input_macaddr)
             if self._bflb_com_if is not None:
                 self._bflb_com_if.if_close()
@@ -2707,29 +2807,7 @@ class BflbEflashLoader(object):
             bflb_utils.printf("efuse_flash_loader fail")
             #bflb_utils.printf(e)
             #traceback.print_exc(limit=NUM_ERR, file=sys.stdout)
-            if self._csv_data and self._csv_file:
-                lock_file = open("lock.txt", 'w+')
-                portalocker.lock(lock_file, portalocker.LOCK_EX)
-                with open(self._csv_file, 'r') as csvf:
-                    reader = csv.DictReader(csvf)
-                    list_csv = []
-                    for row in reader:
-                        if row.get('DeviceName', "") == self._csv_data:
-                            if row.get('Burned', "") == 'P':
-                                row['Burned'] = ''
-                            else:
-                                bflb_utils.printf(self._csv_data + " status not programing")
-                        list_csv.append(row)
-                    with open(self._csv_file, 'w', newline='') as f:
-                        headers = [
-                            'ProductKey', 'DeviceName', 'DeviceSecret', 
-                            'ProductSecret', 'ProductID', 'Burned'
-                        ]
-                        f_csv = csv.DictWriter(f, headers)
-                        f_csv.writeheader()
-                        f_csv.writerows(list_csv)
-                lock_file.close()
-                os.remove("lock.txt")
+            self.csv_file_save(self._csv_data, self._csv_file, False)
             bflb_utils.local_log_save("log", self._input_macaddr)
             if self._bflb_com_if is not None:
                 self._bflb_com_if.if_close()
@@ -2783,6 +2861,7 @@ class BflbEflashLoader(object):
             port = ""
             load_speed = ""
             aeskey = ""
+            aesiv = ""
             publickey = ""
             privatekey = ""
             chip_type = ""
@@ -2792,8 +2871,6 @@ class BflbEflashLoader(object):
             romfs_data = ""
             csvfile = ""
             csvaddr = ""
-            dacvalue = ""
-            dacaddr = ""
             efuse_para = ""
             create_cfg = ""
             flash_set = 0
@@ -2845,14 +2922,12 @@ class BflbEflashLoader(object):
                     self._skip_len = int(skip_para[1], 10)
             if args.key:
                 aeskey = args.key
+            if args.iv:
+                aesiv = args.iv
             if args.publickey:
                 publickey = args.publickey
             if args.privatekey:
                 privatekey = args.privatekey
-            if args.dac:
-                dacvalue = args.dac
-            if args.dacaddr:
-                dacaddr = args.dacaddr
             if args.createcfg:
                 create_cfg = args.createcfg
             if args.chipname:
@@ -3084,6 +3159,9 @@ class BflbEflashLoader(object):
             ram_load = True
             eflash_loader_file = file
 
+        if (aeskey != "" and aesiv != "") or (publickey != "" and privatekey != ""):
+            self._bflb_com_img_loader.img_load_set_sec_cfg(aeskey, aesiv, publickey, privatekey)
+
         try:
             if args.chipid:
                 ret, bootinfo, res = self.get_boot_info(interface, eflash_loader_file, do_reset,
@@ -3196,6 +3274,7 @@ class BflbEflashLoader(object):
             macaddr_check = (cfg.get("LOAD_CFG", "check_mac") == "true")
         if macaddr_check and self._isp_en is False:
             # check mac addr
+            # isp mode don't support read macaddr
             check_macaddr_cnt = 5
             while True:
                 ret, mac_addr = self.efuse_read_mac_addr_process(self._need_shake_hand)
@@ -3206,6 +3285,7 @@ class BflbEflashLoader(object):
                 check_macaddr_cnt -= 1
                 if check_macaddr_cnt == 0:
                     return False, flash_burn_retry
+            bflb_utils.printf("macaddr: ", binascii.hexlify(mac_addr).decode("utf-8"))
             if mac_addr == self._macaddr_check:
                 self.error_code_print("000A")
                 return False, flash_burn_retry
@@ -3299,6 +3379,9 @@ class BflbEflashLoader(object):
                 if self.is_conf_exist(read_flash_id) is False:
                     self.error_code_print("003D")
                     return False, flash_burn_retry
+                else:
+                    self._flash_size = self.flash_get_size(read_flash_id)
+                    bflb_utils.printf("get flash size: 0x%08X" % (self._flash_size))
             else:
                 self.error_code_print("0030")
                 return False, flash_burn_retry
@@ -3307,8 +3390,6 @@ class BflbEflashLoader(object):
                 if cfg.has_option("FLASH2_CFG", "flash2_en"):
                     self._flash2_en = (cfg.get("FLASH2_CFG", "flash2_en") == "true")
                     if self._flash2_en is True:
-                        self._flash1_size = (int(cfg.get("FLASH2_CFG", "flash1_size")) * 1024 * 1024)
-                        self._flash2_size = (int(cfg.get("FLASH2_CFG", "flash2_size")) * 1024 * 1024)
                         bflb_utils.printf("flash2 set para")
                         flash2_pin = 0
                         flash2_clock_cfg = 0
@@ -3375,6 +3456,13 @@ class BflbEflashLoader(object):
                                 fp = open_file(flash2_para_file, 'wb+')
                                 fp.write(para_data)
                                 fp.close()
+                            if self.is_conf_exist(read_flash2_id) is False:
+                                self.error_code_print("003D")
+                                return False, flash_burn_retry
+                            else:
+                                self._flash2_size = self.flash_get_size(read_flash2_id)
+                                bflb_utils.printf("get flash2 size: 0x%08X"
+                                                   % (self._flash2_size))
                         else:
                             self.error_code_print("0030")
                             return False, flash_burn_retry
@@ -3394,7 +3482,7 @@ class BflbEflashLoader(object):
             if self._skip_len:
                 bflb_utils.printf("error: skip mode can not set flash chiperase!")
                 return False, 0
-            if end == "0":
+            if int(end, 16) == 0:
                 erase = 0
                 ret = self.flash_chiperase_main_process(self._need_shake_hand)
                 if ret is False:
@@ -3433,44 +3521,6 @@ class BflbEflashLoader(object):
                         return False, flash_burn_retry
                     self._need_shake_hand = False
                     bflb_utils.printf("Program romfs Finished")
-                elif args.dac:
-                    bflb_utils.printf("DAC encrypt and write")
-                    encrypt_select = False
-                    if args.encrypt:
-                        encrypt_select = True
-                    whole_flash_bin, dac_file, efuse_data, mask_data = \
-                        self.flash_efuse_dac_encrypt_data_create(\
-                            dacvalue, massbin, encrypt_select, publickey, privatekey)
-
-                    bflb_utils.printf(
-                        "========= programming whole flash data ", whole_flash_bin, " to ", hex(0))
-                    whole_flash_bin = os.path.abspath(whole_flash_bin)
-                    ret = self.flash_cfg_option(read_flash_id, flash_para_file, flash_set, id_valid_flag,
-                        whole_flash_bin, config_file, cfg, create_img_callback, create_simple_callback)
-                    if ret is False:
-                        return False, flash_burn_retry
-                    ret = self.flash_load_specified(whole_flash_bin, 0x0, 1, verify, self._need_shake_hand,
-                                                    callback)
-                    if ret is False:
-                        return False, flash_burn_retry
-                    self._need_shake_hand = False
-                    bflb_utils.printf("Program whole flash data Finished")
-
-                    bflb_utils.printf("========= programming ", dac_file, " to ", dacaddr)
-                    dac_file = os.path.abspath(dac_file)
-                    ret = self.flash_load_specified(dac_file, int(dacaddr, 16), 1, verify, self._need_shake_hand,
-                                                    callback)
-                    if ret is False:
-                        return False, flash_burn_retry
-                    bflb_utils.printf("Program dac file Finished")
-
-                    bflb_utils.printf("write efuse data")
-                    security_write = (cfg.get("EFUSE_CFG", "security_write") == "true")
-                    ret = self.efuse_load_specified(None, None, efuse_data, mask_data, 0,
-                                                    self._need_shake_hand, security_write)
-                    if ret is False:
-                        bflb_utils.printf("write efuse data fail")
-                        return False, flash_burn_retry
                 elif fwbin:
                     bflb_utils.printf("load firmware bin ", fwbin)
                     fwbin = os.path.abspath(fwbin)
@@ -3508,7 +3558,7 @@ class BflbEflashLoader(object):
                         address = re.compile('\s+').split(cfg.get("FLASH_CFG", "address"))
                     if csvfile and csvaddr:
                         bflb_utils.printf("factory info burn")
-                        csvbin = "chips/" + self._chip_name.lower() + "/img_create_iot/media.bin"
+                        csvbin = os.path.join(chip_path, self._chip_name, self._outdir, "media.bin")
                         ret, csv_mac = self.get_factory_config_info(csvfile, csvbin)
                         if ret is not False:
                             flash_file.append(csvbin)
@@ -3543,6 +3593,7 @@ class BflbEflashLoader(object):
                         try:
                             ret = False
                             while i < len(flash_file):
+                                write_addr = int(address[i], 16)
                                 if task_num != None and self._csv_burn_en is True:
                                     flash_file[i] = "task" + str(task_num) + "/" + flash_file[i]
                                     size_current = os.path.getsize(
@@ -3563,18 +3614,19 @@ class BflbEflashLoader(object):
                                 else:
                                     bflb_utils.printf("========= programming ",
                                                       convert_path(flash_file[i]),
-                                                      " to 0x%08X" % (int(address[i], 16)))
+                                                      " to 0x%08X" % (write_addr))
                                 flash1_bin = ""
                                 flash1_bin_len = 0
                                 flash2_bin = ""
                                 flash2_bin_len = 0
                                 if self._chip_type == "bl616" or self._chip_type == "wb03":
-                                    if self._flash1_size != 0 and self._flash1_size < int(address[i], 16) + size_current and \
-                                       self._flash1_size > int(address[i], 16) and self._flash2_select is False:
+                                    if self._flash_size != 0 and self._flash_size < write_addr + size_current and \
+                                       self._flash_size > write_addr and self._flash2_select is False and \
+                                       self._flash2_en is True:
                                         bflb_utils.printf("%s file is overflow with flash1" %
                                                           flash_file[i])
                                         flash1_bin, flash1_bin_len, flash2_bin, flash2_bin_len = \
-                                            self.flash_loader_cut_flash_bin(flash_file[i], int(address[i], 16), self._flash1_size)
+                                            self.flash_loader_cut_flash_bin(flash_file[i], write_addr, self._flash_size)
                                 if flash1_bin != "" and flash2_bin != "":
                                     ret = self.flash_cfg_option(read_flash_id, flash_para_file, flash_set, id_valid_flag, flash1_bin, \
                                                                 config_file, cfg, create_img_callback, create_simple_callback)
@@ -3582,9 +3634,9 @@ class BflbEflashLoader(object):
                                         return False, flash_burn_retry
                                     bflb_utils.printf("========= programming ",
                                                       convert_path(flash1_bin),
-                                                      " to 0x%08X" % (int(address[i], 16)))
+                                                      " to 0x%08X" % (write_addr))
                                     ret = self.flash_load_specified(convert_path(flash1_bin),
-                                                                    int(address[i], 16), erase,
+                                                                    write_addr, erase,
                                                                     verify, self._need_shake_hand,
                                                                     callback)
                                     if ret is False:
@@ -3599,24 +3651,23 @@ class BflbEflashLoader(object):
                                         return False, flash_burn_retry
                                     bflb_utils.printf(
                                         "========= programming ", convert_path(flash2_bin),
-                                        " to 0x%08X" % (int(address[i], 16) + flash1_bin_len))
+                                        " to 0x%08X" % (write_addr + flash1_bin_len))
                                     ret = self.flash_load_specified(
                                         convert_path(flash2_bin),
-                                        int(address[i], 16) + flash1_bin_len, erase, verify,
+                                        write_addr + flash1_bin_len, erase, verify,
                                         self._need_shake_hand, callback)
                                     if ret is False:
                                         return False, flash_burn_retry
                                 else:
                                     if self._flash2_en is False or (
                                             self._flash2_select is False and
-                                            int(address[i], 16) < self._flash1_size):
+                                            write_addr < self._flash_size):
                                         ret = self.flash_cfg_option(read_flash_id, flash_para_file, flash_set, id_valid_flag, flash_file[i], \
                                                                     config_file, cfg, create_img_callback, create_simple_callback)
                                         if ret is False:
                                             return False, flash_burn_retry
                                     else:
-                                        if self._flash2_select is False and int(
-                                                address[i], 16) >= self._flash1_size:
+                                        if self._flash2_select is False and write_addr >= self._flash_size:
                                             ret = self.flash_switch_bank_process(
                                                 1, self._need_shake_hand)
                                             self._need_shake_hand = False
@@ -3627,7 +3678,7 @@ class BflbEflashLoader(object):
                                         if ret is False:
                                             return False, flash_burn_retry
                                     ret = self.flash_load_specified(convert_path(flash_file[i]),
-                                                                    int(address[i], 16), erase,
+                                                                    write_addr, erase,
                                                                     verify, self._need_shake_hand,
                                                                     callback)
                                     if ret is False:
@@ -3671,6 +3722,23 @@ class BflbEflashLoader(object):
                         bflb_utils.printf("load macaddr fail")
                         return False, flash_burn_retry
                     self._need_shake_hand = False
+                if publickey:
+                    loadflag = False
+                    bflb_utils.printf("write efuse publickey hash")
+                    vk = ecdsa.VerifyingKey.from_pem(open(publickey).read())
+                    pk_data = vk.to_string()
+                    pk_hash = bflb_utils.img_create_sha256_data(pk_data)
+                    bflb_utils.printf("Public key hash=", binascii.hexlify(pk_hash))
+                    efuse_data, mask_data = self.efuse_create_encrypt_sign_data(None,
+                                                                                1, pk_hash,
+                                                                                0, None,
+                                                                                0, None,
+                                                                                False)
+                    security_write = (cfg.get("EFUSE_CFG", "security_write") == "true")
+                    ret = self.efuse_load_specified(None, None, efuse_data, mask_data, 1,
+                                                    self._need_shake_hand, security_write)
+                    if ret is False:
+                        return False, flash_burn_retry
                 if aeskey:
                     loadflag = False
                     bflb_utils.printf("write efuse aes key ", aeskey)
@@ -3682,9 +3750,14 @@ class BflbEflashLoader(object):
                         return False, flash_burn_retry
                 if load_data and address:
                     loadflag = False
+                    write_addr = 0
+                    if address[0:2] == "0x":
+                        write_addr = int(address, 16)
+                    else:
+                        write_addr = int(address, 10)
                     bflb_utils.printf("write efuse data ", load_data, " to ", address)
                     security_write = (cfg.get("EFUSE_CFG", "security_write") == "true")
-                    ret = self.efuse_load_data_process(load_data, address, efuse_load_func, verify,
+                    ret = self.efuse_load_data_process(load_data, write_addr, efuse_load_func, verify,
                                                        self._need_shake_hand, security_write)
                     if ret is False:
                         bflb_utils.printf("write efuse data fail")
@@ -3692,8 +3765,7 @@ class BflbEflashLoader(object):
                 if efuse_para:
                     loadflag = False
                     bflb_utils.printf("write efuse para")
-                    cfgfile = "chips/" + self._chip_name.lower(
-                    ) + "/img_create_iot/efuse_bootheader_cfg.ini"
+                    cfgfile = os.path.join(chip_path, self._chip_name, self._outdir, "efuse_bootheader_cfg.ini")
                     if os.path.isfile(cfgfile) is False:
                         shutil.copyfile(
                             "chips/" + self._chip_name.lower() +
@@ -3758,6 +3830,12 @@ class BflbEflashLoader(object):
                 else:
                     start_addr = int(start, 16)
                     end_addr = int(end, 16)
+                    if end_addr >= self._flash_size:
+                        bflb_utils.printf(
+                            "read flash end addr 0x%08X was overflow with flash size 0x%08X"
+                                % (end_addr, self._flash_size))
+                        self.error_code_print("0045")
+                        return False, flash_burn_retry
                     ret, readdata = self.flash_read_main_process(start_addr,
                                                                  end_addr - start_addr + 1,
                                                                  self._need_shake_hand, file,

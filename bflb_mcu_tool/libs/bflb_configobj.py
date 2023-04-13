@@ -2392,11 +2392,12 @@ def get_extra_values(conf, _prepend=()):
 
 class BFConfigParser():
     cfg_infile = None
-    cfg_obj = ConfigObj()
+    #cfg_obj = ConfigObj()
 
     def __init__(self, file=None):
         self.cfg_infile = file
-        self.cfg_obj = ConfigObj(self.cfg_infile)
+        #self.cfg_obj = ConfigObj(self.cfg_infile)
+        self.cfg_obj = {}
 
     def read(self, file=None):
         self.cfg_infile = file

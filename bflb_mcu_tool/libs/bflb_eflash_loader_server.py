@@ -79,12 +79,10 @@ def eflash_loader_server(socket_server, port, echo, aes_key):
                         recv_data = recv_data + bytearray(16 - (len(recv_data) % 16))
                     recv_data = create_decrypt_data(recv_data, bytearray.fromhex(aes_key),
                                                     bytearray(16))
-                    i = 0
-                    while True:
+                    for i in range(len(recv_data)):
                         if recv_data[i:i + 1] == bytearray(1):
                             recv_data = recv_data[0:i]
                             break
-                        i += 1
                 except Exception as e:
                     bflb_utils.printf(e)
             elif ecdh_enable:

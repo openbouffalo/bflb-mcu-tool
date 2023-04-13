@@ -138,7 +138,7 @@ def img_create_sign_data(data_bytearray, privatekey_file, publickey_file):
     sk = ecdsa.SigningKey.from_pem(open(privatekey_file).read())
     vk = ecdsa.VerifyingKey.from_pem(open(publickey_file).read())
     pk_data = vk.to_string()
-    bflb_utils.printf("Private key: ", binascii.hexlify(sk.to_string()))
+    #bflb_utils.printf("Private key: ", binascii.hexlify(sk.to_string()))
     bflb_utils.printf("Public key: ", binascii.hexlify(pk_data))
     pk_hash = img_create_sha256_data(pk_data)
     bflb_utils.printf("Public key hash=", binascii.hexlify(pk_hash))
@@ -217,7 +217,7 @@ def firmware_post_proc_do_encrypt(data_bytearray,aeskey_hexstr,aesiv_hexstr,xts_
         elif len(aeskey_bytearray)==24:
             encrypt = 3
         encrypt_key = aeskey_bytearray
-        bflb_utils.printf("Key= ", binascii.hexlify(encrypt_key))
+        #bflb_utils.printf("Key= ", binascii.hexlify(encrypt_key))
         boot_data[bootcfg_start] |=((encrypt<<2)+(xts_mode<<6))
 
         # get IV

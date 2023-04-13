@@ -42,7 +42,6 @@ key = None
 
 
 class BLECDH:
-
     def __init__(self, curve=NIST256p):
         self.ecdh = ECDH(curve)
         self.local_public_key = None
@@ -62,7 +61,6 @@ class BLECDH:
         print(ret)
         return ret
 
-
 def eflash_loader_parser_init():
     parser = argparse.ArgumentParser(description="bouffalolab eflash loader client command")
     parser.add_argument("--usage", dest="usage", action="store_true", help="display usage")
@@ -70,7 +68,6 @@ def eflash_loader_parser_init():
     parser.add_argument("--key", dest="key", help="aes key for socket")
     parser.add_argument("--ecdh", dest="ecdh", action="store_true", help="open ecdh function")
     return parser
-
 
 def create_encrypt_data(data_bytearray, key_bytearray, iv_bytearray):
     cryptor = AES.new(key_bytearray, AES.MODE_CBC, iv_bytearray)
@@ -127,9 +124,11 @@ def udp_socket_send_client(udp_socket_client, send_address, key=None):
             if key:
                 if len(sdata) % 16 != 0:
                     sdata = sdata + bytearray(16 - (len(sdata) % 16))
+                    sdata += bytearray(16)
                 sdata = create_encrypt_data(sdata, bytearray.fromhex(key), bytearray(16))
         print(binascii.hexlify(sdata))
         udp_socket_client.sendto(sdata, send_address)
+        start_time = time.time()
         while True:
             log = udp_socket_recv_log(udp_socket_client)
             if log.decode('utf-8', 'ignore').find("Finished with success") != -1:
@@ -139,12 +138,16 @@ def udp_socket_send_client(udp_socket_client, send_address, key=None):
                 print("Program fail")
                 return False
             else:
+                if time.time() - start_time > 15:
+                    print("timeout, exit!")
+                    return False
                 pass
     return False
 
 
 def main(port, key=None):
     udp_socket_client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    udp_socket_client.settimeout(15)
     print('Enter quit to exist program')
     host = socket.gethostname()
     # send_address is server address

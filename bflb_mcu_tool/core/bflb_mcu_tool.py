@@ -2590,7 +2590,6 @@ def run(argv):
         logger = record_log()
         redir = RedirectText(logger)
         sys.stdout = redir
-    bflb_utils.printf("\r")
     bflb_utils.printf("==================================================")
     bflb_utils.printf("Chip name is %s" % args.chipname)
     gol.chip_name = args.chipname
@@ -2626,5 +2625,5 @@ def run(argv):
 
 
 if __name__ == '__main__':
-    print(sys.argv)
+    #print(sys.argv)
     run(sys.argv[1:])
