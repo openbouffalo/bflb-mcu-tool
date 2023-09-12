@@ -86,7 +86,7 @@ def compress_dir(chipname, zippath, efuse_load=False):
         bflb_utils.printf("PT Check Fail")
         set_error_code("0082")
         return False
-    factory_mode_set(os.path.join(chip_path, chipname, "eflash_loader/eflash_loader_cfg.ini"), "true")
+    #factory_mode_set(os.path.join(chip_path, chipname, "eflash_loader/eflash_loader_cfg.ini"), "true")
     flash_file.append(os.path.join(chip_path, chipname, "eflash_loader/eflash_loader_cfg.ini"))
     if efuse_load:
         flash_file.append(cfg.get("EFUSE_CFG", "file"))
@@ -142,7 +142,7 @@ def compress_dir_iot(chipname, outdir, efuse_load=False):
         bflb_utils.printf("PT Check Fail")
         set_error_code("0082")
         return False
-    factory_mode_set(os.path.join(chip_path, chipname, "eflash_loader", "eflash_loader_cfg.ini"), "true")
+    #factory_mode_set(os.path.join(chip_path, chipname, "eflash_loader", "eflash_loader_cfg.ini"), "true")
     flash_file.append(os.path.join(chip_path, chipname, "eflash_loader", "eflash_loader_cfg.ini"))
     if efuse_load:
         flash_file.append(cfg.get("EFUSE_CFG", "file"))
@@ -204,13 +204,13 @@ def compress_dir_iot(chipname, outdir, efuse_load=False):
     return True
 
 
-def img_create(args, chipname="bl60x", chiptype="bl60x", img_dir=None, config_file=None):
+def img_create(args, chipname="bl60x", chiptype="bl60x", img_dir=None, config_file=None, **kwargs):
     sub_module = __import__("libs." + chiptype, fromlist=[chiptype])
     img_dir_path = os.path.join(chip_path, chipname, "img_create_iot")
     if img_dir is None:
-        res = sub_module.img_create_do.img_create_do(args, img_dir_path, config_file)
+        res = sub_module.img_create_do.img_create_do(args, img_dir_path, config_file, **kwargs)
     else:
-        res = sub_module.img_create_do.img_create_do(args, img_dir, config_file)
+        res = sub_module.img_create_do.img_create_do(args, img_dir, config_file, **kwargs)
     return res
 
 
@@ -224,10 +224,29 @@ def get_img_offset(chiptype="bl60x",bootheader_data=None):
     return sub_module.img_create_do.img_create_get_img_offset(bootheader_data)
 
 
-def encrypt_loader_bin(chiptype, file, sign, encrypt, key, iv, publickey, privatekey):
+def encrypt_loader_bin(chiptype, file, sign, encrypt, key, iv, publickey, privatekey, **kwargs):
     sub_module = __import__("libs." + chiptype, fromlist=[chiptype])
     return sub_module.img_create_do.encrypt_loader_bin_do(file, sign, encrypt, \
-                                                          key, iv, publickey, privatekey)
+                                                          key, iv, publickey, privatekey, **kwargs)
+    
+def create_security_efuse(chiptype, key, sel):
+    sub_module = __import__("libs." + chiptype, fromlist=[chiptype])
+    
+    if chiptype == "bl808" or chiptype == "bl616" or chiptype == "bl628":
+        efuse_data = bytearray(256)
+        mask_data = bytearray(256)
+        img_update_efuse_fun = sub_module.img_create_do.img_update_efuse_group0
+    else:
+        efuse_data = bytearray(128)
+        mask_data = bytearray(128)
+        img_update_efuse_fun = sub_module.img_create_do.img_update_efuse
+        
+    efuse_data, mask_data = img_update_efuse_fun(None, 0, None, 0, None, sel, key, True)
+    for num in range(0, len(efuse_data)):
+        if efuse_data[num] != 0:
+            mask_data[num] |= 0xff
+
+    return efuse_data, mask_data
 
 
 def run():

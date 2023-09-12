@@ -187,8 +187,8 @@ def cli_tx_disable():
     return 't0'
 
 
-def cli_rx_start():
-    return 'r:s'
+def cli_rx_start(bw):
+    return 'r:s'+bw
 
 
 def cli_rx_stop():

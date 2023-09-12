@@ -17,27 +17,19 @@
             pin  = <22>;
             feature = "led";
             active = "Hi"; //Hi or Lo
-            mode = "onoff"; //blink or hearbeat or onoff
-            time = <100>; //duration for this mode
+            mode = "onoff";
+            time = <100>; //Unused for onoff mode
         };
         gpio1 {
             status = "disable";
-            pin  = <6>;
-            feature = "led";
-            active = "Hi"; //Hi or Lo
-            mode = "blink"; //blink or hearbeat or onoff
-            time = <100>; //duration for this mode
-        };
-        gpio2 {
-            status = "disable";
             pin = <5>;
             feature = "button";
-            active = "Hi";
+            active = "Hi"; //Unused for button feature
             mode = "multipress";
             hbn_use = "disable";
             button {
                 debounce = <10>;
-                trig_level = "Lo";
+                trig_level = "Lo"; //Hi or Lo
                 short_press_ms {
                     start = <30>;
                     end = <4000>;
@@ -105,7 +97,7 @@
             xtal = <36 36 0 60 60>;
             pwr = <14>;  //range:0~14dbm
             pwr_mode = "bf";//B: only use power offset in EFUSE; b: use power offset in EFUSE with incremental mode; F: only use power offset in Flash; f: use power offset in Flash with incremental mode
-            //pwr_offset = <10 10>;//due to the limit of current DTC, negative value is used. So we work around by adding all the poweroffset with 10. so 8 represents -2; 10 represents 0; 13 represents 3
+            //due to the limit of current DTC, negative value is used. So we work around by adding all the poweroffset with 10. so 8 represents -2; 10 represents 0; 13 represents 3
             pwr_offset_zigbee = <10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10>;
             pwr_offset_ble = <10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10>;
         };

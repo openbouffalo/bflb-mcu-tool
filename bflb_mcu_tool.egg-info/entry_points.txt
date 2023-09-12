@@ -1,3 +1,2 @@
 [console_scripts]
 bflb-mcu-tool = bflb_mcu_tool.__main__:run_main
-

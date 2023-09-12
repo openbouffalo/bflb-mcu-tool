@@ -41,6 +41,7 @@ import pylink
 from serial import Serial
 from Crypto.Util import Counter
 from Crypto.Cipher import AES
+from CryptoPlus.Cipher import AES as AES_XTS
 
 try:
     from PySide2 import QtCore
@@ -435,6 +436,92 @@ else:
     }
 
 
+def swap_rd_rs2(inst):
+    rd = (inst >> 7) & 0x1F
+    rs2 = (inst >> 20) & 0x1F
+    inst &= 0xFE0FF07F
+    inst |= rd << 20
+    inst |= rs2 << 7
+    return inst
+
+
+def write32le(buf, index, num):
+    buf[0+index] = num & 0xff
+    buf[1+index] = (num >> 8) & 0xff
+    buf[2+index] = (num >> 16) & 0xff
+    buf[3+index] = (num >> 24) & 0xff
+    
+    
+def read32le(buf, index):
+    num = buf[0+index]
+    num |= buf[1+index] << 8
+    num |= buf[2+index] << 16
+    num |= buf[3+index] << 24 
+    return num
+
+
+def riscv_code(buffer, size, now_pos, is_encoder):
+    i = 0
+    while i + 8 <= size:
+        pc = now_pos + i
+        inst = read32le(buffer, i)
+        if (inst & 0xDFF) == 0x0EF:
+            addr = ((inst & 0x80000000) >> 11) | ((inst & 0x7FE00000) >> 20) | ((inst & 0x00100000) >> 9) | (inst & 0x000FF000)
+            if not is_encoder:
+                pc = 0 - pc
+            addr += pc
+            inst &= 0xFFF
+            inst |= ((addr & 0x100000) << 11) | ((addr & 0x0007FE) << 20) | ((addr & 0x000800) << 9) | (addr & 0x0FF000)
+            write32le(buffer, i, inst)
+            i += 2
+        elif (inst & 0x7F) == 0x17:
+            inst2 = read32le(buffer, i + 4)
+            if not ((inst2 & 0x5B) == 0x03 or (inst2 & 0x707F) == 0x67 or (inst2 & 0x707F) == 0x13):
+                i += 8
+                continue
+            auipc_rd = (inst >> 7) & 0x1F
+            inst2_rs1 = (inst2 >> 15) & 0x1F
+            if auipc_rd != inst2_rs1:
+                i += 8
+                continue
+            is_s_type = (inst2 & 0x7B) == 0x23
+            if is_encoder and is_s_type:
+                inst2 = swap_rd_rs2(inst2)
+            if not is_s_type:
+                inst2_rd = (inst2 >> 7) & 0x1F
+                inst ^= inst2_rd << 7
+                inst2 ^= inst2_rd << 15
+            addr = (inst & 0xFFFFF000) + (inst2 >> 20) - ((inst2 >> 19) & 0x1000) 
+            if not is_encoder:
+                pc = 0 - pc
+            addr += pc
+            inst &= 0xFFF
+            inst |= (addr + ((addr << 1) & 0x1000)) & 0xFFFFF000
+            inst2 &= 0x000FFFFF
+            inst2 |= addr << 20
+            if not is_encoder and is_s_type:
+                inst2 = swap_rd_rs2(inst2)
+            write32le(buffer, i, inst)
+            write32le(buffer, i + 4, inst2)
+            i += 6
+        i += 2
+    return i
+
+
+def riscv_encode(bytedata):
+    buffer = bytearray()
+    buffer.extend(bytedata)
+    riscv_code(buffer, len(buffer), 0, True)
+    return buffer
+
+
+def riscv_decode(bytedata):
+    buffer = bytearray()
+    buffer.extend(bytedata)
+    riscv_code(buffer, len(buffer), 0, False)
+    return buffer
+
+
 def convert_path(path: str) -> str:
     return path.replace(r'\/'.replace(os.sep, ''), os.sep)
 
@@ -705,6 +792,59 @@ def img_create_encrypt_data(data_bytearray, key_bytearray, iv_bytearray, flash_i
         ciphertext = cryptor.encrypt(data_bytearray)
     return ciphertext
 
+# decrypt image, mainly segdata
+def img_create_decrypt_data(data_bytearray, key_bytearray, iv_bytearray, flash_img):
+    if flash_img == 0:
+        cryptor = AES.new(key_bytearray, AES.MODE_CBC, iv_bytearray)
+        ciphertext = cryptor.decrypt(data_bytearray)
+    else:
+        iv = Counter.new(128, initial_value=int(binascii.hexlify(iv_bytearray), 16))
+        cryptor = AES.new(key_bytearray, AES.MODE_CTR, counter=iv)
+        ciphertext = cryptor.decrypt(data_bytearray)
+    return ciphertext
+
+
+def img_create_encrypt_data_xts(data_bytearray, key_bytearray, iv_bytearray, encrypt):
+    pass
+    '''
+    counter = binascii.hexlify(iv_bytearray[4:16]).decode()
+    # data unit number default value is 0
+    data_unit_number = 0
+
+    key = (key_bytearray[0:16], key_bytearray[16:32])
+    if encrypt == 2 or encrypt == 3:
+        key = (key_bytearray, key_bytearray)
+    # bflb_utils.printf(key)
+    cipher = AES_XTS.new(key, AES_XTS.MODE_XTS)
+    total_len = len(data_bytearray)
+    ciphertext = bytearray(0)
+    deal_len = 0
+
+    while deal_len < total_len:
+        data_unit_number = str(hex(data_unit_number)).replace("0x", "")
+        data_unit_number_to_str = str(data_unit_number)
+        right_justify_str = data_unit_number_to_str.rjust(8, '0')
+        reverse_data_unit_number_str = reverse_str_data_unit_number(right_justify_str)
+        tweak = reverse_data_unit_number_str + counter
+        tweak = bflb_utils.hexstr_to_bytearray("0" * (32 - len(tweak)) + tweak)
+        # bflb_utils.printf(tweak)
+        if 32 + deal_len <= total_len:
+            cur_block = data_bytearray[0 + deal_len:32 + deal_len]
+            # bflb_utils.printf(binascii.hexlify(cur_block))
+            ciphertext += cipher.encrypt(cur_block, tweak)
+        else:
+            cur_block = data_bytearray[0 + deal_len:16 + deal_len] + bytearray(16)
+            # bflb_utils.printf(binascii.hexlify(cur_block))
+            ciphertext += (cipher.encrypt(cur_block, tweak)[0:16])
+        deal_len += 32
+        data_unit_number = (int(data_unit_number, 16))
+        data_unit_number += 1
+
+    # bflb_utils.printf("Result:")
+    # bflb_utils.printf(binascii.hexlify(ciphertext))
+
+    return ciphertext
+'''
 
 def aes_decrypt_data(data, key_bytearray, iv_bytearray, flash_img):
     if flash_img == 0:
@@ -893,14 +1033,28 @@ def firmware_post_proc_parser_init():
     parser.add_argument("--chipname", dest="chipname", help="chip name")
     parser.add_argument("--cpuid", dest="cpuid", help="cpu id")
     parser.add_argument("--brdcfgdir", dest="brdcfgdir", help="board config dir contains boot2,partition,etc.")
-    parser.add_argument("--imgfile", dest="imgfile", help="image file")
+    parser.add_argument("--imgfile", dest="imgfile", help="image file to deal")
+    parser.add_argument("--datafile", dest="datafile", help="user data file")
+    parser.add_argument("--edatafile_in", dest="edatafile_in", help="input efuse data file")
     parser.add_argument("--hd_append", dest="hd_append", help="header append file")
     parser.add_argument("--fw_append", dest="fw_append", help="firmware append file")
     parser.add_argument("--key", dest="aeskey", help="AES Key")
+    parser.add_argument("--keyoffset", dest="aeskeyoffset", help="AES Key offset in efuse")
     parser.add_argument("--iv", dest="aesiv", help="AES IV")
     parser.add_argument("--xtsmode", dest="xtsmode", help="xts mode enable")
     parser.add_argument("--publickey", dest="publickey", help="ECC public key")
     parser.add_argument("--privatekey", dest="privatekey", help="ECC private key")
+    parser.add_argument("--publickey_str", dest="publickey_str", help="ECC public key base 64 string")
+    parser.add_argument("--privatekey_str", dest="privatekey_str", help="ECC private key base 64 string")
+    parser.add_argument("--edbg_mode", dest="dbg_mode", help="debug mode:open/pswd/close")
+    parser.add_argument("--ejtag_close", dest="jtag_close", help="Close JTAG, mode: true/false")
+    parser.add_argument("--epswwd", dest="pswd", help="JTAG password value hex string")
+    parser.add_argument("--ehbn_sign", dest="hbn_sign", help="enable/disable signature check when HBN mode wakeup, mode: true/false")
+    parser.add_argument("--ehbn_jump", dest="hbn_jump", help="enable/disable hbn jump function")
+    parser.add_argument("--eanti_rollback", dest="anti_rollback", help="enable/disable anti-rollback function")
+    parser.add_argument("--eflash_pdelay", dest="flash_pdelay", help="flash power up delay value, value: 0-3")
+    parser.add_argument("--edata", dest="edata", help="efuse data content:start,hex_str ex:0x10,000102030405060708;0x20,01020304")
+    parser.add_argument("--appkeys", dest="appkeys", help="app use diffrent keys from bootloader ")
     parser.add_argument("--checkpartition", dest="checkpartition", help="check partition in whole_flash_data.bin")
     parser.add_argument("--releasenote", dest="releasenote", action="store_false", help="dump release note")
     return parser
@@ -977,6 +1131,11 @@ def eflash_loader_parser_init():
     parser.add_argument("--ecdh", dest="ecdh", action="store_true", help="open ecdh function")
     parser.add_argument("--echo", dest="echo", action="store_true", help="open local log echo")
     parser.add_argument("-a", "--auto", dest="auto", action="store_true", help="auto flash")
+    parser.add_argument("--dac_value", dest="dac_value", help="dac value")
+    parser.add_argument("--dac_addr", dest="dac_addr", help="dac address")
+    parser.add_argument("--dac_key", dest="dac_key", help="dac encrpt key")
+    parser.add_argument("--dac_iv", dest="dac_iv", help="dac encrypt iv")
+    parser.add_argument("--auto_efuse_verify", action="store_true", dest="auto_efuse_verify", help="auto efuse verify")
     parser.add_argument("-v",
                         "--version",
                         dest="version",

@@ -26,6 +26,6 @@ class BflbEcdh(object):
         self.ecdh.load_received_public_key_bytes(binascii.unhexlify(peer_pk))
         self.sharedsecret = self.ecdh.generate_sharedsecret_bytes()
         ret = binascii.hexlify(self.sharedsecret).decode("utf-8")
-        bflb_utils.printf("secret key:")
-        bflb_utils.printf(ret)
+        #bflb_utils.printf("secret key:")
+        #bflb_utils.printf(ret)
         return ret

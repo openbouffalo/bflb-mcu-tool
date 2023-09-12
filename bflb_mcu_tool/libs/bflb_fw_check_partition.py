@@ -104,6 +104,12 @@ def parse_boot2(chipname,file):
             bflb_utils.printf("Boot2 offset=", image_offset)
             bflb_utils.printf("Boot2 len=", image_len)
             bflb_utils.printf("Boot2 hash=", binascii.hexlify(hash_val_cal))
+            with open("boot2_with_header.bin", 'wb+') as fp:
+                fp.write(content[0:image_offset+image_len])
+                fp.close()
+            with open("partition.bin", 'wb+') as fp:
+                fp.write(content[0xE000:0x10000])
+                fp.close()
             if len(content)<image_offset+image_len:
                 bflb_utils.printf("Boot2 is corrupt")
                 return False
@@ -136,8 +142,9 @@ def parse_one_partition_entry(chipname,entryname,entrydata,maxlen):
         bflb_utils.printf("Len=", image_len)
         bflb_utils.printf("Hash=", binascii.hexlify(hash_val_cal))
         bflb_utils.printf("Max size=", maxlen)
-        if image_offset+image_len>maxlen:
+        if image_len>maxlen:
             bflb_utils.printf("Image actual size is larger than max len")
+            return False
         if len(entrydata)<image_offset+image_len:
             bflb_utils.printf("Image is corrupt")
             return False

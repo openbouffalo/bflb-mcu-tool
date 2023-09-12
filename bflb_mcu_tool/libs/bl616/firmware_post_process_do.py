@@ -12,6 +12,7 @@ from CryptoPlus.Cipher import AES as AES_XTS
 
 from libs import bflb_utils
 from libs.bflb_utils import img_create_sha256_data, img_create_encrypt_data
+from libs.bflb_utils import img_create_decrypt_data
 
 keyslot0 = 28
 keyslot1 = keyslot0 + 16
@@ -64,11 +65,12 @@ rd_lock_key_slot_9 = 30
 rd_lock_key_slot_10 = 31
 
 
+g_args=None
+
 def bytearray_data_merge(data1, data2, len):
     for i in range(len):
         data1[i] |= data2[i]
     return data1
-
 
 # update efuse info
 def img_update_efuse_data(cfg,
@@ -79,14 +81,36 @@ def img_update_efuse_data(cfg,
                             sec_eng_key_sel,
                             sec_eng_key,
                             security=False):
-    efuse_data = bytearray(512)    
-    efuse_mask_data =  bytearray(512)
-
+    if g_args and g_args.edatafile_in!=None:
+        efuse_file_encrypted=g_args.edatafile_in
+        with open(efuse_file_encrypted, 'rb') as fp:
+            efuse_data = fp.read()
+            fp.close()
+        if len(efuse_data)>4096:
+            bflb_utils.printf("Decrypt efuse data")
+            efuse_save_crc = efuse_data[0:4]
+            security_key, security_iv = bflb_utils.get_security_key()
+            efuse_data = img_create_decrypt_data(efuse_data[4096:], security_key, security_iv, 0)
+            efuse_crc = bflb_utils.get_crc32_bytearray(efuse_data)
+            if efuse_crc != efuse_save_crc:
+                bflb_utils.printf("Efuse crc check fail")
+                return False
+        efuse_data = bytearray(efuse_data)
+        cfg, efuse_file_encrypted = os.path.split(efuse_file_encrypted)
+        efuse_mask_data =  bytearray(512)
+    else:
+        efuse_file_encrypted="efusedata.bin"
+        efuse_data = bytearray(512)
+        efuse_mask_data =  bytearray(512)
+    
+    efuse_file_raw="efusedata_raw.bin"
+    efuse_file_mask="efusedata_mask.bin"
     mask_4bytes = bytearray.fromhex("FFFFFFFF")
 
     # Set ef_sf_aes_mode
     if flash_encryp_type >= 3:
         efuse_data[0] |= 3
+        efuse_data[0] |= ((flash_encryp_type - 3) << 2)
     else:
         efuse_data[0] |= flash_encryp_type
     # Set ef_sw_usage_0 --> sign_cfg
@@ -100,19 +124,34 @@ def img_update_efuse_data(cfg,
     rw_lock0 = 0
     rw_lock1 = 0
     if pk_hash is not None:
-        efuse_data[keyslot0:keyslot2] = pk_hash
-        efuse_mask_data[keyslot0:keyslot2] = mask_4bytes * 8
-        rw_lock0 |= (1 << wr_lock_key_slot_0)
-        rw_lock0 |= (1 << wr_lock_key_slot_1)
+        if g_args and g_args.appkeys=="true":
+            efuse_data[0x1A0:0x1A0+32] = pk_hash
+            efuse_mask_data[0x1A0:0x1A0+32] = mask_4bytes * 8
+            efuse_data[0x1FC+3] |= (0x3 << 2)
+        else:
+            efuse_data[keyslot0:keyslot2] = pk_hash
+            efuse_mask_data[keyslot0:keyslot2] = mask_4bytes * 8
+            rw_lock0 |= (1 << wr_lock_key_slot_0)
+            rw_lock0 |= (1 << wr_lock_key_slot_1)
     if flash_key is not None:
         if flash_encryp_type == 1:
             # aes 128
-            efuse_data[keyslot2:keyslot3] = flash_key[0:16]
-            efuse_mask_data[keyslot2:keyslot3] = mask_4bytes * 4
+            if g_args and g_args.appkeys=="true":
+                efuse_data[keyslot3:keyslot3_end] = flash_key[0:16]
+                efuse_mask_data[keyslot3:keyslot3_end] = mask_4bytes * 4
+                rw_lock0 |= (1 << wr_lock_key_slot_3)
+                rw_lock0 |= (1 << rd_lock_key_slot_3)
+            else:
+                efuse_data[keyslot2:keyslot3] = flash_key[0:16]
+                efuse_mask_data[keyslot2:keyslot3] = mask_4bytes * 4
+                rw_lock0 |= (1 << wr_lock_key_slot_2)
+                rw_lock0 |= (1 << rd_lock_key_slot_2)
         elif flash_encryp_type == 2:
             # aes 192
-            efuse_data[keyslot2:keyslot3_end] = flash_key
+            efuse_data[keyslot2:keyslot3_end] = flash_key[0:24]+bytearray(8)
             efuse_mask_data[keyslot2:keyslot3_end] = mask_4bytes * 8
+            rw_lock0 |= (1 << wr_lock_key_slot_2)
+            rw_lock0 |= (1 << rd_lock_key_slot_2)
             rw_lock0 |= (1 << wr_lock_key_slot_3)
             rw_lock0 |= (1 << rd_lock_key_slot_3)
         elif flash_encryp_type == 3:
@@ -127,11 +166,10 @@ def img_update_efuse_data(cfg,
             # aes xts 128/192/256
             efuse_data[keyslot2:keyslot3_end] = flash_key
             efuse_mask_data[keyslot2:keyslot3_end] = mask_4bytes * 8
+            rw_lock0 |= (1 << wr_lock_key_slot_2)
+            rw_lock0 |= (1 << rd_lock_key_slot_2)
             rw_lock0 |= (1 << wr_lock_key_slot_3)
             rw_lock0 |= (1 << rd_lock_key_slot_3)
-
-        rw_lock0 |= (1 << wr_lock_key_slot_2)
-        rw_lock0 |= (1 << rd_lock_key_slot_2)
 
     if sec_eng_key is not None:
         if flash_encryp_type == 0:
@@ -252,26 +290,65 @@ def img_update_efuse_data(cfg,
                                                bflb_utils.int_to_4bytearray_l(rw_lock1), 4)
     efuse_mask_data[252:256] = bytearray_data_merge(efuse_mask_data[252:256],\
                                                bflb_utils.int_to_4bytearray_l(rw_lock1), 4)
+    #feature specified efuse
+    if g_args!=None:
+        if g_args.dbg_mode=="pswd":
+            efuse_data[3]|=(0x3<<4)
+        if g_args.dbg_mode=="close":
+            efuse_data[3]|=(0xf<<4)
+        if g_args.jtag_close=="true":
+            efuse_data[3]|=(0x3<<2)
+        if g_args.anti_rollback=="true":
+            efuse_data[0x7C+1]|=(1<<4)
+        if g_args.pswd!=None:
+            pswd=bytearray.fromhex(g_args.pswd)
+            if len(pswd)!=16:
+                bflb_utils.printf("Password len should be 16 bytes")
+                sys.exit()
+            efuse_data[4:4+len(pswd)]=pswd
+        if g_args.hbn_jump=="false":
+            efuse_data[0x5C+3]|=(1<<7)
+        if g_args.hbn_sign=="true":
+            efuse_data[0x5C+3]|=(1<<5)
+        if g_args.flash_pdelay!=None:
+            efuse_data[0x5C+3]|=(int(g_args.flash_pdelay)&0x3)
+        if g_args.edata!=None:
+            edata_array=g_args.edata.split(";")
+            for edata_item in edata_array:
+                data_list=edata_item.split(",")
+                start=int(data_list[0],16)
+                if len(data_list[1])%2 != 0:
+                    bflb_utils.printf("[Error]:edata hex_str not correct hexadecimal string")
+                    sys.exit()
+                content=bytearray.fromhex(data_list[1])
+                data_len=len(content)
+                efuse_data[start:start+data_len]=bytearray_data_merge(efuse_data[start:start+data_len],content,data_len)
 
     if security is True:
-        fp = open(os.path.join(cfg,"efusedata_raw.bin"), 'wb+')
+        fp = open(os.path.join(cfg,efuse_file_raw), 'wb+')
         fp.write(efuse_data)
         fp.close()
         bflb_utils.printf("Encrypt efuse data")
+        efuse_crc = bflb_utils.get_crc32_bytearray(efuse_data)
         security_key, security_iv = bflb_utils.get_security_key()
         efuse_data = img_create_encrypt_data(efuse_data, security_key, security_iv, 0)
         efuse_data = bytearray(4096) + efuse_data
-    fp = open(os.path.join(cfg,"efusedata.bin"), 'wb+')
+        efuse_data[0:4] = efuse_crc
+    fp = open(os.path.join(cfg,efuse_file_encrypted), 'wb+')
     fp.write(efuse_data)
     fp.close()
-    fp = open(os.path.join(cfg,"efusedata_mask.bin"), 'wb+')
+    fp = open(os.path.join(cfg,efuse_file_mask), 'wb+')
     fp.write(efuse_mask_data)
     fp.close()
 
 # sign image(hash code)
-def img_create_sign_data(data_bytearray, privatekey_file, publickey_file):
-    sk = ecdsa.SigningKey.from_pem(open(privatekey_file).read())
-    vk = ecdsa.VerifyingKey.from_pem(open(publickey_file).read())
+def img_create_sign_data(data_bytearray, privatekey, publickey):
+    sk = ecdsa.SigningKey.from_pem(privatekey)
+    if publickey!=None:
+        vk = ecdsa.VerifyingKey.from_pem(publickey)
+    else:
+        bflb_utils.printf("Get Public key from private key")
+        vk = sk.get_verifying_key()
     pk_data = vk.to_string()
     #bflb_utils.printf("Private key: ", binascii.hexlify(sk.to_string()))
     bflb_utils.printf("Public key: ", binascii.hexlify(pk_data))
@@ -301,6 +378,16 @@ def reverse_str_data_unit_number(str_data_unit_number):
         str_part4 = str_data_unit_number[6:8]
         reverse_str = str_part4 + str_part3 + str_part2 + str_part1
     return reverse_str
+
+def reverse_iv(need_reverse_iv_bytearray):
+    temp_reverse_iv_bytearray = binascii.hexlify(need_reverse_iv_bytearray).decode()
+    if temp_reverse_iv_bytearray[24:32] != '00000000':
+        bflb_utils.printf(
+            "The lower 4 bytes of IV should be set 0, if set IV is less than 16 bytes, make up 0 for the low 4 bytes of IV "
+        )
+        sys.exit()
+    reverse_iv_bytearray = '00000000' + temp_reverse_iv_bytearray[0:24]
+    return reverse_iv_bytearray
 
 def img_create_encrypt_data_xts(data_bytearray, key_bytearray, iv_bytearray, encrypt):
     counter = binascii.hexlify(iv_bytearray[4:16]).decode()
@@ -358,22 +445,55 @@ def firmware_post_get_flash_encrypt_type(encrypt,xts_mode):
             flash_encrypt_type += 3
     return flash_encrypt_type
 
-def firmware_post_proc_do_encrypt(data_bytearray,aeskey_hexstr,aesiv_hexstr,xts_mode,privatekey_file, publickey_file,imgfile):
+def firmware_post_proc_do_encrypt(data_bytearray,aeskey_hexstr,aesiv_hexstr,xts_mode,privatekey, publickey,imgfile):
     flash_img=1
     bootcfg_start=8+4+84+4+4+12+4
+    xip_addr=bflb_utils.bytearray_reverse(data_bytearray[0xB0:0xB4])
+    segheader = bytearray(0)
+    if bflb_utils.bytearray_to_int(xip_addr)!=0x00 and \
+       bflb_utils.bytearray_to_int(xip_addr)!=0xA0000000:
+        #this image is already dealed as ram image
+        flash_img=0
+        if data_bytearray[0x100+12:0x100+16]!=bflb_utils.get_crc32_bytearray(data_bytearray[0x100+0:0x100+12]):
+            bflb_utils.printf("[Error]:This image maybe has already been dealed(wrong segheader crc32 found)")
+            sys.exit()
+    if data_bytearray[0x100+4:0x100+8] == b'SEGH':
+        flash_img=0
 
     if flash_img:
+        bflb_utils.printf("Flash  Image")
         #get image offset
         image_offset=firmware_post_proc_get_image_offset(data_bytearray)
         bflb_utils.printf("Image Offset:"+hex(image_offset))
         image_data=data_bytearray[image_offset:len(data_bytearray)]
         boot_data=data_bytearray[0:image_offset]
+    else:
+        bflb_utils.printf("RAM  Image")
+        #clock cfg flag invalid
+        data_bytearray[0x64:0x68]=bytearray(4)
+        #flash cfg flag invalid
+        data_bytearray[0x8:0xC]=bytearray(4)
+        image_data=data_bytearray[0x100+16:]
+        segheader=data_bytearray[0x100:0x100+16]
+        boot_data=data_bytearray[0:0x100]
+        
+        #update boot entry and len
+        boot_data[0xB0:0xB0+4]=segheader[0:4]
+        if (boot_data[0xB3]&0x0f)<=0x01:
+            #for bootentry,change 0x60/0x20 into 0x62/0x22
+            boot_data[0xB3]+=0x02
+        if (segheader[3]&0x0f)>=0x02:
+            #for dest,change 0x62/0x22 into 0x60/0x20
+            segheader[3]-=0x02
+        segheader[4:8]=bflb_utils.int_to_4bytearray_l(len(image_data))
+        segheader[8:12]=bflb_utils.get_crc32_bytearray(image_data)
+        segheader[12:16]=bflb_utils.get_crc32_bytearray(segheader[0:12])
 
     if aeskey_hexstr!=None:
         bflb_utils.printf("Image need encryption")
         if  aesiv_hexstr== None:
             bflb_utils.printf("[Error] AES IV not given, skip encryption")
-            return data_bytearray,None
+            return data_bytearray,None,flash_img
 
     #get xts mode 
     if xts_mode!=None:
@@ -383,7 +503,7 @@ def firmware_post_proc_do_encrypt(data_bytearray,aeskey_hexstr,aesiv_hexstr,xts_
     if xts_mode == 1:
         if len(aeskey_hexstr)!=64:
             bflb_utils.printf("[Error] Key len must be 32 when xts mode enabled!!!!")
-            return data_bytearray,None
+            return data_bytearray,None,flash_img
         else:
             bflb_utils.printf("Enable xts mode")
 
@@ -391,13 +511,16 @@ def firmware_post_proc_do_encrypt(data_bytearray,aeskey_hexstr,aesiv_hexstr,xts_
 
     aesiv_data= bytearray(0)
     encrypt=0
+    encrypt_key=None    
+    flash_encrypt_key=None
+    sec_eng_encrypt_key=None
     if aeskey_hexstr!=None:
         data_toencrypt = bytearray(0)
         # get aeskey
-        aeskey_bytearray=bflb_utils.hexstr_to_bytearray(aeskey_hexstr)
+        aeskey_bytearray=bflb_utils.hexstr_to_bytearray(aeskey_hexstr)        
         if len(aeskey_bytearray)!=32 and len(aeskey_bytearray)!=24 and len(aeskey_bytearray)!=16:
             bflb_utils.printf("Key length error")
-            return data_bytearray,None
+            return data_bytearray,None,flash_img
 
         if len(aeskey_bytearray)==16:
             encrypt = 1
@@ -430,16 +553,17 @@ def firmware_post_proc_do_encrypt(data_bytearray,aeskey_hexstr,aesiv_hexstr,xts_
 
         if xts_mode != 0:
             # encrypt_iv = codecs.decode(reverse_iv(encrypt_iv), 'hex')
-            image_data = img_create_encrypt_data_xts(data_toencrypt, encrypt_key, encrypt_iv,
+            image_data = img_create_encrypt_data_xts(segheader+data_toencrypt, encrypt_key, encrypt_iv,
                                                             encrypt)
         else:
-            image_data = img_create_encrypt_data(data_toencrypt, encrypt_key, encrypt_iv,
+            image_data = img_create_encrypt_data(segheader+data_toencrypt, encrypt_key, encrypt_iv,
                                                         flash_img)
         if unencrypt_mfg_data != bytearray(0):
-            image_data = image_data[0:0x1000] + unencrypt_mfg_data + image_data[0x2000:]
+            image_data = image_data[0:0x1000+len(segheader)] + unencrypt_mfg_data + image_data[0x2000+len(segheader):]
 
         data_tohash += image_data
     else:
+        image_data=segheader+image_data
         data_tohash += image_data
 
     # hash fw img
@@ -451,29 +575,41 @@ def firmware_post_proc_do_encrypt(data_bytearray,aeskey_hexstr,aesiv_hexstr,xts_
     signature=bytearray(0)
     sign=0
     pk_hash=None
-    if privatekey_file!=None  and publickey_file!=None:
-        pk_data, pk_hash, signature = img_create_sign_data(data_tohash, privatekey_file, publickey_file)
+    if privatekey!=None:
+        pk_data, pk_hash, signature = img_create_sign_data(data_tohash, privatekey, publickey)
         pk_data = pk_data + bflb_utils.get_crc32_bytearray(pk_data)
         boot_data[bootcfg_start] |=(1<<0)
         sign=1
-    
-    boot_data[256:256+len(pk_data+signature)]=pk_data+signature
-    boot_data[256+len(pk_data+signature):256+len(pk_data+signature)+len(aesiv_data)]=aesiv_data
+    elif publickey!=None:
+        #maybe dump public key only
+        vk = ecdsa.VerifyingKey.from_pem(publickey)
+        pk_data = vk.to_string()
+        bflb_utils.printf("Public key: ", binascii.hexlify(pk_data))
+        pk_hash = img_create_sha256_data(pk_data)
+        bflb_utils.printf("Public key hash=", binascii.hexlify(pk_hash))
+        sign=1
+        bflb_utils.printf("Image not sign!!!")
+    if flash_img:
+        boot_data[256:256+len(pk_data+signature)]=pk_data+signature
+        boot_data[256+len(pk_data+signature):256+len(pk_data+signature)+len(aesiv_data)]=aesiv_data
+    else:
+        boot_data+=(pk_data+signature)
+        boot_data+=aesiv_data
 
     #save efuse data
     filedir, ext = os.path.split(imgfile)
     flash_encrypt_type=firmware_post_get_flash_encrypt_type(encrypt,xts_mode)
     key_sel=0
     security=True
-    if encrypt != 0:
-        img_update_efuse_data(filedir, sign, pk_hash, flash_encrypt_type, \
-                                encrypt_key + bytearray(32 - len(encrypt_key)), \
-                                key_sel, None, security)
+    if flash_img:
+        flash_encrypt_key=encrypt_key
     else:
-        img_update_efuse_data(filedir, sign, pk_hash, flash_encrypt_type, None, \
-                                key_sel, None, security)
-     
-    return boot_data+image_data,hash
+        sec_eng_encrypt_key=encrypt_key
+
+    img_update_efuse_data(filedir, sign, pk_hash, flash_encrypt_type, flash_encrypt_key , \
+                                key_sel, sec_eng_encrypt_key, security)
+
+    return boot_data+image_data,hash,flash_img
 
 def firmware_post_proc_update_flash_crc(image_data):
     flash_cfg_start=8
@@ -514,13 +650,16 @@ def firmware_post_proc_get_image_offset(image_data):
              (image_data[cpucfg_start + 6]<<16) +
              (image_data[cpucfg_start + 7]<<24) )
 
-def firmware_post_proc_update_hash(image_data,force_update,args,hash):
+def firmware_post_proc_update_hash(image_data,force_update,args,hash,flash_img):
     #get image offset
     image_offset=firmware_post_proc_get_image_offset(image_data)
     bflb_utils.printf("Image Offset:"+hex(image_offset))
     #udpate image len
     bootcfg_start=(4+4)+(4+84+4)+(4+12+4)
-    image_data[bootcfg_start + 12:bootcfg_start + 12+4]=bflb_utils.int_to_4bytearray_l(len(image_data)-image_offset)
+    if flash_img:
+        image_data[bootcfg_start + 12:bootcfg_start + 12+4]=bflb_utils.int_to_4bytearray_l(len(image_data)-image_offset)
+    else:
+        image_data[bootcfg_start + 12:bootcfg_start + 12+4]=bflb_utils.int_to_4bytearray_l(1)
     #add apeend data
     if args.hd_append!=None:
         bflb_utils.printf("Append bootheader data")
@@ -553,7 +692,32 @@ def firmware_save_file_data(file,data):
         fp.write(data)
         fp.close()
 
+def firmware_get_ecc_key_whole_str(key_str):
+    n = 64
+    list_sk = [key_str[i:i+n] for i in range(0, len(key_str), n)]
+    str_sk = "-----BEGIN EC PRIVATE KEY-----\n"
+    for item in list_sk:
+        str_sk = str_sk + item + "\n"
+    str_sk = str_sk + "-----END EC PRIVATE KEY-----\n"
+    return str_sk
+
+def add_user_key(args):
+    global g_args
+    g_args=args
+    filedir, ext = os.path.split(args.datafile)
+    #deal edata input
+    img_update_efuse_data(filedir, 0, None, 0, None, 0, None, True)
+
+    #deal aes key using edata
+    if args.aeskeyoffset!=None:
+        g_args.edata=args.aeskeyoffset+","+args.aeskey
+    else:
+        g_args.edata="0x4c,"+args.aeskey+";0x7c,00001040"
+    img_update_efuse_data(filedir, 0, None, 0, None, 0, None, True)
+
 def firmware_post_proc(args):
+    global g_args
+    g_args=args
     bflb_utils.printf("========= sp image create =========")
 
     image_data=firmware_get_file_data(args.imgfile)
@@ -563,11 +727,23 @@ def firmware_post_proc(args):
     img_hash=None
     image_data=firmware_post_proc_update_flash_crc(image_data)
     image_data=firmware_post_proc_update_clock_crc(image_data)
-    image_data,img_hash=firmware_post_proc_do_encrypt(image_data,args.aeskey,args.aesiv,args.xtsmode,args.privatekey,args.publickey,args.imgfile)
+    #get publickey and private key whole string 
+    privatekey=None
+    publickey=None
+    if args.privatekey!=None:
+        privatekey=open(args.privatekey).read()
     if args.publickey!=None:
-        image_data=firmware_post_proc_update_hash(image_data,True,args,img_hash)
+        publickey=open(args.publickey).read()
+    if args.privatekey_str!=None:
+        privatekey=firmware_get_ecc_key_whole_str(args.privatekey_str)
+    if args.publickey_str!=None:
+        publickey=firmware_get_ecc_key_whole_str(args.publickey_str)
+    #do encrypt and sign
+    image_data,img_hash,flash_img=firmware_post_proc_do_encrypt(image_data,args.aeskey,args.aesiv,args.xtsmode,privatekey,publickey,args.imgfile)
+    if privatekey!=None:
+        image_data=firmware_post_proc_update_hash(image_data,True,args,img_hash,flash_img)
     else:
-        image_data=firmware_post_proc_update_hash(image_data,False,args,img_hash)
+        image_data=firmware_post_proc_update_hash(image_data,False,args,img_hash,flash_img)
 
     image_data=firmware_post_proc_update_bootheader_crc(image_data)
     firmware_save_file_data(args.imgfile,image_data)
@@ -594,3 +770,4 @@ if __name__ == '__main__':
     iv_bytearray = codecs.decode(reverse_iv(need_reverse_iv_bytearray), 'hex')
     #iv_bytearray = codecs.decode('000000000000000000000000000000000', 'hex')
     img_create_encrypt_data_xts(data_bytearray, key_bytearray, iv_bytearray, 0)
+

@@ -193,6 +193,16 @@ class BflbImgLoader(object):
                 "data_len": "0000",
                 "callback": None
             },
+            "memory_write": {
+                "cmd_id": "50",
+                "data_len": "0080",
+                "callback": None
+            },
+            "memory_read": {
+                "cmd_id": "51",
+                "data_len": "0000",
+                "callback": None
+            },
         }
 
     #####################interface close############################################################
@@ -382,7 +392,7 @@ class BflbImgLoader(object):
             create_cfg = BFConfigParser()
             create_cfg.read(self._create_cfg)
             img_create_section = "Img_Cfg"
-            if self._chip_type == "bl808":
+            if self._chip_type == "bl808" or self._chip_type == "bl616" or self._chip_type == "bl628":
                 img_create_section = "Img_Group0_Cfg"
             key = create_cfg.get(img_create_section, "aes_key_org")
             iv = create_cfg.get(img_create_section, "aes_iv")
@@ -447,7 +457,7 @@ class BflbImgLoader(object):
         return ret
 
     ########################main process###############################################
-    def img_load_main_process(self, file, group, createcfg, callback=None, record_bootinfo=None):
+    def img_load_main_process(self, file, group, createcfg, callback=None, record_bootinfo=None, **kwargs):
         encrypt_blk_size = 16
         #self._imge_fp = open(file, 'rb')
 
@@ -468,7 +478,7 @@ class BflbImgLoader(object):
         else:
             chipid = bootinfo[34:36] + bootinfo[32:34] + bootinfo[30:32] + \
                 bootinfo[28:30] + bootinfo[26:28] + bootinfo[24:26]
-        bflb_utils.printf("========= ChipID: ", chipid, " =========")
+        bflb_utils.printf("========= chipid: ", chipid, " =========")
         if qt_sign and th_sign and QtCore.QThread.currentThread().objectName():
             with mutex:
                 num = str(QtCore.QThread.currentThread().objectName())
@@ -507,24 +517,50 @@ class BflbImgLoader(object):
             sign = int(data_read[8:10], 16)
             encrypt = int(data_read[10:12], 16)
         bflb_utils.printf("sign is ", sign, " encrypt is ", encrypt)
-
         key, iv, publickey, privatekey = self.img_load_get_sec_cfg()
+        eflash_loader_dir = os.path.dirname(file)
+        eflash_loader_file = os.path.basename(file).split('.')[0]
+
+        key = None if not key else key
+        iv = None if not iv else iv
+        privatekey = None if not privatekey else privatekey
+        publickey = None if not publickey else publickey 
+        privatekey_str = None       
+        if 'privatekey_str' in kwargs and kwargs["privatekey_str"]:
+            privatekey_str = kwargs["privatekey_str"]
 
         # encrypt eflash loader helper bin
-        if (key != "" and iv != "") or (publickey != "" and privatekey != ""):
-            ret, encrypted_data = bflb_img_create.encrypt_loader_bin(self._chip_type, \
-                file, sign, encrypt, key, iv, publickey, privatekey)
-            if ret == True:
-                # create new eflash loader helper bin
-                filename, ext = os.path.splitext(file)
-                file_encrypt = filename + '_encrypt' + ext
-                fp = open(file_encrypt, 'wb')
-                fp.write(encrypted_data)
-                fp.close()
-                self._imge_fp = open(file_encrypt, 'rb')
-            else:
+        if (key and iv) or privatekey or privatekey_str:
+            if sign and not privatekey and not privatekey_str:
+                bflb_utils.printf("Error: private key must be provided")
+                return "", bootinfo
+            if encrypt and (not key or not iv):
+                bflb_utils.printf("Error: aes key and aes iv must be provided")
+                return "", bootinfo        
+            if eflash_loader_file == 'img_if' or eflash_loader_file == 'img_group0_if' or eflash_loader_file == 'img_group1_if':
                 file = os.path.join(bflb_utils.app_path, file)
                 self._imge_fp = open(file, 'rb')
+            else:
+                ret, encrypted_data = bflb_img_create.encrypt_loader_bin(self._chip_type, \
+                        file, sign, encrypt, key, iv, publickey, privatekey, **kwargs)           
+                if ret == True:
+                    # create new eflash loader helper bin
+                    filename, ext = os.path.splitext(file)
+                    file_encrypt = filename + '_encrypt' + ext
+                    with open(file_encrypt, 'wb') as fp:
+                        fp.write(encrypted_data)
+                    self._imge_fp = open(file_encrypt, 'rb')
+                else:
+                    file = os.path.join(bflb_utils.app_path, file)
+                    self._imge_fp = open(file, 'rb')
+        elif sign or encrypt:
+            try:
+                eflash_loader_file = eflash_loader_file + '_encrypt.bin'
+                file = os.path.join(bflb_utils.app_path, eflash_loader_dir, eflash_loader_file)
+                self._imge_fp = open(file, 'rb')
+            except Exception as e:
+                bflb_utils.printf(e)
+                return "", bootinfo
         else:
             file = os.path.join(bflb_utils.app_path, file)
             self._imge_fp = open(file, 'rb')
@@ -680,6 +716,15 @@ class BflbImgLoader(object):
             return ret, ""
         # check with image file
         data_read = binascii.hexlify(data_read)
+        if self._chip_type == "bl616" and data_read.decode('utf-8')[:2] == "01":
+            # write memory, set bl616 a0 bootrom uart timeout to 10s
+            tmp = bflb_utils.int_to_2bytearray_l(8)
+            start_addr = bflb_utils.int_to_4bytearray_l(0x6102df04)
+            write_data = bflb_utils.int_to_4bytearray_l(0x27101200)
+            cmd_id = bflb_utils.hexstr_to_bytearray(self._bootrom_cmds.get("memory_write")["cmd_id"])
+            data = cmd_id + bytearray(1) + tmp + start_addr + write_data
+            self.bflb_boot_if.if_write(data)
+            ret, data_read_ack = self.bflb_boot_if.if_deal_ack(dmy_data=False)
         bflb_utils.printf("data read is ", data_read)
         return True, data_read
 
@@ -706,7 +751,8 @@ class BflbImgLoader(object):
                          shake_hand_retry=2,
                          isp_timeout=0,
                          boot_load=True,
-                         record_bootinfo=None):
+                         record_bootinfo=None,
+                         **kwargs):
         bflb_utils.printf("========= image load =========")
         success = True
         bootinfo = None
@@ -728,7 +774,7 @@ class BflbImgLoader(object):
             time.sleep(0.01)
             if file1 is not None and file1 != "":
                 res, bootinfo = self.img_load_main_process(file1, 0, self._create_cfg, callback,
-                                                           record_bootinfo)
+                                                           record_bootinfo, **kwargs)
                 if res.startswith("OK") is False:
                     if res.startswith("repeat_burn") is True:
                         return False, bootinfo, res
@@ -739,7 +785,7 @@ class BflbImgLoader(object):
                         return False, bootinfo, res
             if file2 is not None and file2 != "":
                 res, bootinfo = self.img_load_main_process(file2, 1, self._create_cfg, callback,
-                                                           record_bootinfo)
+                                                           record_bootinfo, **kwargs)
                 if res.startswith("OK") is False:
                     if res.startswith("repeat_burn") is True:
                         return False, bootinfo, res
@@ -757,7 +803,7 @@ class BflbImgLoader(object):
             time.sleep(0.1)
         except Exception as e:
             bflb_utils.printf(e)
-            traceback.print_exc(limit=5, file=sys.stdout)
+            #traceback.print_exc(limit=5, file=sys.stdout)
             return False, bootinfo, ""
         # self.bflb_boot_if.if_close()
         return success, bootinfo, ""

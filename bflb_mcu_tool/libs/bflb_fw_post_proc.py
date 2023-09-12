@@ -35,14 +35,37 @@ from libs import bflb_utils
 from libs import bflb_pt_creater as partition
 from libs import bflb_ro_params_device_tree as bl_ro_device_tree
 from libs import bflb_fw_check_partition as pt_check
+from libs.bflb_utils import img_create_encrypt_data
+from libs.bflb_utils import img_create_encrypt_data_xts
 
-version_str="V1.2.1"
 
-chip_dict = ("bl602", "bl604", "bl702", "bl704", "bl706", "bl702l", "bl704l", "bl606p", "bl808", "bl616", "bl618")
+version_str="V1.2.3"
+
+chip_dict = ("bl602", "bl604", "bl702", "bl704", "bl706", "bl702l", "bl704l", "bl606p", "bl808", "bl616", "bl618", "bl628")
 
 def dump_release_note():
+    vxxx_rn=''
     ################################
-    vxxx_rn='''
+    vxxx_rn+='''
+    ---V1.2.3---
+    Feature:
+        1. support crc check for encrypted efusedata.bin
+    '''
+    ################################
+    vxxx_rn+='''
+    ---V1.2.2.1---
+    Feature:
+        1. temp version for RD
+    '''
+    ################################
+    vxxx_rn+='''
+    ---V1.2.2---
+    Feature:
+        1. support ram image
+        2. support --exxx like efuse option
+    '''
+    ################################
+    vxxx_rn+='''
     ---V1.2.1---
     Feature:
         1. support checkpartition option
@@ -102,7 +125,7 @@ def get_value_file(path, chipname, cpu_id=None):
         if "*" in file_name:
             file_name = file_name.replace(".", "\\.").replace("*", ".*[\u4e00-\u9fa5]*")
         for one_name in all_file_list:
-            pattern = re.compile(file_name)
+            pattern = re.compile('^'+file_name+'$')
             result += pattern.findall(one_name)
         if len(result) > 1:
             bflb_utils.printf("[Error] Multiple files were matched! ")
@@ -162,6 +185,7 @@ def parse_rfpa(bin, dts_bytearray):
 
 def found_file(dir, suffix):
     files = []
+    dir = dir.replace('\'', '').replace('\"', '')
     # return all files as a list
     for file in os.listdir(dir):
         # check the files which are end with specific extension
@@ -173,6 +197,7 @@ def found_file(dir, suffix):
 
 def found_boot2_mfg_file(dir, target):
     files = []
+    dir = dir.replace('\'', '').replace('\"', '')
     # return all files as a list
     for file in os.listdir(dir):
         # check the files which are end with specific extension
@@ -374,6 +399,41 @@ def firmware_create_ota_file(chipname,fw_file):
         bflb_utils.printf("[Error] create OTA file fail")
     return False
 
+def encrypt_user_data(args, chipname="bl60x"):
+    if args.aeskey==None or args.aesiv==None:
+        bflb_utils.printf("[Error] No input key")
+        sys.exit()
+    if args.xtsmode!=None:
+        xts_mode=int(args.xtsmode)
+    else:
+        xts_mode=0
+    encrypt_key=bflb_utils.hexstr_to_bytearray(args.aeskey)
+    if len(encrypt_key)!=32 and len(encrypt_key)!=24 and len(encrypt_key)!=16:
+        bflb_utils.printf("[Error] Key length error")
+        sys.exit()
+
+    iv_value = args.aesiv
+    if xts_mode == 1:
+        if len(encrypt_key)!=32:
+            bflb_utils.printf("[Error] XTS mode key length error")
+            sys.exit()
+        iv_value = iv_value[24:32] + iv_value[:24]
+    encrypt_iv = bflb_utils.hexstr_to_bytearray(iv_value)
+    
+    data=bytearray(0)
+    with open(args.datafile, 'rb') as fp:
+        data = fp.read()
+    if xts_mode:
+        data=img_create_encrypt_data_xts(data,encrypt_key,encrypt_iv,1)
+    else:
+        data=img_create_encrypt_data(data,encrypt_key,encrypt_iv,1)
+    with open(args.datafile, 'wb+') as fp:
+        data = fp.write(data)
+
+    chipname = get_nicky_name(chipname.lower())
+    sub_module = __import__("libs." + chipname, fromlist=[chipname])
+    sub_module.firmware_post_process_do.add_user_key(args)
+
 def run():
     parser = bflb_utils.firmware_post_proc_parser_init()
     args = parser.parse_args()
@@ -392,16 +452,21 @@ def run():
             return
 
     if args.chipname.lower() in chip_dict:
-        if args.checkpartition != None:
-            chipname = get_nicky_name(args.chipname.lower())
+        chipname = get_nicky_name(args.chipname.lower())
+        if args.checkpartition != None:            
             pt_check.dump_partiton(chipname,args.checkpartition)
+            return
+        if args.datafile != None:
+            encrypt_user_data(args,chipname)
             return
         #get image files
         img_file_list = None
         if args.imgfile != None:
+            args.imgfile = args.imgfile.replace('\'', '').replace('\"', '')
             img_file_list = get_img_file_list(args.imgfile, args.chipname, args.cpuid)
 
         if args.brdcfgdir != None:
+            args.brdcfgdir = args.brdcfgdir.replace('\'', '').replace('\"', '')
             bflb_utils.printf("Board config dir: %s" % args.brdcfgdir)
             create_partiton_table(args.brdcfgdir, img_file_list[0])
             append_dts_file(args.brdcfgdir, img_file_list[0])

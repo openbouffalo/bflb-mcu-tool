@@ -4,6 +4,7 @@ import re
 import os
 import sys
 import time
+import zipfile
 import shutil
 import argparse
 import traceback
@@ -102,6 +103,8 @@ class BflbMcuTool(object):
     def __init__(self, chipname="bl60x", chiptype="bl60x"):
         self.chiptype = chiptype
         self.chipname = chipname
+        self.encrypt = False
+        self.sign = False
         self.config = {}
         self.efuse_load_en = False
         self.eflash_loader_cfg = os.path.join(chip_path, chipname,
@@ -111,6 +114,7 @@ class BflbMcuTool(object):
         self.eflash_loader_bin = os.path.join(chip_path, chipname,
                                               "eflash_loader/eflash_loader_40m.bin")
         self.img_create_path = os.path.join(chip_path, chipname, "img_create_mcu")
+        #self.img_create_path = os.path.join("chips", chipname, "img_create_mcu")
         self.efuse_bh_path = os.path.join(chip_path, chipname, "efuse_bootheader")
         self.efuse_bh_default_cfg = os.path.join(chip_path, chipname,
                                                  "efuse_bootheader") + "/efuse_bootheader_cfg.conf"
@@ -204,12 +208,13 @@ class BflbMcuTool(object):
                              args,
                              eflash_loader_bin=None,
                              callback=None,
-                             create_img_callback=None):
+                             create_img_callback=None,
+                             **kwargs):
         ret = None
         try:
             bflb_utils.set_error_code("FFFF")
             ret = self.eflash_loader_t.efuse_flash_loader(args, None, eflash_loader_bin, callback,
-                                                          None, create_img_callback)
+                                                          None, create_img_callback, **kwargs)
             self.eflash_loader_t.object_status_clear()
         except Exception as e:
             traceback.print_exc(limit=5, file=sys.stdout)
@@ -217,13 +222,13 @@ class BflbMcuTool(object):
         finally:
             return ret
 
-    def img_loader_thread(self, comnum, sh_baudrate, wk_baudrate, file1, file2, callback=None):
+    def img_loader_thread(self, comnum, sh_baudrate, wk_baudrate, file1, file2, callback=None, **kwargs):
         ret = None
         try:
-            img_load_t = bflb_img_loader.BflbImgLoader(self.chiptype, self.chipname)
+            img_load_t = bflb_img_loader.BflbImgLoader(self.chiptype, self.chipname, createcfg=self.img_create_cfg)
             ret, bootinfo, res = img_load_t.img_load_process(comnum, sh_baudrate, wk_baudrate,
                                                              file1, file2, callback, True, 50, 100,
-                                                             False, 50, 3)
+                                                             False, 50, 3, **kwargs)
             img_load_t.close_port()
         except Exception as e:
             traceback.print_exc(limit=5, file=sys.stdout)
@@ -557,19 +562,29 @@ class BflbMcuTool(object):
                     bflb_utils.printf(error)
                     bflb_utils.set_error_code("0065")
                     return bflb_utils.errorcode_msg()
+            if values["encrypt_type"] != "None":
+                self.encrypt = True
+            else:
+                self.encrypt = False
         if "sign_type" in values.keys():
+            '''
             if "public_key_cfg" in values.keys():
                 if values["sign_type"] != "None" and values["public_key_cfg"] == "":
                     error = "Please set public key"
                     bflb_utils.printf(error)
                     bflb_utils.set_error_code("0066")
                     return bflb_utils.errorcode_msg()
+            '''
             if "private_key_cfg" in values.keys():
                 if values["sign_type"] != "None" and values["private_key_cfg"] == "":
                     error = "Please set private key"
                     bflb_utils.printf(error)
                     bflb_utils.set_error_code("0067")
                     return bflb_utils.errorcode_msg()
+            if values["sign_type"] != "None":
+                self.sign = True
+            else:
+                self.sign = False
         # create bootheader_boot2.ini
         if values["img_type"] == "SingleCPU":
             section = "BOOTHEADER_CFG"
@@ -812,12 +827,15 @@ class BflbMcuTool(object):
 
         encryptEn = False
         signEn = False
-        if "encrypt_key" in values.keys() and "aes_iv" in values.keys():
-            if values["encrypt_key"] != "" and values["aes_iv"]:
-                encryptEn = True
-        if "public_key_cfg" in values.keys() and "private_key_cfg" in values.keys():
-            if values["public_key_cfg"] != "" and values["private_key_cfg"]:
-                signEn = True
+
+        if values["encrypt_type"] != "None": 
+            if "encrypt_key" in values.keys() and "aes_iv" in values.keys():
+                if values["encrypt_key"] != "" and values["aes_iv"]:
+                    encryptEn = True
+        if values["sign_type"] != "None":
+            if "public_key_cfg" in values.keys() and "private_key_cfg" in values.keys():
+                if values["private_key_cfg"]:
+                    signEn = True
         if "encrypt_key" in values.keys():
             bflb_utils.update_cfg(cfg, img_create_section, "aes_key_org", values["encrypt_key"])
         if "aes_iv" in values.keys():
@@ -835,6 +853,8 @@ class BflbMcuTool(object):
                               img_output_file.replace(".bin", "_if.bin"))
         cfg.write(self.img_create_cfg, "w+")
 
+        cfg = BFConfigParser()
+        cfg.read(self.eflash_loader_cfg_tmp)
         # udate efuse data
         if encryptEn or signEn:
             img_cfg = BFConfigParser()
@@ -845,15 +865,16 @@ class BflbMcuTool(object):
             else:
                 efusefile = img_cfg.get("Img_Cfg", "efuse_file")
                 efusemaskfile = img_cfg.get("Img_Cfg", "efuse_mask_file")
-            cfg = BFConfigParser()
-            cfg.read(self.eflash_loader_cfg_tmp)
             cfg.set('EFUSE_CFG', 'file', convert_path(os.path.relpath(efusefile, app_path)))
             cfg.set('EFUSE_CFG', 'maskfile', convert_path(os.path.relpath(efusemaskfile,
                                                                           app_path)))
+            cfg.set('EFUSE_CFG', 'burn_en', 'true')
             cfg.write(self.eflash_loader_cfg_tmp, 'w')
             self.efuse_load_en = True
         else:
             self.efuse_load_en = False
+            cfg.set('EFUSE_CFG', 'burn_en', 'false')
+            cfg.write(self.eflash_loader_cfg_tmp, 'w')
         # create img
         if values["boot_src"].upper() == "FLASH":
             if values["img_type"] == "SingleCPU":
@@ -1063,12 +1084,14 @@ class BflbMcuTool(object):
                     bflb_utils.set_error_code("0065")
                     return bflb_utils.errorcode_msg()
         if "sign_type-group0" in values.keys():
+            '''
             if "public_key_cfg-group0" in values.keys():
                 if values["sign_type-group0"] != "None" and values["public_key_cfg-group0"] == "":
                     error = "Please set group0 public key"
                     bflb_utils.printf(error)
                     bflb_utils.set_error_code("0066")
                     return bflb_utils.errorcode_msg()
+            '''
             if "private_key_cfg-group0" in values.keys():
                 if values["sign_type-group0"] != "None" and values["private_key_cfg-group0"] == "":
                     error = "Please set group0 private key"
@@ -1076,12 +1099,14 @@ class BflbMcuTool(object):
                     bflb_utils.set_error_code("0067")
                     return bflb_utils.errorcode_msg()
         if "sign_type-group1" in values.keys():
+            '''
             if "public_key_cfg-group1" in values.keys():
                 if values["sign_type-group1"] != "None" and values["public_key_cfg-group1"] == "":
                     error = "Please set group1 public key"
                     bflb_utils.printf(error)
                     bflb_utils.set_error_code("0066")
                     return bflb_utils.errorcode_msg()
+            '''
             if "private_key_cfg-group1" in values.keys():
                 if values["sign_type-group1"] != "None" and values["private_key_cfg-group1"] == "":
                     error = "Please set group1 private key"
@@ -1404,6 +1429,17 @@ class BflbMcuTool(object):
             i = i + 1
         if os.path.exists(self.img_create_path + '/bootheader_dummy.bin'):
             os.remove(self.img_create_path + "/bootheader_dummy.bin")
+        
+        cfg = BFConfigParser()
+        cfg.read(self.eflash_loader_cfg_tmp)        
+        if values["encrypt_type-group0"] != "None" or values["encrypt_type-group1"] != "None" \
+             or values["sign_type-group0"] != "None" or values["sign_type-group1"] != "None": 
+            cfg.set('EFUSE_CFG', 'burn_en', 'true')
+            self.efuse_load_en = True
+        else:
+            cfg.set('EFUSE_CFG', 'burn_en', 'false')
+            self.efuse_load_en = False
+        cfg.write(self.eflash_loader_cfg_tmp, 'w')
         return True
 
     def create_bl616_img(self, chipname, chiptype, values):
@@ -1478,12 +1514,14 @@ class BflbMcuTool(object):
                     bflb_utils.set_error_code("0065")
                     return bflb_utils.errorcode_msg()
         if "sign_type-group0" in values.keys():
+            '''
             if "public_key_cfg-group0" in values.keys():
                 if values["sign_type-group0"] != "None" and values["public_key_cfg-group0"] == "":
                     error = "Please set group0 public key"
                     bflb_utils.printf(error)
                     bflb_utils.set_error_code("0066")
                     return bflb_utils.errorcode_msg()
+            '''
             if "private_key_cfg-group0" in values.keys():
                 if values["sign_type-group0"] != "None" and values["private_key_cfg-group0"] == "":
                     error = "Please set group0 private key"
@@ -1681,7 +1719,9 @@ class BflbMcuTool(object):
                 options.extend(["--security=efuse"])
             args = parser_image.parse_args(options)
             res = bflb_img_create.img_create(args, chipname, chiptype, self.img_create_path,
-                                             self.img_create_cfg)
+                                             self.img_create_cfg, 
+                                             privatekey_str=values["privatekey"],
+                                             publickey_str=values["publickey"])
             if res is not True:
                 bflb_utils.set_error_code("0060")
                 return bflb_utils.errorcode_msg()
@@ -1691,13 +1731,27 @@ class BflbMcuTool(object):
                 options.extend(["--security=efuse"])
             args = parser_image.parse_args(options)
             res = bflb_img_create.img_create(args, chipname, chiptype, self.img_create_path,
-                                             self.img_create_cfg)
+                                             self.img_create_cfg,
+                                             privatekey_str=values["privatekey"],
+                                             publickey_str=values["publickey"])
             if res is not True:
                 bflb_utils.set_error_code("0060")
                 return bflb_utils.errorcode_msg()
         os.remove(self.img_create_path + segheader_file)
         if os.path.exists(self.img_create_path + '/bootheader_dummy.bin'):
             os.remove(self.img_create_path + "/bootheader_dummy.bin")
+            
+        cfg = BFConfigParser()
+        cfg.read(self.eflash_loader_cfg_tmp)
+
+        if ("encrypt_type-group0" in values.keys() and values["encrypt_type-group0"] != "None") or \
+           ("sign_type-group0" in values.keys() and values["sign_type-group0"] != "None"):
+            cfg.set('EFUSE_CFG', 'burn_en', 'true')
+            self.efuse_load_en = True
+        else:
+            cfg.set('EFUSE_CFG', 'burn_en', 'false')
+            self.efuse_load_en = False
+        cfg.write(self.eflash_loader_cfg_tmp, 'w')             
         return True
 
     def program_default_img(self, values, callback=None):
@@ -1747,8 +1801,7 @@ class BflbMcuTool(object):
                 img_output_file = create_output_path + "/img_cpu1.bin"
                 whole_img_output_file = create_output_path + "/whole_img_cpu1.bin"
             # uart download
-            if values["boot_src"].upper() == "UART/SDIO" or values["boot_src"].upper(
-            ) == "UART/USB":
+            if values["boot_src"].upper() == "UART/SDIO" or values["boot_src"].upper() == "UART/USB":
                 cfg = BFConfigParser()
                 if os.path.isfile(self.eflash_loader_cfg_tmp) is False:
                     shutil.copyfile(self.eflash_loader_cfg, self.eflash_loader_cfg_tmp)
@@ -1756,11 +1809,14 @@ class BflbMcuTool(object):
                 boot_speed = int(cfg.get("LOAD_CFG", "speed_uart_boot"))
                 if values["img_type"] == "RAW":
                     ret = self.img_loader_thread(values["dl_comport"], boot_speed, boot_speed,
-                                                 values["img_file"], None, callback)
+                                                 values["img_file"], None, callback,
+                                                 privatekey_str=values["privatekey"],
+                                                 publickey_str=values["publickey"])
                 else:
                     ret = self.img_loader_thread(values["dl_comport"], boot_speed, boot_speed,
-                                                 img_output_file.replace(".bin", "_if.bin"), None,
-                                                 callback)
+                                                 img_output_file.replace(".bin", "_if.bin"), None, callback,
+                                                 privatekey_str=values["privatekey"],
+                                                 publickey_str=values["publickey"])
                 if ret is False:
                     ret = "Img load fail"
                 return ret
@@ -1853,12 +1909,41 @@ class BflbMcuTool(object):
                     values["encrypt_key"] != "" and\
                     values["aes_iv"] != "") or\
                    (values["sign_type"] != "None" and\
-                    values["public_key_cfg"] != "" and\
+                   #values["public_key_cfg"] != "" and\
                     values["private_key_cfg"] != ""):
                     if values["boot_src"].upper() == "FLASH":
                         options.extend(["--efuse", "--createcfg=" + self.img_create_cfg])
                         self.efuse_load_en = True
         ret = bflb_img_create.compress_dir(self.chipname, "img_create_mcu", self.efuse_load_en)
+        if (self.encrypt is True or self.sign is True) and (self.chiptype == "bl602" or self.chiptype == "bl702"):
+            if self.encrypt:
+                encrypt = 1
+            else:
+                encrypt = 0
+            if self.sign:
+                sign = 1
+            else:
+                sign = 0
+            key = values["encrypt_key"] 
+            iv = values["aes_iv"]
+            publickey = values["public_key_cfg"]
+            privatekey = values["private_key_cfg"]
+            ret, encrypted_data = bflb_img_create.encrypt_loader_bin(self.chiptype,
+                             eflash_loader_bin, sign, encrypt, key, iv, publickey, privatekey, 
+                             privatekey_str=values["privatekey"],
+                             publickey_str=values["publickey"])
+            if ret == True:
+                filename, ext = os.path.splitext(eflash_loader_bin)
+                file_encrypt = filename + '_encrypt' + ext
+                with open(file_encrypt, 'wb') as fp:
+                    fp.write(encrypted_data)
+                eflash_loader_bin_org = os.path.basename(eflash_loader_bin)
+                eflash_loader_bin_encrpyt = eflash_loader_bin_org.split('.')[0] + '_encrypt.bin'
+                zip_file = os.path.join(self.img_create_path, "whole_img.pack")
+                z = zipfile.ZipFile(zip_file, 'a')
+                z.write(os.path.join(chip_path, self.chipname, "eflash_loader", eflash_loader_bin_encrpyt), os.path.join(self.chipname, "eflash_loader", eflash_loader_bin_encrpyt))
+                z.close()
+        
         if ret is not True:
             return bflb_utils.errorcode_msg()
         if not values["dl_comport"] and values["dl_device"].lower() == "uart":
@@ -1867,7 +1952,9 @@ class BflbMcuTool(object):
             return error
         args = parser_eflash.parse_args(options)
         ret = self.eflash_loader_thread(args, eflash_loader_bin, callback,
-                                        self.create_img_callback)
+                                        self.create_img_callback,
+                                        privatekey_str=values["privatekey"],
+                                        publickey_str=values["publickey"])
         return ret
 
     def program_bl808_bl628_img(self, values, callback=None):
@@ -1934,21 +2021,29 @@ class BflbMcuTool(object):
             boot_speed = int(cfg.get("LOAD_CFG", "speed_uart_boot"))
             if values["img_type"] == "RAW":
                 ret = self.img_loader_thread(values["dl_comport"], boot_speed, boot_speed,
-                                             values["img1_file"], None, callback)
+                                             values["img1_file"], None, callback,
+                                             privatekey_str=values["privatekey"],
+                                             publickey_str=values["publickey"])
             else:
                 if group0_used is True and group1_used is False:
                     ret = self.img_loader_thread(values["dl_comport"], boot_speed, boot_speed,
                                                  group0_img_output_file.replace(".bin", "_if.bin"),
-                                                 None, callback)
+                                                 None, 
+                                                 callbackprivatekey_str=values["privatekey"],
+                                                 publickey_str=values["publickey"])
                 elif group0_used is False and group1_used is True:
                     ret = self.img_loader_thread(values["dl_comport"], boot_speed, boot_speed,
                                                  group1_img_output_file.replace(".bin", "_if.bin"),
-                                                 None, callback)
+                                                 None, callback,
+                                                 privatekey_str=values["privatekey"],
+                                                 publickey_str=values["publickey"])
                 elif group0_used is True and group1_used is True:
                     ret = self.img_loader_thread(values["dl_comport"], boot_speed, boot_speed,
                                                  group0_img_output_file.replace(".bin", "_if.bin"),
                                                  group1_img_output_file.replace(".bin", "_if.bin"),
-                                                 callback)
+                                                 callback,
+                                                 privatekey_str=values["privatekey"],
+                                                 publickey_str=values["publickey"])
             if ret is False:
                 ret = "Img load fail"
             return ret
@@ -2121,10 +2216,10 @@ class BflbMcuTool(object):
                 values["encrypt_key-group1"] != "" and\
                 values["aes_iv-group1"] != "") or\
                (values["sign_type-group0"] != "None" and\
-                values["public_key_cfg-group0"] != "" and\
+               # values["public_key_cfg-group0"] != "" and\
                 values["private_key_cfg-group0"] != "") or\
                (values["sign_type-group1"] != "None" and\
-                values["public_key_cfg-group1"] != "" and\
+               # values["public_key_cfg-group1"] != "" and\
                 values["private_key_cfg-group1"] != ""):
                 if values["boot_src"].upper() == "FLASH":
                     options.extend(["--efuse", "--createcfg=" + self.img_create_cfg])
@@ -2138,7 +2233,9 @@ class BflbMcuTool(object):
             return error
         args = parser_eflash.parse_args(options)
         ret = self.eflash_loader_thread(args, eflash_loader_bin, callback,
-                                        self.create_img_callback)
+                                        self.create_img_callback, 
+                                        privatekey_str=values["privatekey"],
+                                        publickey_str=values["publickey"])
         return ret
 
     def program_bl616_img(self, values, callback=None):
@@ -2158,11 +2255,15 @@ class BflbMcuTool(object):
             boot_speed = int(cfg.get("LOAD_CFG", "speed_uart_boot"))
             if values["img_type"] == "RAW":
                 ret = self.img_loader_thread(values["dl_comport"], boot_speed, boot_speed,
-                                             values["img1_file"], None, callback)
+                                             values["img1_file"], None, callback,
+                                             privatekey_str=values["privatekey"],
+                                             publickey_str=values["publickey"])
             else:
                 ret = self.img_loader_thread(values["dl_comport"], boot_speed, boot_speed,
                                              group0_img_output_file.replace(".bin", "_if.bin"),
-                                             None, callback)
+                                             None, callback,
+                                             privatekey_str=values["privatekey"],
+                                             publickey_str=values["publickey"])
             if ret is False:
                 ret = "Img load fail"
             return ret
@@ -2260,7 +2361,7 @@ class BflbMcuTool(object):
                 values["encrypt_key-group0"] != "" and\
                 values["aes_iv-group0"] != "") or\
                (values["sign_type-group0"] != "None" and\
-                values["public_key_cfg-group0"] != "" and\
+                #values["public_key_cfg-group0"] != "" and\
                 values["private_key_cfg-group0"] != ""):
                 if values["boot_src"].upper() == "FLASH":
                     options.extend(["--efuse", "--createcfg=" + self.img_create_cfg])
@@ -2274,7 +2375,9 @@ class BflbMcuTool(object):
             return error
         args = parser_eflash.parse_args(options)
         ret = self.eflash_loader_thread(args, eflash_loader_bin, callback,
-                                        self.create_img_callback)
+                                        self.create_img_callback,
+                                        privatekey_str=values["privatekey"],
+                                        publickey_str=values["publickey"])
         return ret
 
     def create_img(self, chipname, chiptype, values):
@@ -2374,7 +2477,21 @@ def get_value(args):
     config.setdefault('aes_iv', '')
     config.setdefault('public_key_cfg', '')
     config.setdefault('private_key_cfg', '')
+    config.setdefault('publickey', '')
+    config.setdefault('privatekey', '')
     config.setdefault('bootinfo_addr', '0x0')
+    
+    config.setdefault('encrypt_type-group0', 'None')
+    config.setdefault('key_sel-group0', '0')
+    config.setdefault('cache_way_disable-group0', '0')
+    config.setdefault('sign_type-group0', 'None')
+    config.setdefault('crc_ignore-group0', 'False')
+    config.setdefault('hash_ignore-group0', 'False')
+    config.setdefault('encrypt_key-group0', '')
+    config.setdefault('aes_iv-group0', '')
+    config.setdefault('public_key_cfg-group0', '')
+    config.setdefault('private_key_cfg-group0', '')
+    
     config["dl_device"] = args.interface.lower()
     config["dl_comport"] = args.port
     config["dl_comspeed"] = str(args.baudrate)
@@ -2503,16 +2620,6 @@ def get_value(args):
             bflb_utils.printf("Default boot source is flash")
         else:
             config["boot_src"] = args.bootsrc
-        config["encrypt_type-group0"] = 'None'
-        config["key_sel-group0"] = '0'
-        config["cache_way_disable-group0"] = '0'
-        config["sign_type-group0"] = 'None'
-        config["crc_ignore-group0"] = 'False'
-        config["hash_ignore-group0"] = 'False'
-        config["encrypt_key-group0"] = ''
-        config["aes_iv-group0"] = ''
-        config["public_key_cfg-group0"] = ''
-        config["private_key_cfg-group0"] = ''
         config["encrypt_type-group1"] = 'None'
         config["key_sel-group1"] = '0'
         config["cache_way_disable-group1"] = '0'
@@ -2531,16 +2638,40 @@ def get_value(args):
         config["img3_file"] = ""
         config["img3_addr"] = ""
         config["img1_file"] = firmware
+        
         if args.addr:
             if args.addr == "0x2000" or args.addr == "2000":
                 config["img1_addr"] = "0x58000000"
             else:
                 config["img1_addr"] = "0x" + args.addr.replace("0x", "")
         else:
-            config["img1_addr"] = "0x58000000"
+            config["img1_addr"] = "0x58000000"                             
     else:
         bflb_utils.printf("Chip type is not correct")
         sys.exit(1)
+        
+    if args.key and args.iv:
+        config["encrypt_type-group0"] = "AES CTR128"
+        config["encrypt_type"] = "AES128"
+        config["encrypt_key"] = args.key
+        config["encrypt_key-group0"] = args.key
+        config["aes_iv-group0"] = args.iv
+        config["aes_iv"] = args.iv
+
+    if args.sk:
+        config["sign_type-group0"] = "ECC"
+        config["sign_type"] = "ECC"
+        config["private_key_cfg-group0"] = args.sk
+        config["private_key_cfg"] = args.sk
+        if args.pk:
+            config["public_key_cfg-group0"] = args.pk
+            config["public_key_cfg"] = args.pk
+            
+    if args.sk_str:
+        config["sign_type-group0"] = "ECC"     
+        config["privatekey"] = args.sk_str
+        if args.pk_str:
+            config["publickey"] = args.pk_str
 
     if config["dl_device"] == "jlink" and args.baudrate > 12000:
         config["dl_jlinkspeed"] = "12000"
@@ -2585,6 +2716,12 @@ def run(argv):
     parser.add_argument("--build", dest="build", action="store_true", help="build image")
     parser.add_argument("--erase", dest="erase", action="store_true", help="chip erase")
     parser.add_argument("--log", dest="log", action="store_true", help="enable logging")
+    parser.add_argument("--key", dest="key", help="aes key")
+    parser.add_argument("--iv", dest="iv", help="aes iv")
+    parser.add_argument("--pk", dest="pk", help="ecc public key")
+    parser.add_argument("--sk", dest="sk", help="ecc private key")
+    parser.add_argument("--pk_str", dest="pk_str", help="ecc public key string")
+    parser.add_argument("--sk_str", dest="sk_str", help="ecc private key string")
     args = parser.parse_args(argv)
     if args.log:
         logger = record_log()
@@ -2612,10 +2749,11 @@ def run(argv):
         if res is not True:
             sys.exit(1)
         if args.build:
-            obj_mcu.bind_img(config)
-            f_org = os.path.join(chip_path, args.chipname, "img_create_mcu", "whole_img.bin")
-            f = "firmware.bin"
-            shutil.copyfile(f_org, f)
+            if args.bootsrc == "Flash":
+                obj_mcu.bind_img(config)
+                f_org = os.path.join(chip_path, args.chipname, "img_create_mcu", "whole_img.bin")
+                f = "firmware.bin"
+                shutil.copyfile(f_org, f)
         else:
             obj_mcu.program_img_thread(config)
     except Exception as e:

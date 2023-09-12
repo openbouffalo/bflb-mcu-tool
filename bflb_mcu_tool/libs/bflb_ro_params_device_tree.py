@@ -144,6 +144,9 @@ def bl_dts2hex(dts):
         troom_os = fdt_obj.get_property("Troom_os", "wifi/rf_temp")
     if fdt_obj.exist_node("bluetooth/brd_rf"):
         pwr_table_ble = fdt_obj.get_property("pwr_table_ble", "bluetooth/brd_rf")
+        pwr_table_bt = fdt_obj.get_property("pwr_table_bt", "bluetooth/brd_rf")
+        pwr_table_zigbee = fdt_obj.get_property("pwr_table_zigbee", "bluetooth/brd_rf")
+        pwr_offset_bz = fdt_obj.get_property("pwr_offset", "bluetooth/brd_rf")
     if fdt_obj.exist_node("bluetooth_zigbee/brd_rf"):
         pwr_table_ble = fdt_obj.get_property("pwr_table_ble", "bluetooth_zigbee/brd_rf")
         pwr_table_bt = fdt_obj.get_property("pwr_table_bt", "bluetooth_zigbee/brd_rf")

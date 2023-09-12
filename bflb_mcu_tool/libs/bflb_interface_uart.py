@@ -36,6 +36,11 @@ try:
 except ImportError:
     raise serial.serialutil.SerialException
 
+def delayMsecond(t):
+    start,end = 0,0
+    start = time.time() * pow(10,6)     #精确至ns级别
+    while(end - start < t* pow(10,3)):
+        end = time.time() * pow(10,6)
 
 class BflbUartPort(object):
 
@@ -47,7 +52,7 @@ class BflbUartPort(object):
         self._shakehand_flag = False
         self._chiptype = "bl602"
         self._chipname = "bl602"
-
+        
     def if_init(self, device, rate, chiptype="bl602", chipname="bl602"):
         try:
             if self._ser is None:
@@ -79,6 +84,7 @@ class BflbUartPort(object):
             self._602a0_dln_fix = False
             self._chiptype = chiptype
             self._chipname = chipname
+            self._ser.writeTimeout = 3
         except Exception as e:
             bflb_utils.printf("Error: %s" % e)
 
@@ -151,7 +157,7 @@ class BflbUartPort(object):
 
     def if_write(self, data_send):
         # bflb_utils.printf("sending ", binascii.hexlify(data_send))
-        if self._ser:
+        if self._ser:    
             self._ser.write(data_send)
 
     def if_raw_read(self):
@@ -276,44 +282,43 @@ class BflbUartPort(object):
                     self._baudrate = baudrate
                     # send reboot to make sure boot2 is running
                     self._ser.write(b"\r\nispboot if\r\nreboot\r\n")
-                    # send 5555 to boot2, boot2 jump to bootrom if mode
-                    fl_thrx = None
-                    fl_thrx = threading.Thread(target=self.if_send_55)
-                    fl_thrx.setDaemon(True)
-                    fl_thrx.start()
 
+                    writeTimeout = self._ser.writeTimeout
+                    self._ser.writeTimeout = 0.003
+                    if self._shakehand_flag is not True:
+                        try:
+                            if self._chiptype == "bl702" or self._chiptype == "bl702l":
+                                self._ser.write(self._if_get_sync_bytes(int(0.003 * self._baudrate / 10)))
+                            else:
+                                self._ser.write(self._if_get_sync_bytes(int(0.006 * self._baudrate / 10)))
+                        except serial.serialutil.SerialTimeoutException:
+                            pass
+                    success, data = self.if_read(self._ser.in_waiting)
                     bflb_utils.printf("Please Press Reset Key!")
                     # reset low
                     self._ser.setRTS(1)
                     # RC delay is 100ms
-                    time.sleep(0.2)
+                    delayMsecond(1)
                     # reset high
                     self._ser.setRTS(0)
-
+                    self._ser.timeout = 0.003
                     time_stamp = time.time()
                     ack = bytearray(0)
-                    while time.time() - time_stamp < wait_timeout:
-                        if self._chiptype == "bl602" or self._chiptype == "bl702":
-                            self._ser.timeout = 0.01
-                            success, data = self.if_read(3000)
-                            ack += data
-                            if ack.find(b'Boot2 ISP Shakehand Suss') != -1:
-                                self._shakehand_flag = True
-                                if ack.find(b'Boot2 ISP Ready') != -1:
-                                    bflb_utils.printf("isp ready")
-                                    self.if_write(bytearray.fromhex("a0000000"))
-                                    self._ser.timeout = timeout
-                                    return "OK"
+                    while time.time() - time_stamp < wait_timeout:                               
+                        if self._shakehand_flag is not True:
+                            try:
+                                if self._chiptype == "bl702" or self._chiptype == "bl702l":
+                                    self._ser.write(self._if_get_sync_bytes(int(0.003 * self._baudrate / 10)))
+                                else:
+                                    self._ser.write(self._if_get_sync_bytes(int(0.006 * self._baudrate / 10)))
+                            except serial.serialutil.SerialTimeoutException:
+                                pass
+                            #delayMsecond(2)
                         else:
-                            success, data = self.if_read(3000)
-                            ack += data
-                            if ack.find(b'Boot2 ISP Ready') != -1:
-                                bflb_utils.printf("isp ready")
-                                self._shakehand_flag = True
-                        if self._shakehand_flag is True:
                             self._ser.timeout = timeout
                             tmp_timeout = self._ser.timeout
                             self._ser.timeout = 0.1
+                            self._ser.writeTimeout = writeTimeout
                             if self._chiptype == "bl602" or self._chiptype == "bl702":
                                 self._ser.timeout = 0.5
                                 # read 15 byte key word
@@ -343,8 +348,24 @@ class BflbUartPort(object):
                                     if len(ack) == 0:
                                         break
                             self._ser.timeout = tmp_timeout
-                            break
-
+                            break                          
+                        if self._chiptype == "bl602" or self._chiptype == "bl702":
+                            success, data = self.if_read(self._ser.in_waiting)
+                            ack += data
+                            if ack.find(b'Boot2 ISP Shakehand Suss') != -1:
+                                self._shakehand_flag = True
+                                if ack.find(b'Boot2 ISP Ready') != -1:
+                                    bflb_utils.printf("isp ready")
+                                    self.if_write(bytearray.fromhex("a0000000"))
+                                    self._ser.timeout = timeout
+                                    return "OK"
+                        else:
+                            success, data = self.if_read(self._ser.in_waiting)
+                            ack += data
+                            if ack.find(b'Boot2 ISP Ready') != -1:
+                                bflb_utils.printf("isp ready")
+                                self._shakehand_flag = True
+                    self._ser.writeTimeout = writeTimeout
                     self._shakehand_flag = True
                     self._ser.timeout = timeout
                     # set actual baudrate
@@ -745,7 +766,10 @@ class BflbUartPort(object):
         try:
             ack = self.if_deal_ack()
             if ack == "OK":
-                success, len_bytes = self.if_read(2)
+                while True:
+                    success, len_bytes = self.if_read(2)
+                    if len_bytes != bytearray(b'OK'):
+                        break
                 if success == 0:
                     bflb_utils.printf("Get length error")
                     bflb_utils.printf("len error is ", binascii.hexlify(len_bytes))
