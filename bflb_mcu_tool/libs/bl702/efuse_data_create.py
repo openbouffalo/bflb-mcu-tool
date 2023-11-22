@@ -46,6 +46,7 @@ def efuse_data_create(name, value):
             efuse_data[0] |= 0x03
         # encrypt flag
         efuse_data[0] |= 0x80
+        efuse_data[0] |= 0x30
         efuse_data_mask[0] |= 0xff
         # encrypt key
         keydata = bytearray.fromhex(value[0])

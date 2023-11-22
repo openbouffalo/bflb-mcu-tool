@@ -14,8 +14,8 @@ bflb_mcu_tool.egg-info/entry_points.txt
 bflb_mcu_tool.egg-info/not-zip-safe
 bflb_mcu_tool.egg-info/requires.txt
 bflb_mcu_tool.egg-info/top_level.txt
-bflb_mcu_tool/chips/bl602/builtin_imgs/boot2_isp_bl602_v6.5.8/boot2_isp_debug.bin
-bflb_mcu_tool/chips/bl602/builtin_imgs/boot2_isp_bl602_v6.5.8/boot2_isp_release.bin
+bflb_mcu_tool/chips/bl602/builtin_imgs/boot2_isp_bl602_v6.5.9/boot2_isp_debug.bin
+bflb_mcu_tool/chips/bl602/builtin_imgs/boot2_isp_bl602_v6.5.9/boot2_isp_release.bin
 bflb_mcu_tool/chips/bl602/builtin_imgs/mfg_v2.89/gu/mfg_gu_567b8d690_24m.bin
 bflb_mcu_tool/chips/bl602/builtin_imgs/mfg_v2.89/gu/mfg_gu_567b8d690_24m_autoboot.bin
 bflb_mcu_tool/chips/bl602/builtin_imgs/mfg_v2.89/gu/mfg_gu_567b8d690_26m.bin
@@ -29,6 +29,7 @@ bflb_mcu_tool/chips/bl602/builtin_imgs/mfg_v2.89/gu/mfg_gu_567b8d690_40m_autoboo
 bflb_mcu_tool/chips/bl602/builtin_imgs/mfg_v2.89/ram/mfg_ram_567b8d690_24m.bin
 bflb_mcu_tool/chips/bl602/builtin_imgs/mfg_v2.89/ram/mfg_ram_567b8d690_26m.bin
 bflb_mcu_tool/chips/bl602/builtin_imgs/mfg_v2.89/ram/mfg_ram_567b8d690_32m.bin
+bflb_mcu_tool/chips/bl602/builtin_imgs/mfg_v2.89/ram/mfg_ram_567b8d690_32m_add16.bin
 bflb_mcu_tool/chips/bl602/builtin_imgs/mfg_v2.89/ram/mfg_ram_567b8d690_38p4m.bin
 bflb_mcu_tool/chips/bl602/builtin_imgs/mfg_v2.89/ram/mfg_ram_567b8d690_40m.bin
 bflb_mcu_tool/chips/bl602/conf/ota.toml
@@ -62,8 +63,8 @@ bflb_mcu_tool/chips/bl602/partition/partition_cfg_2M.toml
 bflb_mcu_tool/chips/bl602/partition/partition_cfg_4M.toml
 bflb_mcu_tool/chips/bl606p/builtin_imgs/bl606p_mfg_v0.59/gu/bl606p_mfg_gu_8476f7743.bin
 bflb_mcu_tool/chips/bl606p/builtin_imgs/bl606p_mfg_v0.59/gu/bl606p_mfg_gu_8476f7743_autoboot.bin
-bflb_mcu_tool/chips/bl606p/builtin_imgs/boot2_isp_bl606p_v6.5.8/boot2_isp_debug.bin
-bflb_mcu_tool/chips/bl606p/builtin_imgs/boot2_isp_bl606p_v6.5.8/boot2_isp_release.bin
+bflb_mcu_tool/chips/bl606p/builtin_imgs/boot2_isp_bl606p_v6.5.9/boot2_isp_debug.bin
+bflb_mcu_tool/chips/bl606p/builtin_imgs/boot2_isp_bl606p_v6.5.9/boot2_isp_release.bin
 bflb_mcu_tool/chips/bl606p/conf/ota.toml
 bflb_mcu_tool/chips/bl606p/device_tree/bl_factory_params_IoTKitA_auto.dts
 bflb_mcu_tool/chips/bl606p/eflash_loader/eflash_loader_cfg.conf
@@ -77,11 +78,12 @@ bflb_mcu_tool/chips/bl606p/img_create_linux/img_create_cfg_mfg.conf
 bflb_mcu_tool/chips/bl606p/img_create_mcu/img_create_cfg.conf
 bflb_mcu_tool/chips/bl606p/partition/partition_cfg_16M_linux.toml
 bflb_mcu_tool/chips/bl606p/partition/partition_cfg_8M.toml
-bflb_mcu_tool/chips/bl616/builtin_imgs/bl616_mfg_v2.39/gu/bl616_mfg_gu_54eddd804.bin
-bflb_mcu_tool/chips/bl616/builtin_imgs/bl616_mfg_v2.39/gu/bl616_mfg_gu_54eddd804_autoboot.bin
-bflb_mcu_tool/chips/bl616/builtin_imgs/bl616_mfg_v2.39/ram/bl616_mfg_ram_54eddd804.bin
-bflb_mcu_tool/chips/bl616/builtin_imgs/boot2_isp_bl616_v6.5.8/boot2_isp_debug.bin
-bflb_mcu_tool/chips/bl616/builtin_imgs/boot2_isp_bl616_v6.5.8/boot2_isp_release.bin
+bflb_mcu_tool/chips/bl616/builtin_imgs/bl616_mfg_v2.48/gu_dcdc/bl616_mfg_v2.48_gu_dcdc_fc812f24f.bin
+bflb_mcu_tool/chips/bl616/builtin_imgs/bl616_mfg_v2.48/gu_dcdc/bl616_mfg_v2.48_gu_dcdc_fc812f24f_autoboot.bin
+bflb_mcu_tool/chips/bl616/builtin_imgs/bl616_mfg_v2.48/gu_ldo/bl616_mfg_v2.48_gu_ldo_fc812f24f.bin
+bflb_mcu_tool/chips/bl616/builtin_imgs/bl616_mfg_v2.48/gu_ldo/bl616_mfg_v2.48_gu_ldo_fc812f24f_autoboot.bin
+bflb_mcu_tool/chips/bl616/builtin_imgs/boot2_isp_bl616_v6.5.9/boot2_isp_debug.bin
+bflb_mcu_tool/chips/bl616/builtin_imgs/boot2_isp_bl616_v6.5.9/boot2_isp_release.bin
 bflb_mcu_tool/chips/bl616/conf/ota.toml
 bflb_mcu_tool/chips/bl616/device_tree/bl_factory_params_IoTKitA_auto.dts
 bflb_mcu_tool/chips/bl616/eflash_loader/eflash_loader_cfg.conf
@@ -92,8 +94,8 @@ bflb_mcu_tool/chips/bl616/img_create_iot/img_create_cfg_mfg.conf
 bflb_mcu_tool/chips/bl616/img_create_mcu/img_create_cfg.conf
 bflb_mcu_tool/chips/bl616/partition/partition_cfg_2M.toml
 bflb_mcu_tool/chips/bl616/partition/partition_cfg_4M.toml
-bflb_mcu_tool/chips/bl702/builtin_imgs/boot2_isp_bl702_v6.5.8/boot2_isp_debug.bin
-bflb_mcu_tool/chips/bl702/builtin_imgs/boot2_isp_bl702_v6.5.8/boot2_isp_release.bin
+bflb_mcu_tool/chips/bl702/builtin_imgs/boot2_isp_bl702_v6.5.9/boot2_isp_debug.bin
+bflb_mcu_tool/chips/bl702/builtin_imgs/boot2_isp_bl702_v6.5.9/boot2_isp_release.bin
 bflb_mcu_tool/chips/bl702/builtin_imgs/mfg/bl702_mfg_stdfw.bin
 bflb_mcu_tool/chips/bl702/conf/ota.toml
 bflb_mcu_tool/chips/bl702/device_tree/bl_factory_params_IoTKitA_32M.dts
@@ -135,8 +137,8 @@ bflb_mcu_tool/chips/bl702l/partition/partition_cfg_2M.toml
 bflb_mcu_tool/chips/bl702l/partition/partition_cfg_512K.toml
 bflb_mcu_tool/chips/bl808/builtin_imgs/bl808_mfg_v0.59/gu/bl808_mfg_gu_8476f7743.bin
 bflb_mcu_tool/chips/bl808/builtin_imgs/bl808_mfg_v0.59/gu/bl808_mfg_gu_8476f7743_autoboot.bin
-bflb_mcu_tool/chips/bl808/builtin_imgs/boot2_isp_bl808_v6.5.8/boot2_isp_debug.bin
-bflb_mcu_tool/chips/bl808/builtin_imgs/boot2_isp_bl808_v6.5.8/boot2_isp_release.bin
+bflb_mcu_tool/chips/bl808/builtin_imgs/boot2_isp_bl808_v6.5.9/boot2_isp_debug.bin
+bflb_mcu_tool/chips/bl808/builtin_imgs/boot2_isp_bl808_v6.5.9/boot2_isp_release.bin
 bflb_mcu_tool/chips/bl808/conf/ota.toml
 bflb_mcu_tool/chips/bl808/device_tree/bl_factory_params_IoTKitA_auto.dts
 bflb_mcu_tool/chips/bl808/eflash_loader/eflash_loader_cfg.conf
@@ -510,6 +512,7 @@ bflb_mcu_tool/utils/flash/bl616/W25Q64JV_ef4017.conf
 bflb_mcu_tool/utils/flash/bl616/W25Q64JW_ef6017.conf
 bflb_mcu_tool/utils/flash/bl616/W25Q80DV_ef4014.conf
 bflb_mcu_tool/utils/flash/bl616/W25Q80EW_ef6014.conf
+bflb_mcu_tool/utils/flash/bl616/XM25LU32C_205016.conf
 bflb_mcu_tool/utils/flash/bl616/XM25QE32C_204016.conf
 bflb_mcu_tool/utils/flash/bl616/XM25QH128C_204018.conf
 bflb_mcu_tool/utils/flash/bl616/XM25QH16_204015.conf
@@ -640,6 +643,7 @@ bflb_mcu_tool/utils/flash/bl702l/XT25F16B_0b4015.conf
 bflb_mcu_tool/utils/flash/bl702l/XT25F32B_0b4016.conf
 bflb_mcu_tool/utils/flash/bl702l/XT25Q32B_0b6016.conf
 bflb_mcu_tool/utils/flash/bl702l/XT25Q80B_0b6014.conf
+bflb_mcu_tool/utils/flash/bl702l/XT25W08F_0b6514.conf
 bflb_mcu_tool/utils/flash/bl702l/ZB25D40B_5e3213.conf
 bflb_mcu_tool/utils/flash/bl702l/ZB25D40B_5e6013.conf
 bflb_mcu_tool/utils/flash/bl702l/ZB25D80B_5e3214.conf

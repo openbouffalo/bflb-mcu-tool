@@ -6,6 +6,7 @@ import sys
 import time
 import zipfile
 import shutil
+import binascii
 import argparse
 import traceback
 from importlib import reload
@@ -25,6 +26,7 @@ from libs import bflb_img_create
 from libs import bflb_img_loader
 from libs import bflb_flash_select
 from libs import bflb_utils
+from libs import bflb_interface_jlink
 from libs.bflb_utils import verify_hex_num, get_eflash_loader, get_serial_ports, convert_path
 from libs.bflb_configobj import BFConfigParser
 import libs.bflb_ro_params_device_tree as bl_ro_device_tree
@@ -51,6 +53,24 @@ def parse_rfpa(bin):
     with open(bin, "rb") as fp:
         content = fp.read()
         return content[1024:1032]
+    
+    
+def file_check_len(filename, num):
+    with open(filename, "rb") as f:
+        length = len(f.read())
+        if length % num != 0:
+            return False
+        else:
+            return True
+                
+def file_add_len(filename, num):
+    with open(filename, "rb") as f:
+        data = f.read() + bytearray(b'\x00'*num)
+    filedir, ext = os.path.splitext(filename)
+    file_new = filedir + "_add16" + ext
+    with open(file_new, "wb") as fp:
+        fp.write(data)
+    return file_new
 
 
 def record_log():
@@ -146,6 +166,29 @@ class BflbMcuTool(object):
         self.img_type = gol.img_type[chiptype]
         self.boot_src = gol.boot_src[chiptype]
         self.eflash_loader_t = bflb_eflash_loader.BflbEflashLoader(chipname, chiptype)
+        
+    def bl60x_mfg_flasher_cfg(self, uart, baudrate='57600', cfg_ini=None):
+        cfg = BFConfigParser()
+        if cfg_ini in [None, '']:
+            f = self.eflash_loader_cfg_tmp
+        else:
+            f = cfg_ini
+        cfg.read(f)
+        cfg.set('LOAD_CFG', 'interface', 'uart')
+        cfg.set('LOAD_CFG', 'device', uart)
+        cfg.set('LOAD_CFG', 'speed_uart_load', baudrate)
+        cfg.write(f, 'w')
+
+    def bl60x_mfg_flasher_jlink_cfg(self, rate="1000", cfg_ini=None):
+        cfg = BFConfigParser()
+        if cfg_ini in [None, '']:
+            f = self.eflash_loader_cfg_tmp
+        else:
+            f = cfg_ini
+        cfg.read(f)
+        cfg.set('LOAD_CFG', 'interface', 'jlink')
+        cfg.set('LOAD_CFG', 'speed_jlink', rate)
+        cfg.write(f, 'w')
 
     def bl_create_flash_default_data(self, length):
         datas = bytearray(length)
@@ -530,6 +573,10 @@ class BflbMcuTool(object):
                     fp.write(bin_bytearray)
                 values["img_file"] = img_new
                 bflb_utils.printf("tlv bin inserted success")
+            if file_check_len(img_org, 4096):
+                fw_new = file_add_len(img_org, 16) 
+                values["img_file"] = fw_new
+                bflb_utils.printf("16 bytes add to tail success")
         else:
             if values["dl_chiperase"] == "True":
                 bflb_utils.printf("flash chiperase operation")
@@ -1018,6 +1065,10 @@ class BflbMcuTool(object):
                     fp.write(bin_bytearray)
                 values["img1_file"] = img_new
                 bflb_utils.printf("tlv bin inserted success")
+            if file_check_len(img_org, 4096):
+                fw_new = file_add_len(img_org, 16) 
+                values["img1_file"] = fw_new
+                bflb_utils.printf("16 bytes add to tail success")                                
         for index in range(cpu_num):
             num = str(index + 1)
             if values["img%s_group" % num] != "unused":
@@ -1478,6 +1529,10 @@ class BflbMcuTool(object):
                     fp.write(bin_bytearray)
                 values["img1_file"] = img_new
                 bflb_utils.printf("tlv bin inserted success")
+            if file_check_len(img_org, 4096):
+                fw_new = file_add_len(img_org, 16) 
+                values["img1_file"] = fw_new
+                bflb_utils.printf("16 bytes add to tail success")
         else:
             if values["dl_chiperase"] == "True":
                 bflb_utils.printf("flash chiperase operation")
@@ -1802,24 +1857,71 @@ class BflbMcuTool(object):
                 whole_img_output_file = create_output_path + "/whole_img_cpu1.bin"
             # uart download
             if values["boot_src"].upper() == "UART/SDIO" or values["boot_src"].upper() == "UART/USB":
-                cfg = BFConfigParser()
-                if os.path.isfile(self.eflash_loader_cfg_tmp) is False:
-                    shutil.copyfile(self.eflash_loader_cfg, self.eflash_loader_cfg_tmp)
-                cfg.read(self.eflash_loader_cfg_tmp)
-                boot_speed = int(cfg.get("LOAD_CFG", "speed_uart_boot"))
-                if values["img_type"] == "RAW":
-                    ret = self.img_loader_thread(values["dl_comport"], boot_speed, boot_speed,
-                                                 values["img_file"], None, callback,
-                                                 privatekey_str=values["privatekey"],
-                                                 publickey_str=values["publickey"])
-                else:
-                    ret = self.img_loader_thread(values["dl_comport"], boot_speed, boot_speed,
-                                                 img_output_file.replace(".bin", "_if.bin"), None, callback,
-                                                 privatekey_str=values["privatekey"],
-                                                 publickey_str=values["publickey"])
-                if ret is False:
-                    ret = "Img load fail"
-                return ret
+                if values["dl_device"].lower() == 'uart':
+                    uart = values["dl_comport"]
+                    uart_brd = values['dl_comspeed']
+                    if not uart_brd.isdigit():
+                        error = '{"ErrorCode":"FFFF","ErrorMsg":"BAUDRATE MUST BE DIGIT"}'
+                        bflb_utils.printf(error)
+                        return error
+                    bflb_utils.printf("========= Interface is Uart =========")
+                    self.bl60x_mfg_flasher_cfg(uart, uart_brd)                                       
+                    cfg = BFConfigParser()
+                    if os.path.isfile(self.eflash_loader_cfg_tmp) is False:
+                        shutil.copyfile(self.eflash_loader_cfg, self.eflash_loader_cfg_tmp)
+                    cfg.read(self.eflash_loader_cfg_tmp)
+                    boot_speed = int(cfg.get("LOAD_CFG", "speed_uart_boot"))
+                    if values["img_type"] == "RAW":
+                        ret = self.img_loader_thread(values["dl_comport"], boot_speed, boot_speed,
+                                                     values["img_file"], None, callback,
+                                                     privatekey_str=values["privatekey"],
+                                                     publickey_str=values["publickey"],
+                                                     ram=True)
+                    else:
+                        ret = self.img_loader_thread(values["dl_comport"], boot_speed, boot_speed,
+                                                     img_output_file.replace(".bin", "_if.bin"), None, callback,
+                                                     privatekey_str=values["privatekey"],
+                                                     publickey_str=values["publickey"],
+                                                     ram=True)
+                    if ret is False:
+                        ret = "Img load fail"
+                    return ret                
+                elif values["dl_device"].lower() == 'jlink':
+                    jlink_brd = values['dl_jlinkspeed']
+                    if not jlink_brd.isdigit():
+                        error = '{"ErrorCode":"FFFF","ErrorMsg":"BAUDRATE MUST BE DIGIT"}'
+                        bflb_utils.printf(error)
+                        return error
+                    bflb_utils.printf("========= Interface is JLink =========")
+                    #self.bl60x_mfg_flasher_jlink_cfg(rate=jlink_brd)
+                    self._bflb_com_if = bflb_interface_jlink.BflbJLinkPort()
+                    self._bflb_com_if.if_init(values["dl_comport"], int(jlink_brd), self.chiptype, self.chipname)
+                    self._bflb_com_if.reset_cpu()
+                    if values["img_type"] == "RAW":
+                        img_file = values["img_file"]
+                    else:
+                        img_file = img_output_file.replace(".bin", "_if.bin")
+                    #print(img_file)
+                    imge_fp = bflb_utils.open_file(img_file, 'rb')
+                    # eflash_loader.bin has 192 bytes bootheader and seg header
+                    fw_data = bytearray(imge_fp.read())[192:] + bytearray(0)
+                    imge_fp.close()
+                    sub_module = __import__("libs." + self.chiptype, fromlist=[self.chiptype])
+                    load_addr = sub_module.jlink_load_cfg.jlink_load_addr
+                    self._bflb_com_if.if_raw_write(load_addr, fw_data)
+                    pc = fw_data[4:8]
+                    pc = bytes([pc[3], pc[2], pc[1], pc[0]])
+                    # c.reverse()
+                    msp = fw_data[0:4]
+                    msp = bytes([msp[3], msp[2], msp[1], msp[0]])
+                    # msp.reverse()
+                    # print(pc, msp)
+                    self._bflb_com_if.set_pc_msp(binascii.hexlify(pc),
+                                                 binascii.hexlify(msp).decode('utf-8'))
+                    time.sleep(0.01)
+                    self._bflb_com_if.if_close()
+                    return True 
+                                                                              
             # program flash,create eflash_loader_cfg.ini
             cfg = BFConfigParser()
             if os.path.isfile(self.eflash_loader_cfg_tmp) is False:
@@ -2023,27 +2125,31 @@ class BflbMcuTool(object):
                 ret = self.img_loader_thread(values["dl_comport"], boot_speed, boot_speed,
                                              values["img1_file"], None, callback,
                                              privatekey_str=values["privatekey"],
-                                             publickey_str=values["publickey"])
+                                             publickey_str=values["publickey"],
+                                             ram=True)
             else:
                 if group0_used is True and group1_used is False:
                     ret = self.img_loader_thread(values["dl_comport"], boot_speed, boot_speed,
                                                  group0_img_output_file.replace(".bin", "_if.bin"),
                                                  None, 
                                                  callbackprivatekey_str=values["privatekey"],
-                                                 publickey_str=values["publickey"])
+                                                 publickey_str=values["publickey"],
+                                                 ram=True)
                 elif group0_used is False and group1_used is True:
                     ret = self.img_loader_thread(values["dl_comport"], boot_speed, boot_speed,
                                                  group1_img_output_file.replace(".bin", "_if.bin"),
                                                  None, callback,
                                                  privatekey_str=values["privatekey"],
-                                                 publickey_str=values["publickey"])
+                                                 publickey_str=values["publickey"],
+                                                 ram=True)
                 elif group0_used is True and group1_used is True:
                     ret = self.img_loader_thread(values["dl_comport"], boot_speed, boot_speed,
                                                  group0_img_output_file.replace(".bin", "_if.bin"),
                                                  group1_img_output_file.replace(".bin", "_if.bin"),
                                                  callback,
                                                  privatekey_str=values["privatekey"],
-                                                 publickey_str=values["publickey"])
+                                                 publickey_str=values["publickey"],
+                                                 ram=True)
             if ret is False:
                 ret = "Img load fail"
             return ret
@@ -2257,13 +2363,15 @@ class BflbMcuTool(object):
                 ret = self.img_loader_thread(values["dl_comport"], boot_speed, boot_speed,
                                              values["img1_file"], None, callback,
                                              privatekey_str=values["privatekey"],
-                                             publickey_str=values["publickey"])
+                                             publickey_str=values["publickey"],
+                                             ram=True)
             else:
                 ret = self.img_loader_thread(values["dl_comport"], boot_speed, boot_speed,
                                              group0_img_output_file.replace(".bin", "_if.bin"),
                                              None, callback,
                                              privatekey_str=values["privatekey"],
-                                             publickey_str=values["publickey"])
+                                             publickey_str=values["publickey"],
+                                             ram=True)
             if ret is False:
                 ret = "Img load fail"
             return ret
@@ -2440,8 +2548,7 @@ class BflbMcuTool(object):
         except Exception as e:
             traceback.print_exc(limit=10, file=sys.stdout)
             ret = str(e)
-            return False, ret
-
+            return False, ret       
 
 def get_value(args):
     if args.firmware:

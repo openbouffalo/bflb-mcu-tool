@@ -1121,7 +1121,7 @@ def eflash_loader_parser_init():
     parser.add_argument("--romfs", dest="romfs", help="romfs data to write")
     parser.add_argument("--csvfile", dest="csvfile", help="csv file contains 3/5 tuples")
     parser.add_argument("--csvaddr", dest="csvaddr", help="address to write for csv file")
-    parser.add_argument("--para", dest="para", help="efuse para")
+    parser.add_argument("--para", dest="para", action="store_true", help="efuse para")
     parser.add_argument("--isp", dest="isp", action="store_true", help="isp config")
     parser.add_argument("--createcfg", dest="createcfg", help="img create cfg file")
     parser.add_argument("--key", dest="key", help="encrypt aes key")

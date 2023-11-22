@@ -1912,13 +1912,10 @@ class BflbEflashLoader(object):
         cmd_id = bflb_utils.hexstr_to_bytearray(self._com_cmds.get("flash_write_check")["cmd_id"])
         try_cnt = 0
         while True:
-            retry = 0
-            if self._decompress_write:
-                retry = 10
             ret, dmy = self.com_process_one_cmd("flash_write_check", cmd_id, bytearray(0))
             if ret.startswith("OK"):
                 break
-            if try_cnt < self._checksum_err_retry_limit + retry:
+            if try_cnt < self._checksum_err_retry_limit:
                 bflb_utils.printf("Retry")
                 try_cnt += 1
             else:
@@ -1961,6 +1958,9 @@ class BflbEflashLoader(object):
         i = 0
         cur_len = 0
         if erase == 1:
+            if flash_data_len == 0:
+                bflb_utils.printf("file size is 0")
+                return False
             ret = self.flash_erase_main_process(start_addr, start_addr + flash_data_len - 1)
             if ret is False:
                 return False
@@ -1980,7 +1980,7 @@ class BflbEflashLoader(object):
                 self._bflb_com_if.if_set_rx_timeout(self._default_time_out)
                 return False
             chip_isp_timeout=2000
-            if self._chip_type == "bl616":
+            if self._chip_type == "bl616" or self._chip_type == "bl602":
                 # bl616 has set isp timeout to 10s in bflb_img_loader.py: img_get_bootinfo
                 chip_isp_timeout=10000
             # if compress take time > 2.2s, chip timeout, reshakehand
@@ -1988,10 +1988,10 @@ class BflbEflashLoader(object):
                 bflb_utils.printf(FLASH_LOAD_SHAKE_HAND)
                 if self.img_load_shake_hand() is False:
                     return False
-            # if compress take time > 1.8s, delay 0.5s make sure chip timeout, and reshakehand
+            # if compress take time > 1.8s, delay 0.6s make sure chip timeout, and reshakehand
             # if compress take time <= 1.8s, no need reshakehand
             elif (time.time() * 1000) - start_time > chip_isp_timeout*0.9:
-                time.sleep(chip_isp_timeout*0.3)
+                time.sleep(chip_isp_timeout*0.001*0.3)
                 bflb_utils.printf(FLASH_LOAD_SHAKE_HAND)
                 if self.img_load_shake_hand() is False:
                     return False
@@ -3281,6 +3281,9 @@ class BflbEflashLoader(object):
                     load_function = 2
             if ram_load:
                 load_function = 1
+                ram = True
+            else:
+                ram = False
             if load_function == 0:
                 bflb_utils.printf("No need load eflash_loader.bin")
             elif load_function == 1:
@@ -3290,7 +3293,7 @@ class BflbEflashLoader(object):
                                                           reset_hold_time, shake_hand_delay,
                                                           reset_revert, cutoff_time,
                                                           shake_hand_retry,
-                                                          self._isp_shakehand_timeout, **kwargs)
+                                                          self._isp_shakehand_timeout, ram=ram, **kwargs)
                 if res == "shake hand fail":
                     self.error_code_print("0050")
                 if res.startswith("repeat_burn") is True:
@@ -3355,7 +3358,7 @@ class BflbEflashLoader(object):
                 else:
                     sign = int(bootinfo.encode("utf-8")[8:10], 16)
                     encrypt = int(bootinfo.encode("utf-8")[10:12], 16)
-                if th_sign or args.auto_efuse_verify:
+                if args.auto_efuse_verify:
                     if sign == 1 or encrypt == 1:
                         bflb_utils.printf("Skip efuse verify")
                         cfg.set("EFUSE_CFG", "factory_mode", "false")
@@ -3808,22 +3811,6 @@ class BflbEflashLoader(object):
                             return False, flash_burn_retry
                     else:
                         bflb_utils.printf("No input file to program to flash")
-            if args.dac_value:
-                bflb_utils.printf("========= encrypt and write dac =========")
-                dac_file, efuse_data, mask_data = self.flash_efuse_dac_encrypt_data_create(dacvalue, dackey, daciv)
-                bflb_utils.printf("========= programming ", dac_file, " to ", dacaddr)
-                dac_file = os.path.abspath(dac_file)
-                ret = self.flash_load_specified(dac_file, int(dacaddr, 16), 1, verify, self._need_shake_hand, callback)
-                if ret is False:
-                    return False, flash_burn_retry
-                bflb_utils.printf("Program dac file Finished")
-                bflb_utils.printf("write efuse data")
-                security_write = (cfg.get("EFUSE_CFG", "security_write") == "true")
-                ret = self.efuse_load_specified(None, None, efuse_data, mask_data, 0,
-                                                self._need_shake_hand, security_write)
-                if ret is False:
-                    bflb_utils.printf("write efuse data fail")
-                    return False, flash_burn_retry
             # get program type
             if args.efuse:
                 loadflag = True
@@ -3870,7 +3857,7 @@ class BflbEflashLoader(object):
                         return False, flash_burn_retry
                 if aeskey:
                     loadflag = False
-                    bflb_utils.printf("write efuse aes key ", aeskey)
+                    # bflb_utils.printf("write efuse aes key ", aeskey)
                     ret = self.efuse_load_aes_key("flash_aes_key", [aeskey, ""],
                                                   verify=1,
                                                   shakehand=self._need_shake_hand)
@@ -3956,6 +3943,22 @@ class BflbEflashLoader(object):
                     else:
                         bflb_utils.printf("efuse load disalbe")
                 self._need_shake_hand = False
+        if args.dac_value:
+            bflb_utils.printf("========= encrypt and write dac =========")
+            dac_file, efuse_data, mask_data = self.flash_efuse_dac_encrypt_data_create(dacvalue, dackey, daciv)
+            bflb_utils.printf("========= programming ", dac_file, " to ", dacaddr)
+            dac_file = os.path.abspath(dac_file)
+            ret = self.flash_load_specified(dac_file, int(dacaddr, 16), 1, verify, self._need_shake_hand, callback)
+            if ret is False:
+                return False, flash_burn_retry
+            bflb_utils.printf("Program dac file Finished")
+            bflb_utils.printf("write efuse data")
+            security_write = (cfg.get("EFUSE_CFG", "security_write") == "true")
+            ret = self.efuse_load_specified(None, None, efuse_data, mask_data, 0,
+                                            self._need_shake_hand, security_write)
+            if ret is False:
+                bflb_utils.printf("write efuse data fail")
+                return False, flash_burn_retry
         # read
         if args.read:
             bflb_utils.printf("Read operation")

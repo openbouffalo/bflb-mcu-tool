@@ -734,9 +734,11 @@ class BflbUartPort(object):
     def if_deal_ack(self, dmy_data=True):
         try:
             success, ack = self.if_read(2)
-            if success == 0:
-                bflb_utils.printf("ack is ", str(binascii.hexlify(ack).decode("utf-8")))
-                return str(binascii.hexlify(ack).decode("utf-8"))
+            # When serial communication is unstable and 4F or 4B is received, compressed downloading can still continue
+            # Removing the judgement of whether the return value is success
+            # if success == 0:
+            #    bflb_utils.printf("ack is ", str(binascii.hexlify(ack).decode("utf-8")))
+            #    return str(binascii.hexlify(ack).decode("utf-8"))
             if ack.find(b'\x4F') != -1 or ack.find(b'\x4B') != -1:
                 # if dmy_data:
                 #    success, ack = self.if_read(14)
@@ -747,7 +749,8 @@ class BflbUartPort(object):
                 return "PD"
             success, err_code = self.if_read(2)
             if success == 0:
-                bflb_utils.printf("err code is ", str(binascii.hexlify(err_code)))
+                if err_code:
+                    bflb_utils.printf("err code is ", str(binascii.hexlify(err_code)))
                 return "FL"
             err_code_str = str(binascii.hexlify(err_code[1:2] + err_code[0:1]).decode('utf-8'))
             ack = "FL"
@@ -1004,7 +1007,7 @@ class CliInfUart(object):
                     if str(str_msg) == '\r':
                         if data != '':
                             self.msg = data
-                            bflb_utils.printf(data)
+                            bflb_utils.printf(data.replace("BOUFFALOLAB5555DTR0", "").replace("BOUFFALOLAB5555RTS0", "").replace("BOUFFALOLAB5555RTS1", ""))
                             # check on_boot
                             if self._check_boot_cond(data) is True:
                                 if self._recv_cb_objs is not None and len(self._recv_cb_objs) != 0:

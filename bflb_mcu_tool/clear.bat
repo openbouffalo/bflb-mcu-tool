@@ -1,3 +1,4 @@
+del /a /f /s /q "*.pyc"
 del /a /f /s /q "*.log"
 del /a /f /s /q "*.ini"
 del /a /f /s /q "iot.toml"

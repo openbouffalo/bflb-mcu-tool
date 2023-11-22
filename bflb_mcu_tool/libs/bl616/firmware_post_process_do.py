@@ -430,7 +430,7 @@ def img_create_encrypt_data_xts(data_bytearray, key_bytearray, iv_bytearray, enc
 
 def firmware_post_get_flash_encrypt_type(encrypt,xts_mode):    
     flash_encrypt_type = 0
-    if encrypt != 0:
+    if encrypt:
         if encrypt == 1:
             # AES 128
             flash_encrypt_type = 1

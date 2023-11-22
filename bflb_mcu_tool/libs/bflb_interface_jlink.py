@@ -287,7 +287,7 @@ class BflbJLinkPort(object):
             self._jlink.close()
             self._inited = False
 
-    def if_deal_ack(self):
+    def if_deal_ack(self, dmy_data=True):
         success, ack = self.if_read(2)
         if success == 0:
             bflb_utils.printf("ack:" + str(binascii.hexlify(ack)))

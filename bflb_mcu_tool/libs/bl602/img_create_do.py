@@ -279,7 +279,7 @@ def img_create_read_file_append_crc(file, crc):
 
 
 def encrypt_loader_bin_do(file, sign, encrypt, key, iv, publickey, privatekey, **kwargs):
-    if encrypt != 0 or sign != 0:
+    if encrypt or sign:
         encrypt_key = bytearray(0)
         encrypt_iv = bytearray(0)
         load_helper_bin_header = bytearray(0)
@@ -303,7 +303,7 @@ def encrypt_loader_bin_do(file, sign, encrypt, key, iv, publickey, privatekey, *
         if load_helper_bin_header != bytearray(0) and load_helper_bin_body != bytearray(0):
             # encrypt body
             load_helper_bin_body = bflb_utils.add_to_16(load_helper_bin_body)
-            if encrypt != 0:
+            if encrypt:
                 encrypt_key = bflb_utils.hexstr_to_bytearray(key)
                 encrypt_iv = bflb_utils.hexstr_to_bytearray(iv)
                 iv_crcarray = bflb_utils.get_crc32_bytearray(encrypt_iv)
@@ -318,10 +318,10 @@ def encrypt_loader_bin_do(file, sign, encrypt, key, iv, publickey, privatekey, *
             oldval = bflb_utils.bytearray_to_int(
                 bflb_utils.bytearray_reverse(data[offset:offset + 4]))
             newval = oldval
-            if encrypt != 0:
+            if encrypt:
                 newval = (newval | (1 << encrypt_type_pos))
                 newval = (newval | (0 << key_sel_pos))
-            if sign != 0:
+            if sign:
                 newval = (newval | (1 << sign_pos))
                 data_tohash += load_helper_bin_body_encrypt
                 publickey_file = publickey
@@ -428,7 +428,7 @@ def create_encryptandsign_flash_data(data, offset, key, iv, publickey, privateke
     output_data[0:len(bootinfo)] = bootinfo
     output_data[offset:offset + seg_cnt] = fw_data
     # update efuse
-    if encrypt != 0:
+    if encrypt:
         if encrypt_type == 1:
             # AES 128
             efuse_data, mask_data = img_update_efuse(None, sign, pk_hash, 1,
@@ -444,7 +444,7 @@ def create_encryptandsign_flash_data(data, offset, key, iv, publickey, privateke
             efuse_data, mask_data = img_update_efuse(None, sign, pk_hash, 2,
                                           encrypt_key + bytearray(32 - len(encrypt_key)), 0,
                                           encrypt_key + bytearray(32 - len(encrypt_key)))
-    elif sign != 0:
+    elif sign:
         efuse_data, mask_data = img_update_efuse(None, sign, pk_hash, 0, None, 0, None)
     return output_data, efuse_data, seg_cnt
 
@@ -472,11 +472,11 @@ def img_creat_process(flash_img, cfg, security=False, **kwargs):
     sign, encrypt, key_sel = img_create_get_sign_encrypt_info(bootheader_data)
     aesiv_data = bytearray(0)
     pk_data = bytearray(0)
-    if sign != 0:
+    if sign:
         bflb_utils.printf("Image need sign")
         publickey_file = cfg.get(cfg_section, "publickey_file")
         privatekey_file_uecc = cfg.get(cfg_section, "privatekey_file_uecc")
-    if encrypt != 0:
+    if encrypt:
         bflb_utils.printf("Image need encrypt ", encrypt)
         encrypt_key_org = bflb_utils.hexstr_to_bytearray(cfg.get(cfg_section, "aes_key_org"))
         if encrypt == 1:
@@ -586,7 +586,7 @@ def img_creat_process(flash_img, cfg, security=False, **kwargs):
             seg_cnt += 16
 
     # do encrypt
-    if encrypt != 0 and data_encrypted == 0:
+    if encrypt and data_encrypted == 0:
         data_toencrypt = img_create_encrypt_data(data_toencrypt, encrypt_key, encrypt_iv,
                                                  flash_img)
     if mfgBin:
@@ -629,7 +629,7 @@ def img_creat_process(flash_img, cfg, security=False, **kwargs):
         fp.write(fw_data + fw_data_hash)
         fp.close()
         # update efuse
-        if encrypt != 0:
+        if encrypt:
             if encrypt == 1:
                 # AES 128
                 img_update_efuse(cfg, sign, pk_hash, 1,
@@ -655,7 +655,7 @@ def img_creat_process(flash_img, cfg, security=False, **kwargs):
         fp.write(img_data)
         fp.close()
         # update efuse
-        if encrypt != 0:
+        if encrypt:
             if encrypt == 1:
                 # AES 128
                 img_update_efuse(cfg, sign, pk_hash, 1, None, key_sel,

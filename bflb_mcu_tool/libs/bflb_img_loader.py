@@ -37,6 +37,7 @@ from libs import bflb_security
 from libs import bflb_img_create
 from libs import bflb_interface_uart
 from libs import bflb_interface_sdio
+from libs import bflb_interface_jlink
 from libs.bflb_configobj import BFConfigParser
 import config as gol
 
@@ -71,6 +72,8 @@ class BflbImgLoader(object):
             self.bflb_boot_if = bflb_interface_uart.BflbUartPort()
         elif interface == "sdio":
             self.bflb_boot_if = bflb_interface_sdio.BflbSdioPort()
+        elif interface == "jlink":
+            self.bflb_boot_if = bflb_interface_jlink.BflbJLinkPort()
 
         self._bootrom_cmds = {
             "get_chip_id": {
@@ -286,7 +289,6 @@ class BflbImgLoader(object):
             length = bflb_utils.hexstr_to_bytearray(self._bootrom_cmds.get(section)["data_len"])
         else:
             length = bflb_utils.int_to_2bytearray_b(data_len)
-
         return self.boot_process_one_cmd(section, cmd_id, length)
 
     #####################change interface rate##########################################
@@ -554,13 +556,17 @@ class BflbImgLoader(object):
                     file = os.path.join(bflb_utils.app_path, file)
                     self._imge_fp = open(file, 'rb')
         elif sign or encrypt:
-            try:
-                eflash_loader_file = eflash_loader_file + '_encrypt.bin'
-                file = os.path.join(bflb_utils.app_path, eflash_loader_dir, eflash_loader_file)
+            if 'ram' in kwargs and kwargs["ram"]:
+                file = os.path.join(bflb_utils.app_path, file)
                 self._imge_fp = open(file, 'rb')
-            except Exception as e:
-                bflb_utils.printf(e)
-                return "", bootinfo
+            else:
+                try:
+                    eflash_loader_file = eflash_loader_file + '_encrypt.bin'
+                    file = os.path.join(bflb_utils.app_path, eflash_loader_dir, eflash_loader_file)
+                    self._imge_fp = open(file, 'rb')
+                except Exception as e:
+                    bflb_utils.printf(e)
+                    return "", bootinfo
         else:
             file = os.path.join(bflb_utils.app_path, file)
             self._imge_fp = open(file, 'rb')
@@ -581,7 +587,7 @@ class BflbImgLoader(object):
             ret, dmy = self.boot_process_one_section("load_boot_header", 0)
         if ret.startswith("OK") is False:
             return ret, bootinfo
-        if sign != 0:
+        if sign:
             ret, dmy = self.boot_process_one_section("load_publick_key", 0)
             if ret.startswith("OK") is False:
                 return ret, bootinfo
@@ -598,7 +604,7 @@ class BflbImgLoader(object):
                 ret, dmy = self.boot_process_one_section("load_signature2", 0)
                 if ret.startswith("OK") is False:
                     return ret, bootinfo
-        if encrypt != 0:
+        if encrypt:
             ret, dmy = self.boot_process_one_section("load_aes_iv", 0)
             if ret.startswith("OK") is False:
                 return ret, bootinfo
@@ -645,7 +651,7 @@ class BflbImgLoader(object):
                            reset_revert=True,
                            cutoff_time=0,
                            shake_hand_retry=2):
-        success = True
+        res = True
         bflb_utils.printf("efuse_read_process")
         self.img_load_interface_init(comnum, sh_baudrate)
         ret = self.img_load_shake_hand(comnum, sh_baudrate, wk_baudrate, do_reset, reset_hold_time,
@@ -670,8 +676,8 @@ class BflbImgLoader(object):
         bflb_utils.printf("Finished")
         if ret.startswith("OK") is False:
             bflb_utils.printf("fail")
-            success = False
-        return success
+            res = False
+        return res
 
     def img_get_bootinfo(self,
                          comnum,
@@ -754,7 +760,7 @@ class BflbImgLoader(object):
                          record_bootinfo=None,
                          **kwargs):
         bflb_utils.printf("========= image load =========")
-        success = True
+        res = True
         bootinfo = None
         try:
             self.img_load_interface_init(comnum, sh_baudrate)
@@ -770,43 +776,47 @@ class BflbImgLoader(object):
                 if ret == "shake hand fail" or ret == "change rate fail":
                     bflb_utils.printf("shake hand fail")
                     self.bflb_boot_if.if_close()
-                    return False, bootinfo, ret
+                    res = False
             time.sleep(0.01)
             if file1 is not None and file1 != "":
                 res, bootinfo = self.img_load_main_process(file1, 0, self._create_cfg, callback,
                                                            record_bootinfo, **kwargs)
                 if res.startswith("OK") is False:
                     if res.startswith("repeat_burn") is True:
-                        return False, bootinfo, res
+                        res = False
                     else:
                         bflb_utils.printf("Error: Image load fail")
                         if res.startswith("error_shakehand") is True:
                             bflb_utils.printf("shakehand with eflash loader found")
-                        return False, bootinfo, res
+                        res = False
             if file2 is not None and file2 != "":
                 res, bootinfo = self.img_load_main_process(file2, 1, self._create_cfg, callback,
                                                            record_bootinfo, **kwargs)
                 if res.startswith("OK") is False:
                     if res.startswith("repeat_burn") is True:
-                        return False, bootinfo, res
+                        res = False
                     else:
                         bflb_utils.printf("Error: Image load fail")
                         if res.startswith("error_shakehand") is True:
                             bflb_utils.printf("shakehand with eflash loader found")
-                        return False, bootinfo, res
+                        res = False
             bflb_utils.printf("Run img")
-            self._imge_fp.close()
             res, dmy = self.boot_process_one_section("run_image", 0)
             if res.startswith("OK") is False:
                 bflb_utils.printf("Img run fail")
-                success = False
+                res = False
+            else:
+                res = True
             time.sleep(0.1)
         except Exception as e:
             bflb_utils.printf(e)
             #traceback.print_exc(limit=5, file=sys.stdout)
-            return False, bootinfo, ""
-        # self.bflb_boot_if.if_close()
-        return success, bootinfo, ""
+            res = False
+        finally:
+            if self._imge_fp:
+                self._imge_fp.close()
+            # self.bflb_boot_if.if_close()
+            return res, bootinfo, ""
 
 
 if __name__ == '__main__':

@@ -138,7 +138,7 @@ def udp_socket_send_client(udp_socket_client, send_address, key=None):
                 print("Program fail")
                 return False
             else:
-                if time.time() - start_time > 15:
+                if time.time() - start_time > 150:
                     print("timeout, exit!")
                     return False
                 pass
@@ -147,7 +147,7 @@ def udp_socket_send_client(udp_socket_client, send_address, key=None):
 
 def main(port, key=None):
     udp_socket_client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    udp_socket_client.settimeout(15)
+    udp_socket_client.settimeout(150)
     print('Enter quit to exist program')
     host = socket.gethostname()
     # send_address is server address
