@@ -36,7 +36,6 @@ from libs import bflb_utils
 
 
 class BflbSdioPort(object):
-
     def __init__(self):
         self._speed = 5000
         self._rx_timeout = 10000
@@ -46,6 +45,10 @@ class BflbSdioPort(object):
 
         self._udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self._send_address = None
+        self._password = None
+
+    def set_password(self, password):
+        self._password = password
 
     def if_init(self, device, rate, chiptype="bl60x", chipname="bl60x"):
         if self._inited is False:
@@ -64,7 +67,7 @@ class BflbSdioPort(object):
         self._rx_timeout = val * 1000
 
     def if_get_rx_timeout(self):
-        return self._rx_timeout/1000
+        return self._rx_timeout / 1000
 
     def if_get_rate(self):
         return self._speed
@@ -87,19 +90,28 @@ class BflbSdioPort(object):
             i += 1
         return data
 
-    def if_shakehand(self,
-                     do_reset=False,
-                     reset_hold_time=100,
-                     shake_hand_delay=100,
-                     reset_revert=True,
-                     cutoff_time=0,
-                     shake_hand_retry=2,
-                     isp_timeout=0,
-                     boot_load=False):
+    def if_shakehand(
+        self,
+        do_reset=False,
+        reset_hold_time=100,
+        shake_hand_delay=100,
+        reset_revert=True,
+        cutoff_time=0,
+        shake_hand_retry=2,
+        isp_timeout=0,
+        boot_load=False,
+    ):
         self.if_write(bytearray(self._if_get_sync_bytes(8)))
         success, ack = self.if_read(2)
         bflb_utils.printf(binascii.hexlify(ack))
-        if ack.find(b'\x4F') != -1 or ack.find(b'\x4B') != -1:
+        if ack.find(b"\x4F") != -1 or ack.find(b"\x4B") != -1:
+            if self._password != None and len(self._password) != 0:
+                cmd = bflb_utils.hexstr_to_bytearray("2400")
+                cmd += bflb_utils.int_to_2bytearray_l(len(self._password) // 2)
+                cmd += bflb_utils.hexstr_to_bytearray(self._password)
+                self.if_write(cmd)
+                success, ack = self.if_read(2)
+                bflb_utils.printf("set pswd ack is ", binascii.hexlify(ack).decode("utf-8"))
             time.sleep(0.03)
             return "OK"
         return "FL"
@@ -113,15 +125,15 @@ class BflbSdioPort(object):
         if success == 0:
             bflb_utils.printf("ack:" + str(binascii.hexlify(ack)))
             return ack.decode("utf-8")
-        if ack.find(b'\x4F') != -1 or ack.find(b'\x4B') != -1:
+        if ack.find(b"\x4F") != -1 or ack.find(b"\x4B") != -1:
             return "OK"
-        elif ack.find(b'\x50') != -1 or ack.find(b'\x44') != -1:
+        elif ack.find(b"\x50") != -1 or ack.find(b"\x44") != -1:
             return "PD"
         success, err_code = self.if_read(4)
         if success == 0:
             bflb_utils.printf("err_code:" + str(binascii.hexlify(err_code)))
             return "FL"
-        err_code_str = str(binascii.hexlify(err_code[3:4] + err_code[2:3]).decode('utf-8'))
+        err_code_str = str(binascii.hexlify(err_code[3:4] + err_code[2:3]).decode("utf-8"))
         ack = "FL"
         try:
             ret = ack + err_code_str + "(" + bflb_utils.get_bflb_error_code(err_code_str) + ")"
@@ -156,7 +168,7 @@ class BflbSdioPort(object):
         return ack, None
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     try:
         eflash_loader_t = BflbSdioPort()
         eflash_loader_t.if_init("", 10086, "bl602")

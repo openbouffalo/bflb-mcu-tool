@@ -37,7 +37,6 @@ dir_dll = os.path.join(app_path, "utils/cklink")
 
 
 class BflbCKLinkPort(object):
-
     def __init__(self, vid=0, pid=0):
         self._speed = 5000
         self._rx_timeout = 10000
@@ -50,8 +49,12 @@ class BflbCKLinkPort(object):
         self._chipname = "bl808"
         self.vid = vid
         self.pid = pid
-        #self.link = None
+        # self.link = None
         self.link = gol.obj_cklink
+        self._password = None
+
+    def set_password(self, password):
+        self._password = password
 
     def if_init(self, device, sn, rate, chiptype="bl808", chipname="bl808"):
         if self._inited is False:
@@ -71,14 +74,16 @@ class BflbCKLinkPort(object):
             self._chiptype = chiptype
             self._chipname = chipname
             if not self.link:
-                self.link = cklink.CKLink(dlldir=dir_dll,
-                                          vid=self._cklink_vid,
-                                          pid=self._cklink_pid,
-                                          sn=serial,
-                                          arch=2,
-                                          cdi=0)
+                self.link = cklink.CKLink(
+                    dlldir=dir_dll,
+                    vid=self._cklink_vid,
+                    pid=self._cklink_pid,
+                    sn=serial,
+                    arch=2,
+                    cdi=0,
+                )
                 gol.obj_cklink = self.link
-            #self.link.print_version()
+            # self.link.print_version()
             self.link.open()
             if self.link.connected():
                 self.link.reset(1)  # can not be set to 0
@@ -87,7 +92,7 @@ class BflbCKLinkPort(object):
     def if_close(self):
         if self.link:
             try:
-                #self.link.halt()
+                # self.link.halt()
                 self.link.close()
             except Exception as e:
                 print(e)
@@ -101,7 +106,7 @@ class BflbCKLinkPort(object):
         self._rx_timeout = val * 1000
 
     def if_get_rx_timeout(self):
-        return self._rx_timeout/1000
+        return self._rx_timeout / 1000
 
     def if_get_rate(self):
         return self._speed
@@ -117,12 +122,10 @@ class BflbCKLinkPort(object):
 
     def set_pc_msp(self, pc, msp):
         self.halt_cpu()
-        if self._chiptype == "bl602" \
-        or self._chiptype == "bl702"\
-        or self._chiptype == "bl702l":
+        if self._chiptype == "bl602" or self._chiptype == "bl702" or self._chiptype == "bl702l":
             addr = int(self._cklink_run_addr, 16)
             self.link.write_cpu_reg(self._cklink_reg_pc, addr)
-            #self.link.resume()
+            # self.link.resume()
 
     def if_raw_write(self, addr, data_send):
         self.halt_cpu()
@@ -132,19 +135,19 @@ class BflbCKLinkPort(object):
         self.resume_cpu()
 
     def if_write(self, data_send):
-        #print(self._cklink_data_addr, self._cklink_shake_hand_addr)
+        # print(self._cklink_data_addr, self._cklink_shake_hand_addr)
         self.if_raw_write(self._cklink_data_addr, data_send)
         # write flag
         self.if_raw_write(self._cklink_shake_hand_addr, binascii.unhexlify("48524459"))
 
     def if_read(self, data_len):
-        start_time = (time.time() * 1000)
+        start_time = time.time() * 1000
         while True:
             self.halt_cpu()
             ready = self.link.read_memory(int(self._cklink_shake_hand_addr, 16), 4)
             if len(ready) >= 1:
                 ready = binascii.hexlify(ready).decode()
-                #bflb_utils.printf("receiving ", ready)
+                # bflb_utils.printf("receiving ", ready)
                 if ready == "5341434b":
                     self.resume_cpu()
                     break
@@ -169,19 +172,28 @@ class BflbCKLinkPort(object):
         self.resume_cpu()
         return bytearray(data)
 
-    def if_shakehand(self,
-                     do_reset=False,
-                     reset_hold_time=100,
-                     shake_hand_delay=100,
-                     reset_revert=True,
-                     cutoff_time=0,
-                     shake_hand_retry=2,
-                     isp_timeout=0,
-                     boot_load=False):
+    def if_shakehand(
+        self,
+        do_reset=False,
+        reset_hold_time=100,
+        shake_hand_delay=100,
+        reset_revert=True,
+        cutoff_time=0,
+        shake_hand_retry=2,
+        isp_timeout=0,
+        boot_load=False,
+    ):
         self.if_write(bytearray(1))
         success, ack = self.if_read(2)
         bflb_utils.printf(binascii.hexlify(ack))
-        if ack.find(b'\x4F') != -1 or ack.find(b'\x4B') != -1:
+        if ack.find(b"\x4F") != -1 or ack.find(b"\x4B") != -1:
+            if self._password != None and len(self._password) != 0:
+                cmd = bflb_utils.hexstr_to_bytearray("2400")
+                cmd += bflb_utils.int_to_2bytearray_l(len(self._password) // 2)
+                cmd += bflb_utils.hexstr_to_bytearray(self._password)
+                self.if_write(cmd)
+                success, ack = self.if_read(2)
+                bflb_utils.printf("set pswd ack is ", binascii.hexlify(ack).decode("utf-8"))
             time.sleep(0.03)
             return "OK"
         return "FL"
@@ -191,15 +203,15 @@ class BflbCKLinkPort(object):
         if success == 0:
             bflb_utils.printf("ack:" + str(binascii.hexlify(ack)))
             return ack.decode("utf-8")
-        if ack.find(b'\x4F') != -1 or ack.find(b'\x4B') != -1:
+        if ack.find(b"\x4F") != -1 or ack.find(b"\x4B") != -1:
             return "OK"
-        elif ack.find(b'\x50') != -1 or ack.find(b'\x44') != -1:
+        elif ack.find(b"\x50") != -1 or ack.find(b"\x44") != -1:
             return "PD"
         success, err_code = self.if_read(4)
         if success == 0:
             bflb_utils.printf("err_code:" + str(binascii.hexlify(err_code)))
             return "FL"
-        err_code_str = str(binascii.hexlify(err_code[3:4] + err_code[2:3]).decode('utf-8'))
+        err_code_str = str(binascii.hexlify(err_code[3:4] + err_code[2:3]).decode("utf-8"))
         ack = "FL"
         try:
             ret = ack + err_code_str + "(" + bflb_utils.get_bflb_error_code(err_code_str) + ")"
@@ -234,7 +246,7 @@ class BflbCKLinkPort(object):
         return ack, None
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     eflash_loader_t = BflbCKLinkPort()
     eflash_loader_t.if_init("", 100, "bl702")
     bflb_utils.printf("read test")
@@ -251,9 +263,57 @@ if __name__ == '__main__':
     bflb_utils.printf(eflash_loader_t.if_raw_read("21000002", 10))
     bflb_utils.printf(eflash_loader_t.if_raw_read("21000002", 16))
     bflb_utils.printf("write test")
-    data = bytearray([
-        1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2,
-        3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4
-    ])
+    data = bytearray(
+        [
+            1,
+            2,
+            3,
+            4,
+            1,
+            2,
+            3,
+            4,
+            1,
+            2,
+            3,
+            4,
+            1,
+            2,
+            3,
+            4,
+            1,
+            2,
+            3,
+            4,
+            1,
+            2,
+            3,
+            4,
+            1,
+            2,
+            3,
+            4,
+            1,
+            2,
+            3,
+            4,
+            1,
+            2,
+            3,
+            4,
+            1,
+            2,
+            3,
+            4,
+            1,
+            2,
+            3,
+            4,
+            1,
+            2,
+            3,
+            4,
+        ]
+    )
     eflash_loader_t.if_raw_write("42020000", data)
     bflb_utils.printf(eflash_loader_t.if_raw_read("42020000", 62))

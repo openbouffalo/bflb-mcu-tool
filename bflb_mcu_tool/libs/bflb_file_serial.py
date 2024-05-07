@@ -14,7 +14,6 @@ except ImportError:
 
 
 class FileSerial(object):
-
     def _int_to_hex(self, data):
         hex_size = hex(data).replace("0x", "0x00")[-4:]
         low_hex_size = hex_size[-2:]
@@ -25,7 +24,7 @@ class FileSerial(object):
         message = hexlify(data)
         new_message = ""
         for i in range(0, len(message), 2):
-            new_message += message[i:i + 2].decode() + " "
+            new_message += message[i : i + 2].decode() + " "
         return new_message
 
     def _get_file_hash(self, file_path):
@@ -53,7 +52,7 @@ class FileSerial(object):
                             file_dict[sdio_file_ser_dict[ser_value]] = p
                         else:
                             file_dict[p] = sdio_file_ser_dict[ser_value]
-        elif sys.platform.startswith('linux') or sys.platform.startswith('darwin'):
+        elif sys.platform.startswith("linux") or sys.platform.startswith("darwin"):
             for p, d, h in comports():
                 if not p:
                     continue
@@ -68,23 +67,28 @@ class FileSerial(object):
                             file_dict[sdio_file_ser_dict[ser_value]] = p
 
         if " (" in dev_com:
-            sdio_dev = dev_com[:dev_com.find(" (")]
+            sdio_dev = dev_com[: dev_com.find(" (")]
         else:
             sdio_dev = dev_com
         file_com = file_dict[sdio_dev]
         print(file_com)
-        _ser = serial.Serial(file_com,
-                             int(baudrate),
-                             timeout=5.0,
-                             xonxoff=False,
-                             rtscts=False,
-                             write_timeout=None,
-                             dsrdtr=False)
+        _ser = serial.Serial(
+            file_com,
+            int(baudrate),
+            timeout=5.0,
+            xonxoff=False,
+            rtscts=False,
+            write_timeout=None,
+            dsrdtr=False,
+        )
         _ser.timeout = timeout
         size = os.path.getsize(file_path)
         hex_size = hex(size).replace("0x", "0x0000000")
-        first_message = bytes.fromhex("F0 00 04 00 {} {} {} {}".format(
-            hex_size[-2:], hex_size[-4:-2], hex_size[-6:-4], hex_size[-8:-6]))
+        first_message = bytes.fromhex(
+            "F0 00 04 00 {} {} {} {}".format(
+                hex_size[-2:], hex_size[-4:-2], hex_size[-6:-4], hex_size[-8:-6]
+            )
+        )
         _ser.write(first_message)
         recv_message = _ser.read(2)
 
@@ -102,8 +106,11 @@ class FileSerial(object):
                     if recv_message == b"OK":
                         recv_message = b""
                         new_message = self._str_to_hex(message)
-                        middle_message = bytes.fromhex("F1 00 {} {} {}".format(
-                            low_middle_size, hight_middle_size, new_message))
+                        middle_message = bytes.fromhex(
+                            "F1 00 {} {} {}".format(
+                                low_middle_size, hight_middle_size, new_message
+                            )
+                        )
                         _ser.write(middle_message)
                         recv_message = _ser.read(2)
                         message = ""
@@ -136,5 +143,8 @@ class FileSerial(object):
 
 if __name__ == "__main__":
     fs = FileSerial()
-    fs.open_listen("/dev/ttyACM1", 2000000,
-                   "/home/tanjiaxi/git/bouffalo_dev_cube/chips/bl602/img_create_mcu/img_if.bin")
+    fs.open_listen(
+        "/dev/ttyACM1",
+        2000000,
+        "/home/tanjiaxi/git/bouffalo_dev_cube/chips/bl602/img_create_mcu/img_if.bin",
+    )
