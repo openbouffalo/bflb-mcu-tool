@@ -47,16 +47,16 @@ def efuse_data_create(name, value):
         # encrypt flag
         efuse_data[0] |= 0x80
         efuse_data[0] |= 0x30
-        efuse_data_mask[0] |= 0xff
+        efuse_data_mask[0] |= 0xFF
         # encrypt key
         keydata = bytearray.fromhex(value[0])
         efuse_data[keyslot2:keyslot4] = keydata + bytearray(32 - len(keydata))
         efuse_data_mask[keyslot2:keyslot4] = mask_4bytes * 8
         # encrypt key read/write lock
-        rw_lock |= (1 << wr_lock_key_slot_2)
-        rw_lock |= (1 << wr_lock_key_slot_3)
-        rw_lock |= (1 << rd_lock_key_slot_2)
-        rw_lock |= (1 << rd_lock_key_slot_3)
+        rw_lock |= 1 << wr_lock_key_slot_2
+        rw_lock |= 1 << wr_lock_key_slot_3
+        rw_lock |= 1 << rd_lock_key_slot_2
+        rw_lock |= 1 << rd_lock_key_slot_3
         efuse_data[124:128] = bflb_utils.int_to_4bytearray_l(rw_lock)
         efuse_data_mask[124:128] = bflb_utils.int_to_4bytearray_l(rw_lock)
     return efuse_data, efuse_data_mask

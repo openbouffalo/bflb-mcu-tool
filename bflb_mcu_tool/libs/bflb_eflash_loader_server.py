@@ -47,6 +47,7 @@ ecdh_enable = False
 
 try:
     import changeconf as cgc
+
     conf_sign = True
 except ImportError:
     conf_sign = False
@@ -60,15 +61,15 @@ def create_decrypt_data(data_bytearray, key_bytearray, iv_bytearray):
 
 def eflash_loader_server(socket_server, port, echo, aes_key):
     ecdh_shared_key = None
-    socket_address = ('', port)
+    socket_address = ("", port)
     socket_server.bind(socket_address)
     bflb_utils.enable_udp_send_log(echo)
     try:
         while True:
             try:
                 recv_data, recv_addr = socket_server.recvfrom(1024)
-                bflb_utils.printf('\n')
-                bflb_utils.printf('Recieve:[from IP:<%s>]' % recv_addr[0])
+                bflb_utils.printf("\n")
+                bflb_utils.printf("Recieve:[from IP:<%s>]" % recv_addr[0])
             except Exception as e:
                 bflb_utils.printf(e)
                 continue
@@ -77,10 +78,11 @@ def eflash_loader_server(socket_server, port, echo, aes_key):
                 try:
                     if len(recv_data) % 16 != 0:
                         recv_data = recv_data + bytearray(16 - (len(recv_data) % 16))
-                    recv_data = create_decrypt_data(recv_data, bytearray.fromhex(aes_key),
-                                                    bytearray(16))
+                    recv_data = create_decrypt_data(
+                        recv_data, bytearray.fromhex(aes_key), bytearray(16)
+                    )
                     for i in range(len(recv_data)):
-                        if recv_data[i:i + 1] == bytearray(1):
+                        if recv_data[i : i + 1] == bytearray(1):
                             recv_data = recv_data[0:i]
                             break
                 except Exception as e:
@@ -91,17 +93,19 @@ def eflash_loader_server(socket_server, port, echo, aes_key):
                         tmp_ecdh = bflb_ecdh.BflbEcdh()
                         ssk = tmp_ecdh.create_public_key()
                         ecdh_private_key = binascii.hexlify(
-                            tmp_ecdh.ecdh.private_key.to_string()).decode("utf-8")
+                            tmp_ecdh.ecdh.private_key.to_string()
+                        ).decode("utf-8")
                         # bflb_utils.printf("ecdh private key")
                         # bflb_utils.printf(ecdh_private_key)
-                        if recv_data.decode('utf-8', 'ignore').startswith("csk:"):
+                        if recv_data.decode("utf-8", "ignore").startswith("csk:"):
                             ecdh_peer_public_key = binascii.hexlify(recv_data[4:]).decode("utf-8")
                             # bflb_utils.printf("ecdh peer key")
                             # bflb_utils.printf(ecdh_peer_public_key)
                             ecdh_shared_key = tmp_ecdh.create_shared_key(ecdh_peer_public_key)
                             socket_server.sendto(
-                                bytearray.fromhex(binascii.hexlify(b'ssk:').decode("utf-8") + ssk),
-                                recv_addr)
+                                bytearray.fromhex(binascii.hexlify(b"ssk:").decode("utf-8") + ssk),
+                                recv_addr,
+                            )
                             continue
                     except Exception as e:
                         bflb_utils.printf(e)
@@ -109,23 +113,24 @@ def eflash_loader_server(socket_server, port, echo, aes_key):
                     try:
                         if len(recv_data) % 16 != 0:
                             recv_data = recv_data + bytearray(16 - (len(recv_data) % 16))
-                        recv_data = create_decrypt_data(recv_data,
-                                                        bytearray.fromhex(ecdh_shared_key[0:32]),
-                                                        bytearray(16))
+                        recv_data = create_decrypt_data(
+                            recv_data, bytearray.fromhex(ecdh_shared_key[0:32]), bytearray(16)
+                        )
                         ecdh_shared_key = None
                         i = 0
                         while True:
-                            if recv_data[i:i + 1] == bytearray(1):
+                            if recv_data[i : i + 1] == bytearray(1):
                                 recv_data = recv_data[0:i]
                                 break
                             i += 1
                     except Exception as e:
                         bflb_utils.printf(e)
 
-            if recv_data.decode('utf-8', 'ignore').startswith("stop"):
+            if recv_data.decode("utf-8", "ignore").startswith("stop"):
                 break
-            eflash_loader_monitor_thread = threading.Thread(target=eflash_loader_monitor,
-                                                            args=(recv_addr, recv_data))
+            eflash_loader_monitor_thread = threading.Thread(
+                target=eflash_loader_monitor, args=(recv_addr, recv_data)
+            )
 
             eflash_loader_monitor_thread.start()
             time.sleep(0.001)
@@ -154,31 +159,34 @@ def eflash_loader_monitor(client_addr, client_data):
 
 def eflash_loader_worker(client_addr, client_data):
     tid = threading.get_ident()
-    request = client_data.decode('utf-8')
+    request = client_data.decode("utf-8")
     bflb_utils.printf("Worker ID:" + str(tid) + " deal request:" + request)
     bflb_utils.add_udp_client(str(tid), client_addr)
     ret = False
     try:
         parser = eflash_loader_parser_init()
         args = parser.parse_args(request.split(" "))
-        eflash_loader_t = bflb_eflash_loader.BflbEflashLoader(args.chipname,
-                                                              gol.dict_chip_cmd[args.chipname])
+        eflash_loader_t = bflb_eflash_loader.BflbEflashLoader(
+            args.chipname, gol.dict_chip_cmd[args.chipname]
+        )
         ret = eflash_loader_t.efuse_flash_loader(args, None, None)
     finally:
         udp_socket_result = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         bflb_utils.remove_udp_client(str(tid))
         if ret is True:
             udp_socket_result.sendto(
-                bytearray.fromhex(binascii.hexlify(b'Finished with success').decode("utf-8")),
-                client_addr)
+                bytearray.fromhex(binascii.hexlify(b"Finished with success").decode("utf-8")),
+                client_addr,
+            )
             bflb_utils.printf("Worker ID:" + str(tid) + " Finished with success")
             udp_socket_result.close()
             del eflash_loader_t
             return True
         else:
             udp_socket_result.sendto(
-                bytearray.fromhex(binascii.hexlify(b'Finished with fail').decode("utf-8")),
-                client_addr)
+                bytearray.fromhex(binascii.hexlify(b"Finished with fail").decode("utf-8")),
+                client_addr,
+            )
             bflb_utils.printf("Worker ID:" + str(tid) + " Finished with fail!!!!!!!!!")
             udp_socket_result.close()
             del eflash_loader_t
@@ -204,7 +212,9 @@ def eflash_loader_server_main():
         bflb_utils.printf(
             "Version: ",
             bflb_version.eflash_loader_version_text.replace(
-                'bflb', cgc.eflash_loader_version_text_first_value))
+                "bflb", cgc.eflash_loader_version_text_first_value
+            ),
+        )
     else:
         bflb_utils.printf("Version: ", bflb_version.eflash_loader_version_text)
     if args.port:
@@ -227,10 +237,11 @@ def eflash_loader_server_main():
         sys.exit()
     socket_server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     bflb_utils.printf("Listening on " + str(port))
-    eflash_loader_server_thread = threading.Thread(target=eflash_loader_server,
-                                                   args=(socket_server, port, echo, aes_key))
+    eflash_loader_server_thread = threading.Thread(
+        target=eflash_loader_server, args=(socket_server, port, echo, aes_key)
+    )
     eflash_loader_server_thread.start()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     eflash_loader_server_main()

@@ -21,8 +21,8 @@ def load_sec_eng_key_slot(cmd, cfgfile, write_callback, ack_callback):
     i = 0
     while i < aeslen:
         start_addr = bflb_utils.int_to_4bytearray_l(0x400070B0 + i)
-        write_data = aeskey[i:i + 4]
-        data += (start_addr + write_data)
+        write_data = aeskey[i : i + 4]
+        data += start_addr + write_data
         i += 4
     # bflb_utils.printf(binascii.hexlify(data))
     write_callback(data)

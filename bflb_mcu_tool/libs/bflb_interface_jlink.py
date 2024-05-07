@@ -43,12 +43,11 @@ if python_version == 64:
     path_dll = os.path.join(app_path, "utils/jlink", "JLink_x64.dll")
 else:
     path_dll = os.path.join(app_path, "utils/jlink", "JLinkARM.dll")
-    
+
 path_dylib = os.path.join(app_path, "utils/jlink", "libjlinkarm.dylib")
 
 
 class BflbJLinkPort(object):
-
     def __init__(self):
         self._speed = 5000
         self._rx_timeout = 10000
@@ -59,6 +58,10 @@ class BflbJLinkPort(object):
         self._chipname = "bl60x"
         self._jlink_run_addr = "22010000"
         self._jlink = None
+        self._password = None
+
+    def set_password(self, password):
+        self._password = password
 
     def if_init(self, device, rate, chiptype="bl60x", chipname="bl60x"):
         if self._inited is False:
@@ -71,10 +74,10 @@ class BflbJLinkPort(object):
                 obj_dll = pylink.Library(dllpath=path_dll)
                 self._jlink = pylink.JLink(lib=obj_dll)
                 self.jlink_path = os.path.join(app_path, "utils/jlink", "JLink.exe")
-            elif sys.platform.startswith('darwin'):
+            elif sys.platform.startswith("darwin"):
                 obj_dylib = pylink.Library(dllpath=path_dylib)
-                self._jlink = pylink.JLink(lib=obj_dylib) 
-                self.jlink_path = "JLinkExe" 
+                self._jlink = pylink.JLink(lib=obj_dylib)
+                self.jlink_path = "JLinkExe"
             else:
                 self._jlink = pylink.JLink()
                 self.jlink_path = "JLinkExe"
@@ -102,7 +105,7 @@ class BflbJLinkPort(object):
         self._rx_timeout = val * 1000
 
     def if_get_rx_timeout(self):
-        return self._rx_timeout/1000
+        return self._rx_timeout / 1000
 
     def if_get_rate(self):
         return self._speed
@@ -126,30 +129,42 @@ class BflbJLinkPort(object):
         if self._jlink.halted() is False:
             self._jlink.halt()
         if self._jlink.halted():
-            if self._chiptype == "bl602" \
-            or self._chiptype == "bl702" \
-            or self._chiptype == "bl702l":
+            if (
+                self._chiptype == "bl602"
+                or self._chiptype == "bl702"
+                or self._chiptype == "bl702l"
+            ):
                 jlink_script = "jlink.cmd"
-                fp = open(jlink_script, 'w+')
+                fp = open(jlink_script, "w+")
                 cmd = "h\r\nSetPC " + str(self._jlink_run_addr) + "\r\nexit"
                 bflb_utils.printf(cmd)
                 fp.write(cmd)
                 fp.close()
                 # jlink_cmd=r'C:/Keil_v5/ARM/Segger/JLink.exe -device Cortex-M4 -Speed 4000 -IF SWD  -JTAGConf -1,-1 -CommanderScript jlink.cmd'
                 if self._device:
-                    jlink_cmd = self.jlink_path + ' -device RISC-V -Speed {0} -SelectEmuBySN {1} \
-                    -IF JTAG -jtagconf -1,-1 -autoconnect 1 -CommanderScript jlink.cmd'.format(
-                        str(self._speed), str(self._device))
+                    jlink_cmd = (
+                        self.jlink_path
+                        + " -device RISC-V -Speed {0} -SelectEmuBySN {1} \
+                    -IF JTAG -jtagconf -1,-1 -autoconnect 1 -CommanderScript jlink.cmd".format(
+                            str(self._speed), str(self._device)
+                        )
+                    )
                 else:
-                    jlink_cmd = self.jlink_path + ' -device RISC-V -Speed {0} \
-                    -IF JTAG -jtagconf -1,-1 -autoconnect 1 -CommanderScript jlink.cmd'.format(
-                        str(self._speed))
+                    jlink_cmd = (
+                        self.jlink_path
+                        + " -device RISC-V -Speed {0} \
+                    -IF JTAG -jtagconf -1,-1 -autoconnect 1 -CommanderScript jlink.cmd".format(
+                            str(self._speed)
+                        )
+                    )
                 bflb_utils.printf(jlink_cmd)
-                p = subprocess.Popen(jlink_cmd,
-                                     shell=True,
-                                     stdin=subprocess.PIPE,
-                                     stdout=subprocess.PIPE,
-                                     stderr=subprocess.PIPE)
+                p = subprocess.Popen(
+                    jlink_cmd,
+                    shell=True,
+                    stdin=subprocess.PIPE,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                )
                 out, err = p.communicate()
                 bflb_utils.printf(out, err)
                 os.remove(jlink_script)
@@ -163,7 +178,7 @@ class BflbJLinkPort(object):
     def if_write(self, data_send):
         self.if_raw_write(self._jlink_data_addr, data_send)
 
-        #write flag
+        # write flag
         data_list = []
         data_list.append(int("59445248", 16))
         self._jlink.memory_write(int(self._jlink_shake_hand_addr, 16), data_list, nbits=32)
@@ -176,8 +191,12 @@ class BflbJLinkPort(object):
         if len1 != 0:
             data_list = []
             for i in range(int(len1 / 4)):
-                data_list.append(data_send[4 * i] + (data_send[4 * i + 1] << 8) +
-                                 (data_send[4 * i + 2] << 16) + (data_send[4 * i + 3] << 24))
+                data_list.append(
+                    data_send[4 * i]
+                    + (data_send[4 * i + 1] << 8)
+                    + (data_send[4 * i + 2] << 16)
+                    + (data_send[4 * i + 3] << 24)
+                )
             self._jlink.memory_write(addr_int, data_list, nbits=32)
         # using 8bits write
         if len2 != 0:
@@ -201,12 +220,16 @@ class BflbJLinkPort(object):
     def if_raw_write32(self, addr, data_send):
         data_list = []
         for i in range(int(len(data_send) / 4)):
-            data_list.append(data_send[4 * i] + (data_send[4 * i + 1] << 8) +
-                             (data_send[4 * i + 2] << 16) + (data_send[4 * i + 3] << 24))
+            data_list.append(
+                data_send[4 * i]
+                + (data_send[4 * i + 1] << 8)
+                + (data_send[4 * i + 2] << 16)
+                + (data_send[4 * i + 3] << 24)
+            )
         self._jlink.memory_write(int(addr, 16), data_list, nbits=32)
 
     def if_read(self, data_len):
-        start_time = (time.time() * 1000)
+        start_time = time.time() * 1000
         while True:
             ready = self._jlink.memory_read(int(self._jlink_shake_hand_addr, 16), 1, nbits=32)
             if len(ready) >= 1:
@@ -265,19 +288,28 @@ class BflbJLinkPort(object):
             data += bflb_utils.int_to_4bytearray_l(tmp)
         return bytearray(data)
 
-    def if_shakehand(self,
-                     do_reset=False,
-                     reset_hold_time=100,
-                     shake_hand_delay=100,
-                     reset_revert=True,
-                     cutoff_time=0,
-                     shake_hand_retry=2,
-                     isp_timeout=0,
-                     boot_load=False):
+    def if_shakehand(
+        self,
+        do_reset=False,
+        reset_hold_time=100,
+        shake_hand_delay=100,
+        reset_revert=True,
+        cutoff_time=0,
+        shake_hand_retry=2,
+        isp_timeout=0,
+        boot_load=False,
+    ):
         self.if_write(bytearray(1))
         success, ack = self.if_read(2)
         bflb_utils.printf(binascii.hexlify(ack))
-        if ack.find(b'\x4F') != -1 or ack.find(b'\x4B') != -1:
+        if ack.find(b"\x4F") != -1 or ack.find(b"\x4B") != -1:
+            if self._password != None and len(self._password) != 0:
+                cmd = bflb_utils.hexstr_to_bytearray("2400")
+                cmd += bflb_utils.int_to_2bytearray_l(len(self._password) // 2)
+                cmd += bflb_utils.hexstr_to_bytearray(self._password)
+                self.if_write(cmd)
+                success, ack = self.if_read(2)
+                bflb_utils.printf("set pswd ack is ", binascii.hexlify(ack).decode("utf-8"))
             time.sleep(0.03)
             return "OK"
         return "FL"
@@ -292,15 +324,15 @@ class BflbJLinkPort(object):
         if success == 0:
             bflb_utils.printf("ack:" + str(binascii.hexlify(ack)))
             return ack.decode("utf-8")
-        if ack.find(b'\x4F') != -1 or ack.find(b'\x4B') != -1:
+        if ack.find(b"\x4F") != -1 or ack.find(b"\x4B") != -1:
             return "OK"
-        elif ack.find(b'\x50') != -1 or ack.find(b'\x44') != -1:
+        elif ack.find(b"\x50") != -1 or ack.find(b"\x44") != -1:
             return "PD"
         success, err_code = self.if_read(4)
         if success == 0:
             bflb_utils.printf("err_code:" + str(binascii.hexlify(err_code)))
             return "FL"
-        err_code_str = str(binascii.hexlify(err_code[3:4] + err_code[2:3]).decode('utf-8'))
+        err_code_str = str(binascii.hexlify(err_code[3:4] + err_code[2:3]).decode("utf-8"))
         ack = "FL"
         try:
             ret = ack + err_code_str + "(" + bflb_utils.get_bflb_error_code(err_code_str) + ")"
@@ -335,7 +367,7 @@ class BflbJLinkPort(object):
         return ack, None
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     try:
         eflash_loader_t = BflbJLinkPort()
         eflash_loader_t.if_init("", 1000, "bl602")

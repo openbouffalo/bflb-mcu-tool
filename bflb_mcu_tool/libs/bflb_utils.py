@@ -45,6 +45,7 @@ from CryptoPlus.Cipher import AES as AES_XTS
 
 try:
     from PySide2 import QtCore
+
     qt_sign = True
 except ImportError:
     qt_sign = False
@@ -66,11 +67,12 @@ if python_version == 64:
     path_dll = os.path.join(app_path, "utils/jlink", "JLink_x64.dll")
 else:
     path_dll = os.path.join(app_path, "utils/jlink", "JLinkARM.dll")
-    
+
 path_dylib = os.path.join(app_path, "utils/jlink", "libjlinkarm.dylib")
 
 try:
     import changeconf as cgc
+
     conf_sign = True
 except ImportError:
     cgc = None
@@ -83,20 +85,74 @@ udp_send_log = False
 udp_log_local_echo = False
 udp_socket_server = None
 error_code_num = "FFFF"
-error_code_num_task = ["FFFF", "FFFF", "FFFF", "FFFF", "FFFF", \
-                       "FFFF", "FFFF", "FFFF", "FFFF", "FFFF", \
-                       "FFFF", "FFFF", "FFFF", "FFFF", "FFFF", \
-                       "FFFF", "FFFF", "FFFF", "FFFF", "FFFF", \
-                       "FFFF", "FFFF", "FFFF", "FFFF", "FFFF", \
-                       "FFFF", "FFFF", "FFFF", "FFFF", "FFFF", \
-                       "FFFF", "FFFF", "FFFF", "FFFF", "FFFF", \
-                       "FFFF", "FFFF", "FFFF", "FFFF", "FFFF", \
-                       "FFFF", "FFFF", "FFFF", "FFFF", "FFFF", \
-                       "FFFF", "FFFF", "FFFF", "FFFF", "FFFF", \
-                       "FFFF", "FFFF", "FFFF", "FFFF", "FFFF", \
-                       "FFFF", "FFFF", "FFFF", "FFFF", "FFFF", \
-                       "FFFF", "FFFF", "FFFF", "FFFF", "FFFF", \
-                       "FFFF"]
+error_code_num_task = [
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+    "FFFF",
+]
 local_log_en = True
 local_log_data = ""
 
@@ -345,6 +401,16 @@ else:
         "0604": "BFLB_ECDH_RANDOM_VAL_ERROR",
         "0605": "BFLB_ECDH_DECRYPT_ERROR",
         "0606": "BFLB_ECDH_ENCRYPT_ERROR",
+        "0701": "BFLB_SDCARD_MOUNT_ERROR",
+        "0702": "BFLB_SDCARD_FILE_NOT_FOUND_ERROR",
+        "0703": "BFLB_SDCARD_READ_LEN_ERROR",
+        "0704": "BFLB_SDCARD_READ_ERROR",
+        "0901": "BFLB_CODEPATH_CHECK_ERROR",
+        "0a01": "BFLB_PASSWORD_LEN_CHECKERROR",
+        "0a02": "BFLB_PASSWORD_MODE_NEED_PSW",
+        "0a03": "BFLB_PASSWORD_MODE_CLOSE",
+        "0b01": "BFLB_MODE_LEN_CHECK_ERROR",
+        "0c01": "BFLB_BOOT2_VERSION_CHECK_ERROR",
         "fffc": "BFLB_PLL_ERROR",
         "fffd": "BFLB_INVASION_ERROR",
         "fffe": "BFLB_POLLING",
@@ -446,17 +512,17 @@ def swap_rd_rs2(inst):
 
 
 def write32le(buf, index, num):
-    buf[0+index] = num & 0xff
-    buf[1+index] = (num >> 8) & 0xff
-    buf[2+index] = (num >> 16) & 0xff
-    buf[3+index] = (num >> 24) & 0xff
-    
-    
+    buf[0 + index] = num & 0xFF
+    buf[1 + index] = (num >> 8) & 0xFF
+    buf[2 + index] = (num >> 16) & 0xFF
+    buf[3 + index] = (num >> 24) & 0xFF
+
+
 def read32le(buf, index):
-    num = buf[0+index]
-    num |= buf[1+index] << 8
-    num |= buf[2+index] << 16
-    num |= buf[3+index] << 24 
+    num = buf[0 + index]
+    num |= buf[1 + index] << 8
+    num |= buf[2 + index] << 16
+    num |= buf[3 + index] << 24
     return num
 
 
@@ -466,17 +532,29 @@ def riscv_code(buffer, size, now_pos, is_encoder):
         pc = now_pos + i
         inst = read32le(buffer, i)
         if (inst & 0xDFF) == 0x0EF:
-            addr = ((inst & 0x80000000) >> 11) | ((inst & 0x7FE00000) >> 20) | ((inst & 0x00100000) >> 9) | (inst & 0x000FF000)
+            addr = (
+                ((inst & 0x80000000) >> 11)
+                | ((inst & 0x7FE00000) >> 20)
+                | ((inst & 0x00100000) >> 9)
+                | (inst & 0x000FF000)
+            )
             if not is_encoder:
                 pc = 0 - pc
             addr += pc
             inst &= 0xFFF
-            inst |= ((addr & 0x100000) << 11) | ((addr & 0x0007FE) << 20) | ((addr & 0x000800) << 9) | (addr & 0x0FF000)
+            inst |= (
+                ((addr & 0x100000) << 11)
+                | ((addr & 0x0007FE) << 20)
+                | ((addr & 0x000800) << 9)
+                | (addr & 0x0FF000)
+            )
             write32le(buffer, i, inst)
             i += 2
         elif (inst & 0x7F) == 0x17:
             inst2 = read32le(buffer, i + 4)
-            if not ((inst2 & 0x5B) == 0x03 or (inst2 & 0x707F) == 0x67 or (inst2 & 0x707F) == 0x13):
+            if not (
+                (inst2 & 0x5B) == 0x03 or (inst2 & 0x707F) == 0x67 or (inst2 & 0x707F) == 0x13
+            ):
                 i += 8
                 continue
             auipc_rd = (inst >> 7) & 0x1F
@@ -491,7 +569,7 @@ def riscv_code(buffer, size, now_pos, is_encoder):
                 inst2_rd = (inst2 >> 7) & 0x1F
                 inst ^= inst2_rd << 7
                 inst2 ^= inst2_rd << 15
-            addr = (inst & 0xFFFFF000) + (inst2 >> 20) - ((inst2 >> 19) & 0x1000) 
+            addr = (inst & 0xFFFFF000) + (inst2 >> 20) - ((inst2 >> 19) & 0x1000)
             if not is_encoder:
                 pc = 0 - pc
             addr += pc
@@ -523,7 +601,7 @@ def riscv_decode(bytedata):
 
 
 def convert_path(path: str) -> str:
-    return path.replace(r'\/'.replace(os.sep, ''), os.sep)
+    return path.replace(r"\/".replace(os.sep, ""), os.sep)
 
 
 def printf(*args):
@@ -536,23 +614,25 @@ def printf(*args):
         if conf_sign:
             for key, value in cgc.replace_name_list.items():
                 data = data.replace(key, value)
-        now_time = datetime.datetime.now().strftime('[%H:%M:%S.%f')[:-3] + '] - '
+        now_time = datetime.datetime.now().strftime("[%H:%M:%S.%f")[:-3] + "] - "
         data = now_time + data
 
         # save log
         global local_log_en
         global local_log_data
         if local_log_en is True:
-            local_log_data += data + '\n'
+            local_log_data += data + "\n"
         else:
             local_log_data = ""
 
         if udp_send_log:
             tid = str(threading.get_ident())
             if udp_log_local_echo:
-                print("[" + tid + ":]" + data.strip())  #.lower()
+                print("[" + tid + ":]" + data.strip())  # .lower()
             try:
-                udp_socket_server.sendto((data.strip() + "\r\n").encode('utf-8'), udp_clinet_dict[tid])  #.lower()
+                udp_socket_server.sendto(
+                    (data.strip() + "\r\n").encode("utf-8"), udp_clinet_dict[tid]
+                )  # .lower()
             except Exception as e:
                 print(e)
         else:
@@ -580,8 +660,8 @@ def local_log_save(local_path="log", key_word=""):
         os.makedirs(log_dir)
     if local_log_en is True:
         try:
-            rq = time.strftime('%Y%m%d%H%M%S', time.localtime(time.time()))
-            log_name = rq + '_' + key_word + '.log'
+            rq = time.strftime("%Y%m%d%H%M%S", time.localtime(time.time()))
+            log_name = rq + "_" + key_word + ".log"
             log_path = os.path.join(log_dir, log_name)
             #             fp = open(log_path, 'w')
             #             fp.write(local_log_data)
@@ -629,23 +709,29 @@ def errorcode_msg(task=None):
     global error_code_num
     global error_code_num_task
     global eflash_loader_error_code
-    '''
+    """
     if task != None:
         return '{"ErrorCode": "' + error_code_num_task[task] + \
             '", "ErrorMsg":"' + eflash_loader_error_code[error_code_num_task[task]] + '"}'
     return '{"ErrorCode": "' + error_code_num + \
         '", "ErrorMsg":"' + eflash_loader_error_code[error_code_num] + '"}'
-    '''
+    """
     if task != None:
-        return "ErrorCode: " + error_code_num_task[task] + \
-            " ErrorMsg: " + eflash_loader_error_code[error_code_num_task[task]]
-    return "ErrorCode: " + error_code_num + ", ErrorMsg: " + eflash_loader_error_code[
-        error_code_num]
+        return (
+            "ErrorCode: "
+            + error_code_num_task[task]
+            + " ErrorMsg: "
+            + eflash_loader_error_code[error_code_num_task[task]]
+        )
+    return (
+        "ErrorCode: " + error_code_num + ", ErrorMsg: " + eflash_loader_error_code[error_code_num]
+    )
 
 
 def get_security_key():
-    return hexstr_to_bytearray("424F554646414C4F4C41424B45594956"), \
-           hexstr_to_bytearray("424F554646414C4F4C41424B00000000")
+    return hexstr_to_bytearray("424F554646414C4F4C41424B45594956"), hexstr_to_bytearray(
+        "424F554646414C4F4C41424B00000000"
+    )
 
 
 # 12345678->0x12,0x34,0x56,0x78
@@ -673,10 +759,10 @@ def int_to_2bytearray_b(intvalue):
 
 def int_to_4bytearray_l(intvalue):
     src = bytearray(4)
-    src[3] = ((intvalue >> 24) & 0xFF)
-    src[2] = ((intvalue >> 16) & 0xFF)
-    src[1] = ((intvalue >> 8) & 0xFF)
-    src[0] = ((intvalue >> 0) & 0xFF)
+    src[3] = (intvalue >> 24) & 0xFF
+    src[2] = (intvalue >> 16) & 0xFF
+    src[1] = (intvalue >> 8) & 0xFF
+    src[0] = (intvalue >> 0) & 0xFF
     return src
 
 
@@ -712,7 +798,7 @@ def get_random_hexstr(n_bytes):
     hextring = ""
     i = 0
     while i < n_bytes:
-        hextring = hextring + "%02X" % random.randint(0,255)
+        hextring = hextring + "%02X" % random.randint(0, 255)
         i = i + 1
     return hextring
 
@@ -724,7 +810,7 @@ def get_crc32_bytearray(data):
 
 def add_to_16(par):
     while len(par) % 16 != 0:
-        par += b'\x00'
+        par += b"\x00"
     return par
 
 
@@ -756,7 +842,7 @@ def verify_hex_num(string):
     length = len(string)
     i = 0
     while True:
-        if re.match('\A[0-9a-fA-F]+\Z', string[i:i + 1]) is None:
+        if re.match("\A[0-9a-fA-F]+\Z", string[i : i + 1]) is None:
             return False
         i += 1
         if i >= length:
@@ -792,6 +878,7 @@ def img_create_encrypt_data(data_bytearray, key_bytearray, iv_bytearray, flash_i
         ciphertext = cryptor.encrypt(data_bytearray)
     return ciphertext
 
+
 # decrypt image, mainly segdata
 def img_create_decrypt_data(data_bytearray, key_bytearray, iv_bytearray, flash_img):
     if flash_img == 0:
@@ -806,7 +893,7 @@ def img_create_decrypt_data(data_bytearray, key_bytearray, iv_bytearray, flash_i
 
 def img_create_encrypt_data_xts(data_bytearray, key_bytearray, iv_bytearray, encrypt):
     pass
-    '''
+    """
     counter = binascii.hexlify(iv_bytearray[4:16]).decode()
     # data unit number default value is 0
     data_unit_number = 0
@@ -844,7 +931,8 @@ def img_create_encrypt_data_xts(data_bytearray, key_bytearray, iv_bytearray, enc
     # bflb_utils.printf(binascii.hexlify(ciphertext))
 
     return ciphertext
-'''
+"""
+
 
 def aes_decrypt_data(data, key_bytearray, iv_bytearray, flash_img):
     if flash_img == 0:
@@ -857,7 +945,7 @@ def aes_decrypt_data(data, key_bytearray, iv_bytearray, flash_img):
     return plaintext
 
 
-def open_file(file, mode='rb'):
+def open_file(file, mode="rb"):
     fp = open(os.path.join(app_path, file), mode)
     return fp
 
@@ -870,7 +958,7 @@ def copyfile(srcfile, dstfile):
         shutil.copyfile(srcfile, dstfile)
     else:
         printf("Src file not exists")
-        #sys.exit()
+        # sys.exit()
 
 
 def get_systype():
@@ -924,7 +1012,7 @@ def serial_enumerate():
             if "PID=1D6B" in h.upper():
                 ser_value = h.split(" ")[2][4:]
                 if ser_value not in sdio_file_ser_dict:
-                    #sdio_ports.append(p+" (SDIO)")
+                    # sdio_ports.append(p+" (SDIO)")
                     sdio_file_ser_dict[ser_value] = p
                 else:
                     if "LOCATION" in h.upper():
@@ -939,11 +1027,11 @@ def serial_enumerate():
                 else:
                     uart_ports.append(p)
         try:
-            uart_ports = sorted(uart_ports, key=lambda x: int(re.match('COM(\d+)', x).group(1)))
+            uart_ports = sorted(uart_ports, key=lambda x: int(re.match("COM(\d+)", x).group(1)))
         except Exception:
             uart_ports = sorted(uart_ports)
         ports = sorted(prog_ports) + sorted(sdio_ports) + uart_ports
-    elif sys.platform.startswith('linux'):
+    elif sys.platform.startswith("linux"):
         for p, d, h in comports():
             if not p:
                 continue
@@ -964,20 +1052,20 @@ def serial_enumerate():
                 else:
                     uart_ports.append(p)
         ports = sorted(prog_ports) + sorted(sdio_ports) + sorted(uart_ports)
-    elif sys.platform.startswith('darwin'):
-        for dev in glob('/dev/tty.usb*'):
+    elif sys.platform.startswith("darwin"):
+        for dev in glob("/dev/tty.usb*"):
             ports.append(dev)
     return ports
 
 
 def pylink_enumerate():
     try:
-        if sys.platform == 'win32':
+        if sys.platform == "win32":
             obj_dll = pylink.Library(dllpath=path_dll)
             obj = pylink.JLink(lib=obj_dll)
-        elif sys.platform.startswith('darwin'):
+        elif sys.platform.startswith("darwin"):
             obj_dylib = pylink.Library(dllpath=path_dylib)
-            obj = pylink.JLink(lib=obj_dylib)   
+            obj = pylink.JLink(lib=obj_dylib)
         else:
             obj = pylink.JLink()
     except Exception:
@@ -1028,11 +1116,14 @@ def image_create_parser_init():
     parser.add_argument("-s", "--signer", dest="signer", help="signer")
     return parser
 
+
 def firmware_post_proc_parser_init():
     parser = argparse.ArgumentParser(description="bouffalolab image create command")
     parser.add_argument("--chipname", dest="chipname", help="chip name")
     parser.add_argument("--cpuid", dest="cpuid", help="cpu id")
-    parser.add_argument("--brdcfgdir", dest="brdcfgdir", help="board config dir contains boot2,partition,etc.")
+    parser.add_argument(
+        "--brdcfgdir", dest="brdcfgdir", help="board config dir contains boot2,partition,etc."
+    )
     parser.add_argument("--imgfile", dest="imgfile", help="image file to deal")
     parser.add_argument("--datafile", dest="datafile", help="user data file")
     parser.add_argument("--edatafile_in", dest="edatafile_in", help="input efuse data file")
@@ -1044,26 +1135,48 @@ def firmware_post_proc_parser_init():
     parser.add_argument("--xtsmode", dest="xtsmode", help="xts mode enable")
     parser.add_argument("--publickey", dest="publickey", help="ECC public key")
     parser.add_argument("--privatekey", dest="privatekey", help="ECC private key")
-    parser.add_argument("--publickey_str", dest="publickey_str", help="ECC public key base 64 string")
-    parser.add_argument("--privatekey_str", dest="privatekey_str", help="ECC private key base 64 string")
+    parser.add_argument(
+        "--publickey_str", dest="publickey_str", help="ECC public key base 64 string"
+    )
+    parser.add_argument(
+        "--privatekey_str", dest="privatekey_str", help="ECC private key base 64 string"
+    )
     parser.add_argument("--edbg_mode", dest="dbg_mode", help="debug mode:open/pswd/close")
     parser.add_argument("--ejtag_close", dest="jtag_close", help="Close JTAG, mode: true/false")
     parser.add_argument("--epswwd", dest="pswd", help="JTAG password value hex string")
-    parser.add_argument("--ehbn_sign", dest="hbn_sign", help="enable/disable signature check when HBN mode wakeup, mode: true/false")
+    parser.add_argument(
+        "--ehbn_sign",
+        dest="hbn_sign",
+        help="enable/disable signature check when HBN mode wakeup, mode: true/false",
+    )
     parser.add_argument("--ehbn_jump", dest="hbn_jump", help="enable/disable hbn jump function")
-    parser.add_argument("--eanti_rollback", dest="anti_rollback", help="enable/disable anti-rollback function")
-    parser.add_argument("--eflash_pdelay", dest="flash_pdelay", help="flash power up delay value, value: 0-3")
-    parser.add_argument("--edata", dest="edata", help="efuse data content:start,hex_str ex:0x10,000102030405060708;0x20,01020304")
+    parser.add_argument(
+        "--eanti_rollback", dest="anti_rollback", help="enable/disable anti-rollback function"
+    )
+    parser.add_argument(
+        "--eflash_pdelay", dest="flash_pdelay", help="flash power up delay value, value: 0-3"
+    )
+    parser.add_argument(
+        "--edata",
+        dest="edata",
+        help="efuse data content:start,hex_str ex:0x10,000102030405060708;0x20,01020304",
+    )
     parser.add_argument("--appkeys", dest="appkeys", help="app use diffrent keys from bootloader ")
-    parser.add_argument("--checkpartition", dest="checkpartition", help="check partition in whole_flash_data.bin")
-    parser.add_argument("--releasenote", dest="releasenote", action="store_false", help="dump release note")
+    parser.add_argument(
+        "--checkpartition", dest="checkpartition", help="check partition in whole_flash_data.bin"
+    )
+    parser.add_argument(
+        "--releasenote", dest="releasenote", action="store_false", help="dump release note"
+    )
     return parser
+
 
 def firmware_auxiliary_parser_init():
     parser = argparse.ArgumentParser(description="bouffalolab image auxiliary command")
     parser.add_argument("--wdir", dest="wdir", help="sdk work directory")
     parser.add_argument("--imgfile", dest="imgfile", help="image file")
     return parser
+
 
 def eflash_loader_parser_init():
     parser = argparse.ArgumentParser(description="bouffalolab eflash loader command")
@@ -1073,42 +1186,32 @@ def eflash_loader_parser_init():
     parser.add_argument("--flash", dest="flash", action="store_true", help="target is flash")
     parser.add_argument("--efuse", dest="efuse", action="store_true", help="target is efuse")
     parser.add_argument("--ram", dest="ram", action="store_true", help="target is ram")
-    parser.add_argument("--efusecheck",
-                        dest="efusecheck",
-                        action="store_true",
-                        help="efuse check data")
-    parser.add_argument("-w",
-                        "--write",
-                        dest="write",
-                        action="store_true",
-                        help="write to flash/efuse")
+    parser.add_argument(
+        "--efusecheck", dest="efusecheck", action="store_true", help="efuse check data"
+    )
+    parser.add_argument(
+        "-w", "--write", dest="write", action="store_true", help="write to flash/efuse"
+    )
     parser.add_argument("-e", "--erase", dest="erase", action="store_true", help="erase flash")
-    parser.add_argument("-r",
-                        "--read",
-                        dest="read",
-                        action="store_true",
-                        help="read from flash/efuse")
-    parser.add_argument("-n",
-                        "--none",
-                        dest="none",
-                        action="store_true",
-                        help="eflash loader environment init")
+    parser.add_argument(
+        "-r", "--read", dest="read", action="store_true", help="read from flash/efuse"
+    )
+    parser.add_argument(
+        "-n", "--none", dest="none", action="store_true", help="eflash loader environment init"
+    )
     parser.add_argument("-p", "--port", dest="port", help="serial port to use")
-    parser.add_argument("-b",
-                        "--baudrate",
-                        dest="baudrate",
-                        type=int,
-                        help="the speed at which to communicate")
+    parser.add_argument(
+        "-b", "--baudrate", dest="baudrate", type=int, help="the speed at which to communicate"
+    )
     parser.add_argument("-c", "--config", dest="config", help="eflash loader config file")
-    parser.add_argument("-i",
-                        "--interface",
-                        dest="interface",
-                        help="interface type: uart/jlink/openocd")
+    parser.add_argument(
+        "-i", "--interface", dest="interface", help="interface type: uart/jlink/openocd"
+    )
     parser.add_argument("--xtal", dest="xtal", help="xtal type")
     parser.add_argument("--start", dest="start", help="start address")
     parser.add_argument("--end", dest="end", help="end address")
     parser.add_argument("--addr", dest="addr", help="address to write")
-    parser.add_argument("--mac", dest="mac", nargs='?', const=True, default=False)
+    parser.add_argument("--mac", dest="mac", nargs="?", const=True, default=False)
     parser.add_argument("--file", dest="file", help="file to store read data or file to write")
     parser.add_argument("--skip", dest="skip", help="skip write file to flash")
     parser.add_argument("--packet", dest="packet", help=" import packet to replace burn file")
@@ -1135,10 +1238,13 @@ def eflash_loader_parser_init():
     parser.add_argument("--dac_addr", dest="dac_addr", help="dac address")
     parser.add_argument("--dac_key", dest="dac_key", help="dac encrpt key")
     parser.add_argument("--dac_iv", dest="dac_iv", help="dac encrypt iv")
-    parser.add_argument("--auto_efuse_verify", action="store_true", dest="auto_efuse_verify", help="auto efuse verify")
-    parser.add_argument("-v",
-                        "--version",
-                        dest="version",
-                        action="store_true",
-                        help="display version")
+    parser.add_argument(
+        "--auto_efuse_verify",
+        action="store_true",
+        dest="auto_efuse_verify",
+        help="auto efuse verify",
+    )
+    parser.add_argument(
+        "-v", "--version", dest="version", action="store_true", help="display version"
+    )
     return parser

@@ -24,7 +24,7 @@ from string import printable
 
 
 def is_string(data):
-    """ Check property string validity """
+    """Check property string validity"""
     if not len(data):
         return None
     if data[-1] != 0:
@@ -32,10 +32,12 @@ def is_string(data):
     pos = 0
     while pos < len(data):
         posi = pos
-        while pos < len(data) and \
-              data[pos] != 0 and \
-              data[pos] in printable.encode() and \
-              data[pos] not in (ord('\r'), ord('\n')):
+        while (
+            pos < len(data)
+            and data[pos] != 0
+            and data[pos] in printable.encode()
+            and data[pos] not in (ord("\r"), ord("\n"))
+        ):
             pos += 1
         if data[pos] != 0 or pos == posi:
             return None
@@ -44,7 +46,7 @@ def is_string(data):
 
 
 def extract_string(data, offset=0):
-    """ Extract string """
+    """Extract string"""
     str_end = offset
     while data[str_end] != 0:
         str_end += 1
@@ -58,35 +60,35 @@ def line_offset(tabsize, offset, string):
 
 def get_version_info(text):
     ret = dict()
-    for line in text.split('\n'):
-        line = line.rstrip('\0')
-        if line and line.startswith('/ {'):
+    for line in text.split("\n"):
+        line = line.rstrip("\0")
+        if line and line.startswith("/ {"):
             break
-        if line and line.startswith('//'):
-            line = line.replace('//', '').replace(':', '')
+        if line and line.startswith("//"):
+            line = line.replace("//", "").replace(":", "")
             line = line.split()
-            if line[0] in ('version', 'last_comp_version', 'boot_cpuid_phys'):
+            if line[0] in ("version", "last_comp_version", "boot_cpuid_phys"):
                 ret[line[0]] = int(line[1], 0)
     return ret
 
 
 def strip_comments(text):
-    text = re.sub('//.*?(\r\n?|\n)|/\*.*?\*/', '\n', text, flags=re.S)
+    text = re.sub("//.*?(\r\n?|\n)|/\*.*?\*/", "\n", text, flags=re.S)
     return text
 
 
 def split_to_lines(text):
     lines = []
     mline = str()
-    for line in text.split('\n'):
-        line = line.replace('\t', ' ')
-        line = line.rstrip('\0')
-        line = line.rstrip(' ')
-        line = line.lstrip(' ')
-        if not line or line.startswith('/dts-'):
+    for line in text.split("\n"):
+        line = line.replace("\t", " ")
+        line = line.rstrip("\0")
+        line = line.rstrip(" ")
+        line = line.lstrip(" ")
+        if not line or line.startswith("/dts-"):
             continue
-        if line.endswith('{') or line.endswith(';'):
-            line = line.replace(';', '')
+        if line.endswith("{") or line.endswith(";"):
+            line = line.replace(";", "")
             lines.append(mline + line)
             mline = str()
         else:
@@ -111,7 +113,6 @@ DTB_END = 0x9
 
 
 class Header:
-
     MIN_SIZE = 4 * 7
     MAX_SIZE = 4 * 10
 
@@ -164,12 +165,12 @@ class Header:
         self.size_dt_struct = None
 
     def __str__(self):
-        return '<FDT-v{}, size: {}>'.format(self.version, self.size)
+        return "<FDT-v{}, size: {}>".format(self.version, self.size)
 
     def info(self):
-        nfo = 'FDT Header:'
-        nfo += '- Version: {}'.format(self.version)
-        nfo += '- Size:    {}'.format(self.size)
+        nfo = "FDT Header:"
+        nfo += "- Version: {}".format(self.version)
+        nfo += "- Size:    {}".format(self.size)
         return nfo
 
     def export(self) -> bytes:
@@ -180,14 +181,22 @@ class Header:
         if self.version is None:
             raise Exception("Header Version must be specified !")
 
-        blob = pack('>7I', self.MAGIC_NUMBER, self.total_size, self.off_dt_struct,
-                    self.off_dt_strings, self.off_mem_rsvmap, self.version, self.last_comp_version)
+        blob = pack(
+            ">7I",
+            self.MAGIC_NUMBER,
+            self.total_size,
+            self.off_dt_struct,
+            self.off_dt_strings,
+            self.off_mem_rsvmap,
+            self.version,
+            self.last_comp_version,
+        )
         if self.version >= 2:
-            blob += pack('>I', self.boot_cpuid_phys)
+            blob += pack(">I", self.boot_cpuid_phys)
         if self.version >= 3:
-            blob += pack('>I', self.size_dt_strings)
+            blob += pack(">I", self.size_dt_strings)
         if self.version >= 17:
-            blob += pack('>I', self.size_dt_struct)
+            blob += pack(">I", self.size_dt_struct)
         if self.padding:
             blob += bytes([0] * self.padding)
 
@@ -201,29 +210,35 @@ class Header:
         :param offset:
         """
         if len(data) < (offset + cls.MIN_SIZE):
-            raise ValueError('Data size too small !')
+            raise ValueError("Data size too small !")
 
         header = cls()
-        (magic_number, header.total_size, header.off_dt_struct, header.off_dt_strings,
-         header.off_mem_rsvmap, header.version,
-         header.last_comp_version) = unpack_from('>7I', data, offset)
+        (
+            magic_number,
+            header.total_size,
+            header.off_dt_struct,
+            header.off_dt_strings,
+            header.off_mem_rsvmap,
+            header.version,
+            header.last_comp_version,
+        ) = unpack_from(">7I", data, offset)
         offset += cls.MIN_SIZE
 
         if magic_number != cls.MAGIC_NUMBER:
-            raise Exception('Invalid Magic Number')
+            raise Exception("Invalid Magic Number")
         if header.last_comp_version > cls.MAX_VERSION - 1:
-            raise Exception(f'Invalid last compatible Version {header.last_comp_version}')
+            raise Exception(f"Invalid last compatible Version {header.last_comp_version}")
 
         if header.version >= 2:
-            header.boot_cpuid_phys = unpack_from('>I', data, offset)[0]
+            header.boot_cpuid_phys = unpack_from(">I", data, offset)[0]
             offset += 4
 
         if header.version >= 3:
-            header.size_dt_strings = unpack_from('>I', data, offset)[0]
+            header.size_dt_strings = unpack_from(">I", data, offset)[0]
             offset += 4
 
         if header.version >= 17:
-            header.size_dt_struct = unpack_from('>I', data, offset)[0]
+            header.size_dt_struct = unpack_from(">I", data, offset)[0]
             offset += 4
 
         return header
@@ -245,7 +260,7 @@ def new_property(name: str, raw_value: bytes) -> object:
     if is_string(raw_value):
         obj = PropStrings(name)
         # Extract strings from raw value
-        for st in raw_value.decode('ascii').split('\0'):
+        for st in raw_value.decode("ascii").split("\0"):
             if st:
                 obj.append(st)
         return obj
@@ -254,7 +269,7 @@ def new_property(name: str, raw_value: bytes) -> object:
         obj = PropWords(name)
         # Extract words from raw value
         for i in range(0, len(raw_value), 4):
-            obj.append(unpack(">I", raw_value[i:i + 4])[0])
+            obj.append(unpack(">I", raw_value[i : i + 4])[0])
         return obj
 
     elif len(raw_value):
@@ -270,7 +285,6 @@ def new_property(name: str, raw_value: bytes) -> object:
 
 
 class BaseItem:
-
     @property
     def name(self):
         return self._name
@@ -284,16 +298,16 @@ class BaseItem:
         node = self._parent
         path = ""
         while node:
-            if node.name == '/':
+            if node.name == "/":
                 break
-            path = '/' + node.name + path
+            path = "/" + node.name + path
             node = node.parent
-        return path if path else '/'
+        return path if path else "/"
 
     def __init__(self, name: str):
-        """ 
+        """
         BaseItem constructor
-        
+
         :param name: Item name
         """
         assert isinstance(name, str)
@@ -302,13 +316,13 @@ class BaseItem:
         self._parent = None
 
     def __str__(self):
-        """ String representation """
+        """String representation"""
         return f"{self.name}"
 
     def set_name(self, value: str):
-        """ 
+        """
         Set item name
-        
+
         :param value: The name in string format
         """
         assert isinstance(value, str)
@@ -316,10 +330,10 @@ class BaseItem:
         self._name = value
 
     def set_parent(self, value):
-        """ 
+        """
         Set item parent
 
-        :param value: The parent node 
+        :param value: The parent node
         """
         assert isinstance(value, Node)
         self._parent = value
@@ -337,17 +351,16 @@ class BaseItem:
 
 
 class Property(BaseItem):
-
     def __getitem__(self, value):
-        """ Returns No Items """
+        """Returns No Items"""
         return None
 
     def __eq__(self, obj):
-        """ Check Property object equality """
+        """Check Property object equality"""
         return isinstance(obj, Property) and self.name == obj.name
 
     def copy(self):
-        """ Get object copy """
+        """Get object copy"""
         return Property(self.name)
 
     def to_dts(self, tabsize: int = 4, depth: int = 0):
@@ -357,7 +370,7 @@ class Property(BaseItem):
         :param tabsize: Tabulator size in count of spaces
         :param depth: Start depth for line
         """
-        return line_offset(tabsize, depth, '{};\n'.format(self.name))
+        return line_offset(tabsize, depth, "{};\n".format(self.name))
 
     def to_dtb(self, strings: str, pos: int = 0, version: int = Header.MAX_VERSION):
         """
@@ -367,12 +380,12 @@ class Property(BaseItem):
         :param pos:
         :param version:
         """
-        strpos = strings.find(self.name + '\0')
+        strpos = strings.find(self.name + "\0")
         if strpos < 0:
             strpos = len(strings)
-            strings += self.name + '\0'
+            strings += self.name + "\0"
         pos += 12
-        return pack('>III', DTB_PROP, 0, strpos), strings, pos
+        return pack(">III", DTB_PROP, 0, strpos), strings, pos
 
 
 class PropStrings(Property):
@@ -383,9 +396,9 @@ class PropStrings(Property):
         return self.data[0] if self.data else None
 
     def __init__(self, name: str, *args):
-        """ 
+        """
         PropStrings constructor
-        
+
         :param name: Property name
         :param args: str1, str2, ...
         """
@@ -395,19 +408,19 @@ class PropStrings(Property):
             self.append(arg)
 
     def __str__(self):
-        """ String representation """
+        """String representation"""
         return f"{self.name} = {self.data}"
 
     def __len__(self):
-        """ Get strings count """
+        """Get strings count"""
         return len(self.data)
 
     def __getitem__(self, index):
-        """ Get string by index """
+        """Get string by index"""
         return self.data[index]
 
     def __eq__(self, obj):
-        """ Check PropStrings object equality """
+        """Check PropStrings object equality"""
         if not isinstance(obj, PropStrings) or self.name != obj.name or len(self) != len(obj):
             return False
         for index in range(len(self)):
@@ -416,14 +429,15 @@ class PropStrings(Property):
         return True
 
     def copy(self):
-        """ Get object copy """
+        """Get object copy"""
         return PropStrings(self.name, *self.data)
 
     def append(self, value: str):
         assert isinstance(value, str)
         assert len(value) > 0, "Invalid strings value"
         assert all(
-            c in printable or c in ('\r', '\n') for c in value), "Invalid chars in strings value"
+            c in printable or c in ("\r", "\n") for c in value
+        ), "Invalid chars in strings value"
         self.data.append(value)
 
     def pop(self, index: int):
@@ -454,19 +468,19 @@ class PropStrings(Property):
         :param pos:
         :param version:
         """
-        blob = pack('')
+        blob = pack("")
         for chars in self.data:
-            blob += chars.encode('ascii') + pack('b', 0)
+            blob += chars.encode("ascii") + pack("b", 0)
         blob_len = len(blob)
         if version < 16 and (pos + 12) % 8 != 0:
-            blob = pack('b', 0) * (8 - ((pos + 12) % 8)) + blob
+            blob = pack("b", 0) * (8 - ((pos + 12) % 8)) + blob
         if blob_len % 4:
-            blob += pack('b', 0) * (4 - (blob_len % 4))
-        strpos = strings.find(self.name + '\0')
+            blob += pack("b", 0) * (4 - (blob_len % 4))
+        strpos = strings.find(self.name + "\0")
         if strpos < 0:
             strpos = len(strings)
-            strings += self.name + '\0'
-        blob = pack('>III', DTB_PROP, blob_len, strpos) + blob
+            strings += self.name + "\0"
+        blob = pack(">III", DTB_PROP, blob_len, strpos) + blob
         pos += len(blob)
         return blob, strings, pos
 
@@ -492,19 +506,19 @@ class PropWords(Property):
             self.append(val)
 
     def __str__(self):
-        """ String representation """
+        """String representation"""
         return f"{self.name} = {self.data}"
 
     def __getitem__(self, index):
-        """ Get word by index """
+        """Get word by index"""
         return self.data[index]
 
     def __len__(self):
-        """ Get words count """
+        """Get words count"""
         return len(self.data)
 
     def __eq__(self, prop):
-        """ Check PropWords object equality  """
+        """Check PropWords object equality"""
         if not isinstance(prop, PropWords):
             return False
         if self.name != prop.name:
@@ -521,8 +535,9 @@ class PropWords(Property):
 
     def append(self, value):
         assert isinstance(value, int), "Invalid object type"
-        assert 0 <= value < 2**self.word_size, "Invalid word value {}, use <0x0 - 0x{:X}>".format(
-            value, 2**self.word_size - 1)
+        assert (
+            0 <= value < 2**self.word_size
+        ), "Invalid word value {}, use <0x0 - 0x{:X}>".format(value, 2**self.word_size - 1)
         self.data.append(value)
 
     def pop(self, index):
@@ -540,8 +555,8 @@ class PropWords(Property):
         :param depth: Start depth for line
         """
         result = line_offset(tabsize, depth, self.name)
-        result += ' = <'
-        result += ' '.join(["0x{:X}".format(word) for word in self.data])
+        result += " = <"
+        result += " ".join(["0x{:X}".format(word) for word in self.data])
         result += ">;\n"
         return result
 
@@ -553,13 +568,13 @@ class PropWords(Property):
         :param pos:
         :param version:
         """
-        strpos = strings.find(self.name + '\0')
+        strpos = strings.find(self.name + "\0")
         if strpos < 0:
             strpos = len(strings)
-            strings += self.name + '\0'
-        blob = pack('>III', DTB_PROP, len(self.data) * 4, strpos)
+            strings += self.name + "\0"
+        blob = pack(">III", DTB_PROP, len(self.data) * 4, strpos)
         for word in self.data:
-            blob += pack('>I', word)
+            blob += pack(">I", word)
         pos += len(blob)
         return blob, strings, pos
 
@@ -568,9 +583,9 @@ class PropBytes(Property):
     """Property with bytes as value"""
 
     def __init__(self, name, data=None):
-        """ 
+        """
         PropBytes constructor
-        
+
         :param name: Property name
         :param data: Data as list, bytes or bytearray
         """
@@ -581,19 +596,19 @@ class PropBytes(Property):
             self.data = bytearray(data)
 
     def __str__(self):
-        """ String representation """
+        """String representation"""
         return f"{self.name} = {self.data}"
 
     def __getitem__(self, index):
-        """Get byte by index """
+        """Get byte by index"""
         return self.data[index]
 
     def __len__(self):
-        """ Get bytes count """
+        """Get bytes count"""
         return len(self.data)
 
     def __eq__(self, prop):
-        """ Check PropBytes object equality  """
+        """Check PropBytes object equality"""
         if not isinstance(prop, PropBytes):
             return False
         if self.name != prop.name:
@@ -606,7 +621,7 @@ class PropBytes(Property):
         return True
 
     def copy(self):
-        """ Create a copy of object """
+        """Create a copy of object"""
         return PropBytes(self.name, self.data)
 
     def append(self, value):
@@ -629,9 +644,9 @@ class PropBytes(Property):
         :param depth: Start depth for line
         """
         result = line_offset(tabsize, depth, self.name)
-        result += ' = ['
-        result += ' '.join(["{:02X}".format(byte) for byte in self.data])
-        result += '];\n'
+        result += " = ["
+        result += " ".join(["{:02X}".format(byte) for byte in self.data])
+        result += "];\n"
         return result
 
     def to_dtb(self, strings: str, pos: int = 0, version: int = Header.MAX_VERSION):
@@ -642,11 +657,11 @@ class PropBytes(Property):
         :param pos:
         :param version:
         """
-        strpos = strings.find(self.name + '\0')
+        strpos = strings.find(self.name + "\0")
         if strpos < 0:
             strpos = len(strings)
-            strings += self.name + '\0'
-        blob = pack('>III', DTB_PROP, len(self.data), strpos)
+            strings += self.name + "\0"
+        blob = pack(">III", DTB_PROP, len(self.data), strpos)
         blob += bytes(self.data)
         if len(blob) % 4:
             blob += bytes([0] * (4 - (len(blob) % 4)))
@@ -671,7 +686,7 @@ class PropIncBin(PropBytes):
         self.relative_path = rpath
 
     def __eq__(self, prop):
-        """ Check PropIncBin object equality  """
+        """Check PropIncBin object equality"""
         if not isinstance(prop, PropIncBin):
             return False
         if self.name != prop.name:
@@ -685,7 +700,7 @@ class PropIncBin(PropBytes):
         return True
 
     def copy(self):
-        """ Create a copy of object """
+        """Create a copy of object"""
         return PropIncBin(self.name, self.data, self.file_name, self.relative_path)
 
     def to_dts(self, tabsize: int = 4, depth: int = 0):
@@ -699,7 +714,7 @@ class PropIncBin(PropBytes):
         if self.relative_path is not None:
             file_path = "{}/{}".format(self.relative_path, self.file_name)
         result = line_offset(tabsize, depth, self.name)
-        result += " = /incbin/(\"{}\");\n".format(file_path)
+        result += ' = /incbin/("{}");\n'.format(file_path)
         return result
 
 
@@ -724,9 +739,9 @@ class Node(BaseItem):
         return False if self.nodes or self.props else True
 
     def __init__(self, name, *args):
-        """ 
+        """
         Node constructor
-        
+
         :param name: Node name
         :param args: List of properties and subnodes
         """
@@ -737,16 +752,18 @@ class Node(BaseItem):
             self.append(item)
 
     def __str__(self):
-        """ String representation """
+        """String representation"""
         return "< {}: {} props, {} nodes >".format(self.name, len(self.props), len(self.nodes))
 
     def __eq__(self, node):
-        """ Check node equality """
+        """Check node equality"""
         if not isinstance(node, Node):
             return False
-        if self.name != node.name or \
-           len(self.props) != len(node.props) or \
-           len(self.nodes) != len(node.nodes):
+        if (
+            self.name != node.name
+            or len(self.props) != len(node.props)
+            or len(self.nodes) != len(node.nodes)
+        ):
             return False
         for p in self.props:
             if p not in node.props:
@@ -757,7 +774,7 @@ class Node(BaseItem):
         return True
 
     def copy(self):
-        """ Create a copy of Node object """
+        """Create a copy of Node object"""
         node = Node(self.name)
         for p in self.props:
             node.append(p.copy())
@@ -766,9 +783,9 @@ class Node(BaseItem):
         return node
 
     def get_property(self, name):
-        """ 
+        """
         Get property object by its name
-        
+
         :param name: Property name
         """
         for p in self.props:
@@ -796,7 +813,7 @@ class Node(BaseItem):
         elif isinstance(value, (bytes, bytearray)):
             new_prop = PropBytes(name, data=value)
         else:
-            raise TypeError('Value type not supported')
+            raise TypeError("Value type not supported")
         new_prop.set_parent(self)
         old_prop = self.get_property(name)
         if old_prop is None:
@@ -806,7 +823,7 @@ class Node(BaseItem):
             self.props[index] = new_prop
 
     def get_subnode(self, name: str):
-        """ 
+        """
         Get subnode object by name
 
         :param name: Subnode name
@@ -817,25 +834,25 @@ class Node(BaseItem):
         return None
 
     def exist_property(self, name: str) -> bool:
-        """ 
+        """
         Check if property exist and return True if exist else False
-        
+
         :param name: Property name
         """
         return False if self.get_property(name) is None else True
 
     def exist_subnode(self, name: str) -> bool:
-        """ 
+        """
         Check if subnode exist and return True if exist else False
-        
+
         :param name: Subnode name
         """
         return False if self.get_subnode(name) is None else True
 
     def remove_property(self, name: str):
-        """ 
+        """
         Remove property object by its name.
-        
+
         :param name: Property name
         """
         item = self.get_property(name)
@@ -843,9 +860,9 @@ class Node(BaseItem):
             self.props.remove(item)
 
     def remove_subnode(self, name: str):
-        """ 
+        """
         Remove subnode object by its name.
-        
+
         :param name: Subnode name
         """
         item = self.get_subnode(name)
@@ -853,32 +870,31 @@ class Node(BaseItem):
             self.nodes.remove(item)
 
     def append(self, item):
-        """ 
+        """
         Append node or property
-        
+
         :param item: The node or property object
         """
-        assert isinstance(item,
-                          (Node, Property)), "Invalid object type, use \"Node\" or \"Property\""
+        assert isinstance(item, (Node, Property)), 'Invalid object type, use "Node" or "Property"'
 
         if isinstance(item, Property):
             if self.get_property(item.name) is not None:
-                raise Exception("{}: \"{}\" property already exists".format(self, item.name))
+                raise Exception('{}: "{}" property already exists'.format(self, item.name))
             item.set_parent(self)
             self.props.append(item)
 
         else:
             if self.get_subnode(item.name) is not None:
-                raise Exception("{}: \"{}\" node already exists".format(self, item.name))
+                raise Exception('{}: "{}" node already exists'.format(self, item.name))
             if item is self:
                 raise Exception("{}: append the same node {}".format(self, item.name))
             item.set_parent(self)
             self.nodes.append(item)
 
     def merge(self, node_obj, replace: bool = True):
-        """ 
+        """
         Merge two nodes
-        
+
         :param node_obj: Node object
         :param replace: If True, replace current properties with the given properties
         """
@@ -919,33 +935,33 @@ class Node(BaseItem):
                 self._nodes[index].merge(sub_node, replace)
 
     def to_dts(self, tabsize: int = 4, depth: int = 0) -> str:
-        """ 
+        """
         Get string representation of NODE object
-        
+
         :param tabsize: Tabulator size in count of spaces
         :param depth: Start depth for line
         """
-        dts = line_offset(tabsize, depth, self.name + ' {\n')
-        dts += ''.join(prop.to_dts(tabsize, depth + 1) for prop in self._props)
-        dts += ''.join(node.to_dts(tabsize, depth + 1) for node in self._nodes)
+        dts = line_offset(tabsize, depth, self.name + " {\n")
+        dts += "".join(prop.to_dts(tabsize, depth + 1) for prop in self._props)
+        dts += "".join(node.to_dts(tabsize, depth + 1) for node in self._nodes)
         dts += line_offset(tabsize, depth, "};\n")
         return dts
 
     def to_dtb(self, strings: str, pos: int = 0, version: int = Header.MAX_VERSION) -> tuple:
-        """ 
+        """
         Get NODE in binary blob representation
-        
-        :param strings: 
+
+        :param strings:
         :param pos:
         :param version:
         """
-        if self.name == '/':
-            blob = pack('>II', DTB_BEGIN_NODE, 0)
+        if self.name == "/":
+            blob = pack(">II", DTB_BEGIN_NODE, 0)
         else:
-            blob = pack('>I', DTB_BEGIN_NODE)
-            blob += self.name.encode('ascii') + b'\0'
+            blob = pack(">I", DTB_BEGIN_NODE)
+            blob += self.name.encode("ascii") + b"\0"
         if len(blob) % 4:
-            blob += pack('b', 0) * (4 - (len(blob) % 4))
+            blob += pack("b", 0) * (4 - (len(blob) % 4))
         pos += len(blob)
         for prop in self._props:
             (data, strings, pos) = prop.to_dtb(strings, pos, version)
@@ -954,7 +970,7 @@ class Node(BaseItem):
             (data, strings, pos) = node.to_dtb(strings, pos, version)
             blob += data
         pos += 4
-        blob += pack('>I', DTB_END_NODE)
+        blob += pack(">I", DTB_END_NODE)
         return blob, strings, pos
 
 
@@ -965,7 +981,7 @@ class ItemType:
 
 
 class FDT:
-    """ Flattened Device Tree Class """
+    """Flattened Device Tree Class"""
 
     @property
     def empty(self):
@@ -979,32 +995,32 @@ class FDT:
         """
         self.entries = []
         self.header = Header() if header is None else header
-        self.root = Node('/')
+        self.root = Node("/")
 
     def __str__(self):
-        """ String representation """
+        """String representation"""
         return self.info()
 
     def info(self):
-        """ Return object info in human readable format """
+        """Return object info in human readable format"""
         msg = "FDT Content:\n"
         for path, nodes, props in self.walk():
             msg += "{} [{}N, {}P]\n".format(path, len(nodes), len(props))
         return msg
 
     def get_node(self, path: str, create: bool = False) -> Node:
-        """ 
+        """
         Get node object from specified path
-        
+
         :param path: Path as string
         :param create: If True, not existing nodes will be created
         """
         assert isinstance(path, str), "Node path must be a string type !"
 
         node = self.root
-        path = path.lstrip('/')
+        path = path.lstrip("/")
         if path:
-            names = path.split('/')
+            names = path.split("/")
             for name in names:
                 item = node.get_subnode(name)
                 if item is None:
@@ -1012,24 +1028,24 @@ class FDT:
                         item = Node(name)
                         node.append(item)
                     else:
-                        raise ValueError("Path \"{}\" doesn't exists".format(path))
+                        raise ValueError('Path "{}" doesn\'t exists'.format(path))
                 node = item
 
         return node
 
-    def get_property(self, name: str, path: str = '') -> Property:
-        """ 
+    def get_property(self, name: str, path: str = "") -> Property:
+        """
         Get property object by name from specified path
-        
+
         :param name: Property name
         :param path: Path to sub-node
         """
         return self.get_node(path).get_property(name)
 
-    def set_property(self, name: str, value, path: str = '', create: bool = True):
+    def set_property(self, name: str, value, path: str = "", create: bool = True):
         """
         Set property object by name
-        
+
         :param name: Property name
         :param value: Property value
         :param path: Path to subnode
@@ -1038,9 +1054,9 @@ class FDT:
         self.get_node(path, create).set_property(name, value)
 
     def exist_node(self, path: str) -> bool:
-        """ 
+        """
         Check if <path>/node exist and return True
-        
+
         :param path: path/node name
         :return True if <path>/node exist else False
         """
@@ -1051,47 +1067,47 @@ class FDT:
         else:
             return True
 
-    def exist_property(self, name: str, path: str = '') -> bool:
-        """ 
+    def exist_property(self, name: str, path: str = "") -> bool:
+        """
         Check if property exist
-        
+
         :param name: Property name
         :param path: The path
         """
         return self.get_node(path).exist_property(name) if self.exist_node(path) else False
 
-    def remove_node(self, name: str, path: str = ''):
-        """ 
+    def remove_node(self, name: str, path: str = ""):
+        """
         Remove node obj by path/name. Raises ValueError if path/name doesn't exist
-        
+
         :param name: Node name
         :param path: Path to sub-node
         """
         self.get_node(path).remove_subnode(name)
 
-    def remove_property(self, name: str, path: str = ''):
-        """ 
+    def remove_property(self, name: str, path: str = ""):
+        """
         Remove property obj by name. Raises ValueError if path/name doesn't exist
-        
+
         :param name: Property name
         :param path: Path to subnode
         """
         self.get_node(path).remove_property(name)
 
-    def add_item(self, obj, path: str = '', create: bool = True):
-        """ 
+    def add_item(self, obj, path: str = "", create: bool = True):
+        """
         Add sub-node or property at specified path. Raises ValueError if path doesn't exist
-        
+
         :param obj: The node or property object
         :param path: The path to subnode
         :param create: If True, not existing nodes will be created
         """
         self.get_node(path, create).append(obj)
 
-    def search(self, name: str, itype: int = ItemType.BOTH, path: str = '') -> list:
-        """ 
+    def search(self, name: str, itype: int = ItemType.BOTH, path: str = "") -> list:
+        """
         Search properties and/or nodes with specified name. Return list of founded items
-        
+
         :param name: Property or Node name
         :param itype: Item type - NODE, PROP or BOTH
         :param path: Path to root node
@@ -1116,10 +1132,10 @@ class FDT:
 
         return items
 
-    def walk(self, path: str = '', relative: bool = False) -> list:
-        """ 
+    def walk(self, path: str = "", relative: bool = False) -> list:
+        """
         Walk trough nodes and return relative/absolute path with list of sub-nodes and properties
-        
+
         :param path: The path to root node
         :param relative: True for relative or False for absolute return path
         """
@@ -1129,10 +1145,10 @@ class FDT:
         while True:
             all_nodes += node.nodes
             current_path = f"{node.path}/{node.name}"
-            current_path = current_path.replace('///', '/')
-            current_path = current_path.replace('//', '/')
+            current_path = current_path.replace("///", "/")
+            current_path = current_path.replace("//", "/")
             if path and relative:
-                current_path = current_path.replace(path, '').lstrip('/')
+                current_path = current_path.replace(path, "").lstrip("/")
             yield (current_path, node.nodes, node.props)
             if not all_nodes:
                 break
@@ -1141,7 +1157,7 @@ class FDT:
     def merge(self, fdt_obj, replace: bool = True):
         """
         Merge external FDT object into this object.
-        
+
         :param fdt_obj: The FDT object which will be merged into this
         :param replace: True for replace existing items or False for keep old items
         """
@@ -1149,21 +1165,20 @@ class FDT:
         if self.header.version is None:
             self.header = fdt_obj.header
         else:
-            if fdt_obj.header.version is not None and \
-               fdt_obj.header.version > self.header.version:
+            if fdt_obj.header.version is not None and fdt_obj.header.version > self.header.version:
                 self.header.version = fdt_obj.header.version
         if fdt_obj.entries:
             for in_entry in fdt_obj.entries:
                 exist = False
                 for index in range(len(self.entries)):
-                    if self.entries[index]['address'] == in_entry['address']:
-                        self.entries[index]['address'] = in_entry['size']
+                    if self.entries[index]["address"] == in_entry["address"]:
+                        self.entries[index]["address"] = in_entry["size"]
                         exist = True
                         break
                 if not exist:
                     self.entries.append(in_entry)
 
-        self.root.merge(fdt_obj.get_node('/'), replace)
+        self.root.merge(fdt_obj.get_node("/"), replace)
 
     def update_phandles(self):
         all_nodes = []
@@ -1173,7 +1188,7 @@ class FDT:
         node = self.root
         all_nodes += self.root.nodes
         while all_nodes:
-            props = (node.get_property('phandle'), node.get_property('linux,phandle'))
+            props = (node.get_property("phandle"), node.get_property("linux,phandle"))
             value = None
             for i, p in enumerate(props):
                 if isinstance(p, PropWords) and isinstance(p.value, int):
@@ -1190,8 +1205,8 @@ class FDT:
             phandle_value += 1
 
         for node in no_phandle_nodes:
-            node.set_property('linux,phandle', phandle_value)
-            node.set_property('phandle', phandle_value)
+            node.set_property("linux,phandle", phandle_value)
+            node.set_property("phandle", phandle_value)
             phandle_value += 1
 
     def to_dts(self, tabsize: int = 4) -> str:
@@ -1206,21 +1221,20 @@ class FDT:
             result += "// last_comp_version: {}\n".format(self.header.last_comp_version)
             if self.header.version >= 2:
                 result += "// boot_cpuid_phys: 0x{:X}\n".format(self.header.boot_cpuid_phys)
-        result += '\n'
+        result += "\n"
         if self.entries:
             for entry in self.entries:
                 result += "/memreserve/ "
-                result += "{:#x} ".format(entry['address']) if entry['address'] else "0 "
-                result += "{:#x}".format(entry['size']) if entry['size'] else "0"
+                result += "{:#x} ".format(entry["address"]) if entry["address"] else "0 "
+                result += "{:#x}".format(entry["size"]) if entry["size"] else "0"
                 result += ";\n"
         if self.root is not None:
             result += self.root.to_dts(tabsize)
         return result
 
-    def to_dtb(self,
-               version: int = None,
-               last_comp_version: int = None,
-               boot_cpuid_phys: int = None) -> bytes:
+    def to_dtb(
+        self, version: int = None, last_comp_version: int = None, boot_cpuid_phys: int = None
+    ) -> bytes:
         """
         Export FDT Object into Binary Blob format (DTB)
 
@@ -1229,7 +1243,7 @@ class FDT:
         :param boot_cpuid_phys:
         """
         if self.root is None:
-            return b''
+            return b""
 
         from struct import pack
 
@@ -1245,12 +1259,13 @@ class FDT:
         blob_entries = bytes()
         if self.entries:
             for entry in self.entries:
-                blob_entries += pack('>QQ', entry['address'], entry['size'])
-        blob_entries += pack('>QQ', 0, 0)
+                blob_entries += pack(">QQ", entry["address"], entry["size"])
+        blob_entries += pack(">QQ", 0, 0)
         blob_data_start = self.header.size + len(blob_entries)
-        (blob_data, blob_strings, data_pos) = self.root.to_dtb('', blob_data_start,
-                                                               self.header.version)
-        blob_data += pack('>I', DTB_END)
+        (blob_data, blob_strings, data_pos) = self.root.to_dtb(
+            "", blob_data_start, self.header.version
+        )
+        blob_data += pack(">I", DTB_END)
         self.header.size_dt_strings = len(blob_strings)
         self.header.size_dt_struct = len(blob_data)
         self.header.off_mem_rsvmap = self.header.size
@@ -1258,42 +1273,42 @@ class FDT:
         self.header.off_dt_strings = blob_data_start + len(blob_data)
         self.header.total_size = blob_data_start + len(blob_data) + len(blob_strings)
         blob_header = self.header.export()
-        return blob_header + blob_entries + blob_data + blob_strings.encode('ascii')
+        return blob_header + blob_entries + blob_data + blob_strings.encode("ascii")
 
 
-def parse_dts(text: str, root_dir: str = '') -> FDT:
+def parse_dts(text: str, root_dir: str = "") -> FDT:
     """
     Parse DTS text file and create FDT Object
 
     :param text:
-    :param root_dir: 
+    :param root_dir:
     """
     ver = get_version_info(text)
     text = strip_comments(text)
     dts_lines = split_to_lines(text)
     fdt_obj = FDT()
-    if 'version' in ver:
-        fdt_obj.header.version = ver['version']
-    if 'last_comp_version' in ver:
-        fdt_obj.header.last_comp_version = ver['last_comp_version']
-    if 'boot_cpuid_phys' in ver:
-        fdt_obj.header.boot_cpuid_phys = ver['boot_cpuid_phys']
+    if "version" in ver:
+        fdt_obj.header.version = ver["version"]
+    if "last_comp_version" in ver:
+        fdt_obj.header.last_comp_version = ver["last_comp_version"]
+    if "boot_cpuid_phys" in ver:
+        fdt_obj.header.boot_cpuid_phys = ver["boot_cpuid_phys"]
     # parse entries
     fdt_obj.entries = []
     for line in dts_lines:
-        if line.endswith('{'):
+        if line.endswith("{"):
             break
-        if line.startswith('/memreserve/'):
-            line = line.strip(';')
+        if line.startswith("/memreserve/"):
+            line = line.strip(";")
             line = line.split()
             if len(line) != 3:
                 raise Exception()
-            fdt_obj.entries.append({'address': int(line[1], 0), 'size': int(line[2], 0)})
+            fdt_obj.entries.append({"address": int(line[1], 0), "size": int(line[2], 0)})
     # parse nodes
     curnode = None
     fdt_obj.root = None
     for line in dts_lines:
-        if line.endswith('{'):
+        if line.endswith("{"):
             # start node
             node_name = line.split()[0]
             new_node = Node(node_name)
@@ -1302,39 +1317,39 @@ def parse_dts(text: str, root_dir: str = '') -> FDT:
             if curnode is not None:
                 curnode.append(new_node)
             curnode = new_node
-        elif line.endswith('}'):
+        elif line.endswith("}"):
             # end node
             if curnode is not None:
                 curnode = curnode.parent
         else:
             # properties
-            if line.find('=') == -1:
+            if line.find("=") == -1:
                 prop_name = line
                 prop_obj = Property(prop_name)
             else:
-                line = line.split('=', maxsplit=1)
-                prop_name = line[0].rstrip(' ')
-                prop_value = line[1].lstrip(' ')
-                if prop_value.startswith('<'):
+                line = line.split("=", maxsplit=1)
+                prop_name = line[0].rstrip(" ")
+                prop_value = line[1].lstrip(" ")
+                if prop_value.startswith("<"):
                     prop_obj = PropWords(prop_name)
-                    prop_value = prop_value.replace('<', '').replace('>', '')
+                    prop_value = prop_value.replace("<", "").replace(">", "")
                     for prop in prop_value.split():
-                        if prop.startswith('0x'):
+                        if prop.startswith("0x"):
                             prop_obj.append(int(prop, 16))
-                        elif prop.startswith('0b'):
+                        elif prop.startswith("0b"):
                             prop_obj.append(int(prop, 2))
-                        elif prop.startswith('0'):
+                        elif prop.startswith("0"):
                             prop_obj.append(int(prop, 8))
                         else:
                             prop_obj.append(int(prop))
-                elif prop_value.startswith('['):
+                elif prop_value.startswith("["):
                     prop_obj = PropBytes(prop_name)
-                    prop_value = prop_value.replace('[', '').replace(']', '')
+                    prop_value = prop_value.replace("[", "").replace("]", "")
                     for prop in prop_value.split():
                         prop_obj.append(int(prop, 16))
-                elif prop_value.startswith('/incbin/'):
-                    prop_value = prop_value.replace('/incbin/("', '').replace('")', '')
-                    prop_value = prop_value.split(',')
+                elif prop_value.startswith("/incbin/"):
+                    prop_value = prop_value.replace('/incbin/("', "").replace('")', "")
+                    prop_value = prop_value.split(",")
                     file_path = os.path.join(root_dir, prop_value[0].strip())
                     file_offset = int(prop_value.strip(), 0) if len(prop_value) > 1 else 0
                     file_size = int(prop_value.strip(), 0) if len(prop_value) > 2 else 0
@@ -1344,9 +1359,9 @@ def parse_dts(text: str, root_dir: str = '') -> FDT:
                         f.seek(file_offset)
                         prop_data = f.read(file_size) if file_size > 0 else f.read()
                     prop_obj = PropIncBin(prop_name, prop_data, os.path.split(file_path)[1])
-                elif prop_value.startswith('/plugin/'):
+                elif prop_value.startswith("/plugin/"):
                     raise NotImplementedError("Not implemented property value: /plugin/")
-                elif prop_value.startswith('/bits/'):
+                elif prop_value.startswith("/bits/"):
                     raise NotImplementedError("Not implemented property value: /bits/")
                 else:
                     prop_obj = PropStrings(prop_name)
@@ -1363,7 +1378,7 @@ def parse_dts(text: str, root_dir: str = '') -> FDT:
 def parse_dtb(data: bytes, offset: int = 0) -> FDT:
     """
     Parse FDT Binary Blob and create FDT Object
-    
+
     :param data: FDT Binary Blob as bytes or bytearray
     :param offset:
     """
@@ -1377,9 +1392,9 @@ def parse_dtb(data: bytes, offset: int = 0) -> FDT:
     # parse entries
     index = fdt_obj.header.off_mem_rsvmap
     while True:
-        entrie = dict(zip(('address', 'size'), unpack_from(">QQ", data, offset + index)))
+        entrie = dict(zip(("address", "size"), unpack_from(">QQ", data, offset + index)))
         index += 16
-        if entrie['address'] == 0 and entrie['size'] == 0:
+        if entrie["address"] == 0 and entrie["size"] == 0:
             break
         fdt_obj.entries.append(entrie)
     # parse nodes
@@ -1393,9 +1408,9 @@ def parse_dtb(data: bytes, offset: int = 0) -> FDT:
         index += 4
         if tag == DTB_BEGIN_NODE:
             node_name = extract_string(data, offset + index)
-            index = ((index + len(node_name) + 4) & ~3)
+            index = (index + len(node_name) + 4) & ~3
             if not node_name:
-                node_name = '/'
+                node_name = "/"
             new_node = Node(node_name)
             if fdt_obj.root is None:
                 fdt_obj.root = new_node
@@ -1406,14 +1421,17 @@ def parse_dtb(data: bytes, offset: int = 0) -> FDT:
             if current_node is not None:
                 current_node = current_node.parent
         elif tag == DTB_PROP:
-            prop_size, prop_string_pos, = unpack_from(">II", data, offset + index)
+            (
+                prop_size,
+                prop_string_pos,
+            ) = unpack_from(">II", data, offset + index)
             prop_start = index + 8
             if fdt_obj.header.version < 16 and prop_size >= 8:
-                prop_start = ((prop_start + 7) & ~0x7)
+                prop_start = (prop_start + 7) & ~0x7
             prop_name = extract_string(data, fdt_obj.header.off_dt_strings + prop_string_pos)
-            prop_raw_value = data[offset + prop_start:offset + prop_start + prop_size]
+            prop_raw_value = data[offset + prop_start : offset + prop_start + prop_size]
             index = prop_start + prop_size
-            index = ((index + 3) & ~0x3)
+            index = (index + 3) & ~0x3
             if current_node is not None:
                 current_node.append(new_property(prop_name, prop_raw_value))
         elif tag == DTB_END:
@@ -1425,9 +1443,9 @@ def parse_dtb(data: bytes, offset: int = 0) -> FDT:
 
 
 def diff(fdt1: FDT, fdt2: FDT) -> tuple:
-    """ 
+    """
     Compare two flattened device tree objects and return list of 3 objects (same in 1 and 2, specific for 1, specific for 2)
-    
+
     :param fdt1: The object 1 of FDT
     :param fdt2: The object 2 of FDT
     """
@@ -1445,14 +1463,14 @@ def diff(fdt1: FDT, fdt2: FDT) -> tuple:
     if fdt1.entries and fdt2.entries:
         for entry_a in fdt1.entries:
             for entry_b in fdt2.entries:
-                if entry_a['address'] == entry_b['address'] and entry_a['size'] == entry_b['size']:
+                if entry_a["address"] == entry_b["address"] and entry_a["size"] == entry_b["size"]:
                     fdt_same.entries.append(entry_a)
                     break
 
     for entry_a in fdt1.entries:
         found = False
         for entry_s in fdt_same.entries:
-            if entry_a['address'] == entry_s['address'] and entry_a['size'] == entry_s['size']:
+            if entry_a["address"] == entry_s["address"] and entry_a["size"] == entry_s["size"]:
                 found = True
                 break
         if not found:
@@ -1461,7 +1479,7 @@ def diff(fdt1: FDT, fdt2: FDT) -> tuple:
     for entry_b in fdt2.entries:
         found = False
         for entry_s in fdt_same.entries:
-            if entry_b['address'] == entry_s['address'] and entry_b['size'] == entry_s['size']:
+            if entry_b["address"] == entry_s["address"] and entry_b["size"] == entry_s["size"]:
                 found = True
                 break
         if not found:

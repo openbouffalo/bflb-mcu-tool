@@ -1,27 +1,29 @@
 Archive member included to satisfy reference by file (symbol)
 
-/root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/../../../../riscv64-unknown-elf/lib/rv32imafc/ilp32f/libc.a(lib_a-memmove-stub.o)
+/home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/../../../../riscv64-unknown-elf/lib/rv32imafc/ilp32f/libc.a(lib_a-memmove-stub.o)
                               out/BSP_Common/xz/xz_dec_lzma2.o (memmove)
-/root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clzsi2.o)
+/home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clzsi2.o)
                               out/3rdParty/FreeRTOS/Source/tasks.o (__clzsi2)
-/root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_udivdi3.o)
+/home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_udivdi3.o)
                               out/BSP_Common/libc/vsnprintf.o (__udivdi3)
-/root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_umoddi3.o)
+/home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_umoddi3.o)
                               out/BSP_Common/libc/vsnprintf.o (__umoddi3)
-/root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(adddf3.o)
+/home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(adddf3.o)
                               out/BSP_Common/libc/atof.o (__adddf3)
-/root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(divdf3.o)
+/home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(divdf3.o)
                               out/ChipTest/Eflash_Loader/bflb_eflash_loader_uart.o (__divdf3)
-/root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(muldf3.o)
+/home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(muldf3.o)
                               out/ChipTest/Eflash_Loader/bflb_eflash_loader_uart.o (__muldf3)
-/root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(fixunsdfsi.o)
+/home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(fixdfsi.o)
+                              out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o (__fixdfsi)
+/home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(fixunsdfsi.o)
                               out/ChipTest/Eflash_Loader/bflb_eflash_loader_uart.o (__fixunsdfsi)
-/root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatsidf.o)
+/home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatsidf.o)
                               out/BSP_Common/libc/atof.o (__floatsidf)
-/root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatunsidf.o)
+/home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatunsidf.o)
                               out/ChipTest/Eflash_Loader/bflb_eflash_loader_uart.o (__floatunsidf)
-/root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clz.o)
-                              /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clzsi2.o) (__clz_tab)
+/home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clz.o)
+                              /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clzsi2.o) (__clz_tab)
 
 Discarded input sections
 
@@ -1120,7 +1122,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x66 out/BSP_Common/ring_buffer/ring_buffer.o
  .debug_macro   0x0000000000000000       0x10 out/BSP_Common/ring_buffer/ring_buffer.o
  .debug_line    0x0000000000000000     0x154b out/BSP_Common/ring_buffer/ring_buffer.o
- .debug_str     0x0000000000000000    0x7f263 out/BSP_Common/ring_buffer/ring_buffer.o
+ .debug_str     0x0000000000000000    0x7f26e out/BSP_Common/ring_buffer/ring_buffer.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/ring_buffer/ring_buffer.o
  .debug_frame   0x0000000000000000      0x2ec out/BSP_Common/ring_buffer/ring_buffer.o
  .riscv.attributes
@@ -1153,7 +1155,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x41 out/BSP_Common/libc/atof.o
  .debug_macro   0x0000000000000000      0x3eb out/BSP_Common/libc/atof.o
  .debug_line    0x0000000000000000      0x7d9 out/BSP_Common/libc/atof.o
- .debug_str     0x0000000000000000     0x40d2 out/BSP_Common/libc/atof.o
+ .debug_str     0x0000000000000000     0x40dd out/BSP_Common/libc/atof.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/atof.o
  .debug_frame   0x0000000000000000       0x80 out/BSP_Common/libc/atof.o
  .riscv.attributes
@@ -1186,7 +1188,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x16 out/BSP_Common/libc/atoi.o
  .debug_macro   0x0000000000000000       0x58 out/BSP_Common/libc/atoi.o
  .debug_line    0x0000000000000000      0x19e out/BSP_Common/libc/atoi.o
- .debug_str     0x0000000000000000     0x4152 out/BSP_Common/libc/atoi.o
+ .debug_str     0x0000000000000000     0x415d out/BSP_Common/libc/atoi.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/atoi.o
  .debug_frame   0x0000000000000000       0x2c out/BSP_Common/libc/atoi.o
  .riscv.attributes
@@ -1219,7 +1221,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x16 out/BSP_Common/libc/atol.o
  .debug_macro   0x0000000000000000       0x58 out/BSP_Common/libc/atol.o
  .debug_line    0x0000000000000000      0x19e out/BSP_Common/libc/atol.o
- .debug_str     0x0000000000000000     0x415c out/BSP_Common/libc/atol.o
+ .debug_str     0x0000000000000000     0x4167 out/BSP_Common/libc/atol.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/atol.o
  .debug_frame   0x0000000000000000       0x2c out/BSP_Common/libc/atol.o
  .riscv.attributes
@@ -1252,7 +1254,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x16 out/BSP_Common/libc/atoll.o
  .debug_macro   0x0000000000000000       0x58 out/BSP_Common/libc/atoll.o
  .debug_line    0x0000000000000000      0x17f out/BSP_Common/libc/atoll.o
- .debug_str     0x0000000000000000     0x415b out/BSP_Common/libc/atoll.o
+ .debug_str     0x0000000000000000     0x4166 out/BSP_Common/libc/atoll.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/atoll.o
  .debug_frame   0x0000000000000000       0x20 out/BSP_Common/libc/atoll.o
  .riscv.attributes
@@ -1281,7 +1283,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x16 out/BSP_Common/libc/jrand48.o
  .debug_macro   0x0000000000000000      0x1f6 out/BSP_Common/libc/jrand48.o
  .debug_line    0x0000000000000000      0x174 out/BSP_Common/libc/jrand48.o
- .debug_str     0x0000000000000000     0x3390 out/BSP_Common/libc/jrand48.o
+ .debug_str     0x0000000000000000     0x339b out/BSP_Common/libc/jrand48.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/jrand48.o
  .debug_frame   0x0000000000000000       0x20 out/BSP_Common/libc/jrand48.o
  .riscv.attributes
@@ -1313,7 +1315,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x16 out/BSP_Common/libc/lrand48.o
  .debug_macro   0x0000000000000000      0x1f6 out/BSP_Common/libc/lrand48.o
  .debug_line    0x0000000000000000       0xe0 out/BSP_Common/libc/lrand48.o
- .debug_str     0x0000000000000000     0x339b out/BSP_Common/libc/lrand48.o
+ .debug_str     0x0000000000000000     0x33a6 out/BSP_Common/libc/lrand48.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/lrand48.o
  .debug_frame   0x0000000000000000       0x64 out/BSP_Common/libc/lrand48.o
  .riscv.attributes
@@ -1341,7 +1343,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x16 out/BSP_Common/libc/mrand48.o
  .debug_macro   0x0000000000000000      0x1f6 out/BSP_Common/libc/mrand48.o
  .debug_line    0x0000000000000000       0xb8 out/BSP_Common/libc/mrand48.o
- .debug_str     0x0000000000000000     0x3386 out/BSP_Common/libc/mrand48.o
+ .debug_str     0x0000000000000000     0x3391 out/BSP_Common/libc/mrand48.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/mrand48.o
  .debug_frame   0x0000000000000000       0x20 out/BSP_Common/libc/mrand48.o
  .riscv.attributes
@@ -1370,7 +1372,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x16 out/BSP_Common/libc/nrand48.o
  .debug_macro   0x0000000000000000      0x1f6 out/BSP_Common/libc/nrand48.o
  .debug_line    0x0000000000000000       0xc8 out/BSP_Common/libc/nrand48.o
- .debug_str     0x0000000000000000     0x3387 out/BSP_Common/libc/nrand48.o
+ .debug_str     0x0000000000000000     0x3392 out/BSP_Common/libc/nrand48.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/nrand48.o
  .debug_frame   0x0000000000000000       0x2c out/BSP_Common/libc/nrand48.o
  .riscv.attributes
@@ -1401,7 +1403,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x16 out/BSP_Common/libc/seed48.o
  .debug_macro   0x0000000000000000      0x1f6 out/BSP_Common/libc/seed48.o
  .debug_line    0x0000000000000000       0xe7 out/BSP_Common/libc/seed48.o
- .debug_str     0x0000000000000000     0x338c out/BSP_Common/libc/seed48.o
+ .debug_str     0x0000000000000000     0x3397 out/BSP_Common/libc/seed48.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/seed48.o
  .debug_frame   0x0000000000000000       0x20 out/BSP_Common/libc/seed48.o
  .riscv.attributes
@@ -1432,7 +1434,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x16 out/BSP_Common/libc/srand48.o
  .debug_macro   0x0000000000000000      0x1f6 out/BSP_Common/libc/srand48.o
  .debug_line    0x0000000000000000      0x159 out/BSP_Common/libc/srand48.o
- .debug_str     0x0000000000000000     0x339d out/BSP_Common/libc/srand48.o
+ .debug_str     0x0000000000000000     0x33a8 out/BSP_Common/libc/srand48.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/srand48.o
  .debug_frame   0x0000000000000000       0x40 out/BSP_Common/libc/srand48.o
  .riscv.attributes
@@ -1457,7 +1459,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x16 out/BSP_Common/libc/memccpy.o
  .debug_macro   0x0000000000000000      0x1f6 out/BSP_Common/libc/memccpy.o
  .debug_line    0x0000000000000000      0x11b out/BSP_Common/libc/memccpy.o
- .debug_str     0x0000000000000000     0x3159 out/BSP_Common/libc/memccpy.o
+ .debug_str     0x0000000000000000     0x3164 out/BSP_Common/libc/memccpy.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/memccpy.o
  .debug_frame   0x0000000000000000       0x20 out/BSP_Common/libc/memccpy.o
  .riscv.attributes
@@ -1504,7 +1506,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x34 out/BSP_Common/libc/memswap.o
  .debug_macro   0x0000000000000000      0x1f6 out/BSP_Common/libc/memswap.o
  .debug_line    0x0000000000000000      0x121 out/BSP_Common/libc/memswap.o
- .debug_str     0x0000000000000000     0x3159 out/BSP_Common/libc/memswap.o
+ .debug_str     0x0000000000000000     0x3164 out/BSP_Common/libc/memswap.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/memswap.o
  .debug_frame   0x0000000000000000       0x20 out/BSP_Common/libc/memswap.o
  .riscv.attributes
@@ -1529,7 +1531,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x16 out/BSP_Common/libc/memchr.o
  .debug_macro   0x0000000000000000      0x1f6 out/BSP_Common/libc/memchr.o
  .debug_line    0x0000000000000000       0xf2 out/BSP_Common/libc/memchr.o
- .debug_str     0x0000000000000000     0x3152 out/BSP_Common/libc/memchr.o
+ .debug_str     0x0000000000000000     0x315d out/BSP_Common/libc/memchr.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/memchr.o
  .debug_frame   0x0000000000000000       0x20 out/BSP_Common/libc/memchr.o
  .riscv.attributes
@@ -1554,7 +1556,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x16 out/BSP_Common/libc/memrchr.o
  .debug_macro   0x0000000000000000      0x1f6 out/BSP_Common/libc/memrchr.o
  .debug_line    0x0000000000000000      0x111 out/BSP_Common/libc/memrchr.o
- .debug_str     0x0000000000000000     0x3154 out/BSP_Common/libc/memrchr.o
+ .debug_str     0x0000000000000000     0x315f out/BSP_Common/libc/memrchr.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/memrchr.o
  .debug_frame   0x0000000000000000       0x20 out/BSP_Common/libc/memrchr.o
  .riscv.attributes
@@ -1579,7 +1581,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x34 out/BSP_Common/libc/memmem.o
  .debug_macro   0x0000000000000000      0x1f6 out/BSP_Common/libc/memmem.o
  .debug_line    0x0000000000000000      0x254 out/BSP_Common/libc/memmem.o
- .debug_str     0x0000000000000000     0x317a out/BSP_Common/libc/memmem.o
+ .debug_str     0x0000000000000000     0x3185 out/BSP_Common/libc/memmem.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/memmem.o
  .debug_frame   0x0000000000000000       0x80 out/BSP_Common/libc/memmem.o
  .riscv.attributes
@@ -1617,7 +1619,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x34 out/BSP_Common/libc/bsearch.o
  .debug_macro   0x0000000000000000       0x16 out/BSP_Common/libc/bsearch.o
  .debug_line    0x0000000000000000      0x16d out/BSP_Common/libc/bsearch.o
- .debug_str     0x0000000000000000     0x2bd0 out/BSP_Common/libc/bsearch.o
+ .debug_str     0x0000000000000000     0x2bdb out/BSP_Common/libc/bsearch.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/bsearch.o
  .debug_frame   0x0000000000000000       0x4c out/BSP_Common/libc/bsearch.o
  .riscv.attributes
@@ -1648,7 +1650,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000      0x1f6 out/BSP_Common/libc/qsort.o
  .debug_macro   0x0000000000000000       0x58 out/BSP_Common/libc/qsort.o
  .debug_line    0x0000000000000000      0x322 out/BSP_Common/libc/qsort.o
- .debug_str     0x0000000000000000     0x34e1 out/BSP_Common/libc/qsort.o
+ .debug_str     0x0000000000000000     0x34ec out/BSP_Common/libc/qsort.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/qsort.o
  .debug_frame   0x0000000000000000       0x70 out/BSP_Common/libc/qsort.o
  .riscv.attributes
@@ -1671,7 +1673,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x16 out/BSP_Common/libc/fnmatch.o
  .debug_macro   0x0000000000000000       0x22 out/BSP_Common/libc/fnmatch.o
  .debug_line    0x0000000000000000      0x410 out/BSP_Common/libc/fnmatch.o
- .debug_str     0x0000000000000000     0x297c out/BSP_Common/libc/fnmatch.o
+ .debug_str     0x0000000000000000     0x2987 out/BSP_Common/libc/fnmatch.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/fnmatch.o
  .debug_frame   0x0000000000000000       0x48 out/BSP_Common/libc/fnmatch.o
  .riscv.attributes
@@ -1697,7 +1699,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x58 out/BSP_Common/libc/snprintf.o
  .debug_macro   0x0000000000000000       0x34 out/BSP_Common/libc/snprintf.o
  .debug_line    0x0000000000000000      0x170 out/BSP_Common/libc/snprintf.o
- .debug_str     0x0000000000000000     0x2b09 out/BSP_Common/libc/snprintf.o
+ .debug_str     0x0000000000000000     0x2b14 out/BSP_Common/libc/snprintf.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/snprintf.o
  .debug_frame   0x0000000000000000       0x2c out/BSP_Common/libc/snprintf.o
  .riscv.attributes
@@ -1722,7 +1724,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x58 out/BSP_Common/libc/sprintf.o
  .debug_macro   0x0000000000000000       0x34 out/BSP_Common/libc/sprintf.o
  .debug_line    0x0000000000000000      0x17f out/BSP_Common/libc/sprintf.o
- .debug_str     0x0000000000000000     0x2b00 out/BSP_Common/libc/sprintf.o
+ .debug_str     0x0000000000000000     0x2b0b out/BSP_Common/libc/sprintf.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/sprintf.o
  .debug_frame   0x0000000000000000       0x2c out/BSP_Common/libc/sprintf.o
  .riscv.attributes
@@ -1747,7 +1749,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x58 out/BSP_Common/libc/sscanf.o
  .debug_macro   0x0000000000000000       0x34 out/BSP_Common/libc/sscanf.o
  .debug_line    0x0000000000000000      0x16e out/BSP_Common/libc/sscanf.o
- .debug_str     0x0000000000000000     0x2af5 out/BSP_Common/libc/sscanf.o
+ .debug_str     0x0000000000000000     0x2b00 out/BSP_Common/libc/sscanf.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/sscanf.o
  .debug_frame   0x0000000000000000       0x2c out/BSP_Common/libc/sscanf.o
  .riscv.attributes
@@ -1789,7 +1791,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x58 out/BSP_Common/libc/vsprintf.o
  .debug_macro   0x0000000000000000       0x34 out/BSP_Common/libc/vsprintf.o
  .debug_line    0x0000000000000000      0x116 out/BSP_Common/libc/vsprintf.o
- .debug_str     0x0000000000000000     0x2b02 out/BSP_Common/libc/vsprintf.o
+ .debug_str     0x0000000000000000     0x2b0d out/BSP_Common/libc/vsprintf.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/vsprintf.o
  .debug_frame   0x0000000000000000       0x20 out/BSP_Common/libc/vsprintf.o
  .riscv.attributes
@@ -1826,7 +1828,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x8e out/BSP_Common/libc/vsscanf.o
  .debug_macro   0x0000000000000000       0x64 out/BSP_Common/libc/vsscanf.o
  .debug_line    0x0000000000000000     0x1190 out/BSP_Common/libc/vsscanf.o
- .debug_str     0x0000000000000000     0x47f5 out/BSP_Common/libc/vsscanf.o
+ .debug_str     0x0000000000000000     0x4800 out/BSP_Common/libc/vsscanf.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/vsscanf.o
  .debug_frame   0x0000000000000000       0x60 out/BSP_Common/libc/vsscanf.o
  .riscv.attributes
@@ -1851,7 +1853,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x34 out/BSP_Common/libc/strcmp.o
  .debug_macro   0x0000000000000000      0x1f6 out/BSP_Common/libc/strcmp.o
  .debug_line    0x0000000000000000      0x116 out/BSP_Common/libc/strcmp.o
- .debug_str     0x0000000000000000     0x3150 out/BSP_Common/libc/strcmp.o
+ .debug_str     0x0000000000000000     0x315b out/BSP_Common/libc/strcmp.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/strcmp.o
  .debug_frame   0x0000000000000000       0x20 out/BSP_Common/libc/strcmp.o
  .riscv.attributes
@@ -1876,7 +1878,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x34 out/BSP_Common/libc/strncmp.o
  .debug_macro   0x0000000000000000      0x1f6 out/BSP_Common/libc/strncmp.o
  .debug_line    0x0000000000000000      0x143 out/BSP_Common/libc/strncmp.o
- .debug_str     0x0000000000000000     0x3159 out/BSP_Common/libc/strncmp.o
+ .debug_str     0x0000000000000000     0x3164 out/BSP_Common/libc/strncmp.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/strncmp.o
  .debug_frame   0x0000000000000000       0x20 out/BSP_Common/libc/strncmp.o
  .riscv.attributes
@@ -1906,7 +1908,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x58 out/BSP_Common/libc/strcasecmp.o
  .debug_macro   0x0000000000000000       0x41 out/BSP_Common/libc/strcasecmp.o
  .debug_line    0x0000000000000000      0x140 out/BSP_Common/libc/strcasecmp.o
- .debug_str     0x0000000000000000     0x33e9 out/BSP_Common/libc/strcasecmp.o
+ .debug_str     0x0000000000000000     0x33f4 out/BSP_Common/libc/strcasecmp.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/strcasecmp.o
  .debug_frame   0x0000000000000000       0x3c out/BSP_Common/libc/strcasecmp.o
  .riscv.attributes
@@ -1936,7 +1938,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x58 out/BSP_Common/libc/strncasecmp.o
  .debug_macro   0x0000000000000000       0x41 out/BSP_Common/libc/strncasecmp.o
  .debug_line    0x0000000000000000      0x175 out/BSP_Common/libc/strncasecmp.o
- .debug_str     0x0000000000000000     0x33f2 out/BSP_Common/libc/strncasecmp.o
+ .debug_str     0x0000000000000000     0x33fd out/BSP_Common/libc/strncasecmp.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/strncasecmp.o
  .debug_frame   0x0000000000000000       0x40 out/BSP_Common/libc/strncasecmp.o
  .riscv.attributes
@@ -1961,7 +1963,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x34 out/BSP_Common/libc/strcpy.o
  .debug_macro   0x0000000000000000      0x1f6 out/BSP_Common/libc/strcpy.o
  .debug_line    0x0000000000000000      0x128 out/BSP_Common/libc/strcpy.o
- .debug_str     0x0000000000000000     0x3150 out/BSP_Common/libc/strcpy.o
+ .debug_str     0x0000000000000000     0x315b out/BSP_Common/libc/strcpy.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/strcpy.o
  .debug_frame   0x0000000000000000       0x20 out/BSP_Common/libc/strcpy.o
  .riscv.attributes
@@ -1986,7 +1988,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x34 out/BSP_Common/libc/strlcpy.o
  .debug_macro   0x0000000000000000      0x1f6 out/BSP_Common/libc/strlcpy.o
  .debug_line    0x0000000000000000      0x169 out/BSP_Common/libc/strlcpy.o
- .debug_str     0x0000000000000000     0x3164 out/BSP_Common/libc/strlcpy.o
+ .debug_str     0x0000000000000000     0x316f out/BSP_Common/libc/strlcpy.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/strlcpy.o
  .debug_frame   0x0000000000000000       0x20 out/BSP_Common/libc/strlcpy.o
  .riscv.attributes
@@ -2011,7 +2013,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x34 out/BSP_Common/libc/strncpy.o
  .debug_macro   0x0000000000000000      0x1f6 out/BSP_Common/libc/strncpy.o
  .debug_line    0x0000000000000000      0x14d out/BSP_Common/libc/strncpy.o
- .debug_str     0x0000000000000000     0x3171 out/BSP_Common/libc/strncpy.o
+ .debug_str     0x0000000000000000     0x317c out/BSP_Common/libc/strncpy.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/strncpy.o
  .debug_frame   0x0000000000000000       0x30 out/BSP_Common/libc/strncpy.o
  .riscv.attributes
@@ -2036,7 +2038,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x34 out/BSP_Common/libc/strcat.o
  .debug_macro   0x0000000000000000      0x1f6 out/BSP_Common/libc/strcat.o
  .debug_line    0x0000000000000000       0xd0 out/BSP_Common/libc/strcat.o
- .debug_str     0x0000000000000000     0x316f out/BSP_Common/libc/strcat.o
+ .debug_str     0x0000000000000000     0x317a out/BSP_Common/libc/strcat.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/strcat.o
  .debug_frame   0x0000000000000000       0x34 out/BSP_Common/libc/strcat.o
  .riscv.attributes
@@ -2061,7 +2063,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x34 out/BSP_Common/libc/strlcat.o
  .debug_macro   0x0000000000000000      0x1f6 out/BSP_Common/libc/strlcat.o
  .debug_line    0x0000000000000000      0x1c1 out/BSP_Common/libc/strlcat.o
- .debug_str     0x0000000000000000     0x316b out/BSP_Common/libc/strlcat.o
+ .debug_str     0x0000000000000000     0x3176 out/BSP_Common/libc/strlcat.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/strlcat.o
  .debug_frame   0x0000000000000000       0x3c out/BSP_Common/libc/strlcat.o
  .riscv.attributes
@@ -2086,7 +2088,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x34 out/BSP_Common/libc/strncat.o
  .debug_macro   0x0000000000000000      0x1f6 out/BSP_Common/libc/strncat.o
  .debug_line    0x0000000000000000      0x13f out/BSP_Common/libc/strncat.o
- .debug_str     0x0000000000000000     0x3171 out/BSP_Common/libc/strncat.o
+ .debug_str     0x0000000000000000     0x317c out/BSP_Common/libc/strncat.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/strncat.o
  .debug_frame   0x0000000000000000       0x48 out/BSP_Common/libc/strncat.o
  .riscv.attributes
@@ -2122,7 +2124,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x34 out/BSP_Common/libc/strnlen.o
  .debug_macro   0x0000000000000000      0x1f6 out/BSP_Common/libc/strnlen.o
  .debug_line    0x0000000000000000      0x117 out/BSP_Common/libc/strnlen.o
- .debug_str     0x0000000000000000     0x3160 out/BSP_Common/libc/strnlen.o
+ .debug_str     0x0000000000000000     0x316b out/BSP_Common/libc/strnlen.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/strnlen.o
  .debug_frame   0x0000000000000000       0x20 out/BSP_Common/libc/strnlen.o
  .riscv.attributes
@@ -2149,7 +2151,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000      0x1f6 out/BSP_Common/libc/strchr.o
  .debug_macro   0x0000000000000000       0x64 out/BSP_Common/libc/strchr.o
  .debug_line    0x0000000000000000      0x138 out/BSP_Common/libc/strchr.o
- .debug_str     0x0000000000000000     0x33a7 out/BSP_Common/libc/strchr.o
+ .debug_str     0x0000000000000000     0x33b2 out/BSP_Common/libc/strchr.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/strchr.o
  .debug_frame   0x0000000000000000       0x20 out/BSP_Common/libc/strchr.o
  .riscv.attributes
@@ -2174,7 +2176,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x34 out/BSP_Common/libc/strrchr.o
  .debug_macro   0x0000000000000000      0x1f6 out/BSP_Common/libc/strrchr.o
  .debug_line    0x0000000000000000      0x11d out/BSP_Common/libc/strrchr.o
- .debug_str     0x0000000000000000     0x3158 out/BSP_Common/libc/strrchr.o
+ .debug_str     0x0000000000000000     0x3163 out/BSP_Common/libc/strrchr.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/strrchr.o
  .debug_frame   0x0000000000000000       0x20 out/BSP_Common/libc/strrchr.o
  .riscv.attributes
@@ -2199,7 +2201,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x34 out/BSP_Common/libc/strsep.o
  .debug_macro   0x0000000000000000      0x1f6 out/BSP_Common/libc/strsep.o
  .debug_line    0x0000000000000000      0x12e out/BSP_Common/libc/strsep.o
- .debug_str     0x0000000000000000     0x3166 out/BSP_Common/libc/strsep.o
+ .debug_str     0x0000000000000000     0x3171 out/BSP_Common/libc/strsep.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/strsep.o
  .debug_frame   0x0000000000000000       0x34 out/BSP_Common/libc/strsep.o
  .riscv.attributes
@@ -2224,7 +2226,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x34 out/BSP_Common/libc/strstr.o
  .debug_macro   0x0000000000000000      0x1f6 out/BSP_Common/libc/strstr.o
  .debug_line    0x0000000000000000       0xd2 out/BSP_Common/libc/strstr.o
- .debug_str     0x0000000000000000     0x316e out/BSP_Common/libc/strstr.o
+ .debug_str     0x0000000000000000     0x3179 out/BSP_Common/libc/strstr.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/strstr.o
  .debug_frame   0x0000000000000000       0x38 out/BSP_Common/libc/strstr.o
  .riscv.attributes
@@ -2249,7 +2251,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x34 out/BSP_Common/libc/strcspn.o
  .debug_macro   0x0000000000000000      0x1f6 out/BSP_Common/libc/strcspn.o
  .debug_line    0x0000000000000000       0xb2 out/BSP_Common/libc/strcspn.o
- .debug_str     0x0000000000000000     0x3175 out/BSP_Common/libc/strcspn.o
+ .debug_str     0x0000000000000000     0x3180 out/BSP_Common/libc/strcspn.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/strcspn.o
  .debug_frame   0x0000000000000000       0x20 out/BSP_Common/libc/strcspn.o
  .riscv.attributes
@@ -2274,7 +2276,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x34 out/BSP_Common/libc/strspn.o
  .debug_macro   0x0000000000000000      0x1f6 out/BSP_Common/libc/strspn.o
  .debug_line    0x0000000000000000       0xb1 out/BSP_Common/libc/strspn.o
- .debug_str     0x0000000000000000     0x3173 out/BSP_Common/libc/strspn.o
+ .debug_str     0x0000000000000000     0x317e out/BSP_Common/libc/strspn.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/strspn.o
  .debug_frame   0x0000000000000000       0x20 out/BSP_Common/libc/strspn.o
  .riscv.attributes
@@ -2304,7 +2306,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000      0x3eb out/BSP_Common/libc/strxspn.o
  .debug_macro   0x0000000000000000       0x8e out/BSP_Common/libc/strxspn.o
  .debug_line    0x0000000000000000      0x219 out/BSP_Common/libc/strxspn.o
- .debug_str     0x0000000000000000     0x3fd3 out/BSP_Common/libc/strxspn.o
+ .debug_str     0x0000000000000000     0x3fde out/BSP_Common/libc/strxspn.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/strxspn.o
  .debug_frame   0x0000000000000000       0x3c out/BSP_Common/libc/strxspn.o
  .riscv.attributes
@@ -2329,7 +2331,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x34 out/BSP_Common/libc/strpbrk.o
  .debug_macro   0x0000000000000000      0x1f6 out/BSP_Common/libc/strpbrk.o
  .debug_line    0x0000000000000000      0x102 out/BSP_Common/libc/strpbrk.o
- .debug_str     0x0000000000000000     0x316e out/BSP_Common/libc/strpbrk.o
+ .debug_str     0x0000000000000000     0x3179 out/BSP_Common/libc/strpbrk.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/strpbrk.o
  .debug_frame   0x0000000000000000       0x30 out/BSP_Common/libc/strpbrk.o
  .riscv.attributes
@@ -2356,7 +2358,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x34 out/BSP_Common/libc/strtok.o
  .debug_macro   0x0000000000000000      0x1f6 out/BSP_Common/libc/strtok.o
  .debug_line    0x0000000000000000       0xaa out/BSP_Common/libc/strtok.o
- .debug_str     0x0000000000000000     0x3166 out/BSP_Common/libc/strtok.o
+ .debug_str     0x0000000000000000     0x3171 out/BSP_Common/libc/strtok.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/strtok.o
  .debug_frame   0x0000000000000000       0x20 out/BSP_Common/libc/strtok.o
  .riscv.attributes
@@ -2382,7 +2384,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x34 out/BSP_Common/libc/strtok_r.o
  .debug_macro   0x0000000000000000      0x1f6 out/BSP_Common/libc/strtok_r.o
  .debug_line    0x0000000000000000      0x118 out/BSP_Common/libc/strtok_r.o
- .debug_str     0x0000000000000000     0x3168 out/BSP_Common/libc/strtok_r.o
+ .debug_str     0x0000000000000000     0x3173 out/BSP_Common/libc/strtok_r.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/strtok_r.o
  .debug_frame   0x0000000000000000       0x34 out/BSP_Common/libc/strtok_r.o
  .riscv.attributes
@@ -2415,7 +2417,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000      0x3eb out/BSP_Common/libc/strtol.o
  .debug_macro   0x0000000000000000       0x4c out/BSP_Common/libc/strtol.o
  .debug_line    0x0000000000000000      0x130 out/BSP_Common/libc/strtol.o
- .debug_str     0x0000000000000000     0x41a6 out/BSP_Common/libc/strtol.o
+ .debug_str     0x0000000000000000     0x41b1 out/BSP_Common/libc/strtol.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/strtol.o
  .debug_frame   0x0000000000000000       0x2c out/BSP_Common/libc/strtol.o
  .riscv.attributes
@@ -2448,7 +2450,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000      0x3eb out/BSP_Common/libc/strtoll.o
  .debug_macro   0x0000000000000000       0x4c out/BSP_Common/libc/strtoll.o
  .debug_line    0x0000000000000000      0x111 out/BSP_Common/libc/strtoll.o
- .debug_str     0x0000000000000000     0x41a5 out/BSP_Common/libc/strtoll.o
+ .debug_str     0x0000000000000000     0x41b0 out/BSP_Common/libc/strtoll.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/strtoll.o
  .debug_frame   0x0000000000000000       0x20 out/BSP_Common/libc/strtoll.o
  .riscv.attributes
@@ -2481,7 +2483,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000      0x3eb out/BSP_Common/libc/strtoul.o
  .debug_macro   0x0000000000000000       0x4c out/BSP_Common/libc/strtoul.o
  .debug_line    0x0000000000000000      0x131 out/BSP_Common/libc/strtoul.o
- .debug_str     0x0000000000000000     0x41a2 out/BSP_Common/libc/strtoul.o
+ .debug_str     0x0000000000000000     0x41ad out/BSP_Common/libc/strtoul.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/strtoul.o
  .debug_frame   0x0000000000000000       0x2c out/BSP_Common/libc/strtoul.o
  .riscv.attributes
@@ -2515,7 +2517,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000      0x3eb out/BSP_Common/libc/strtoull.o
  .debug_macro   0x0000000000000000       0x4c out/BSP_Common/libc/strtoull.o
  .debug_line    0x0000000000000000      0x112 out/BSP_Common/libc/strtoull.o
- .debug_str     0x0000000000000000     0x41aa out/BSP_Common/libc/strtoull.o
+ .debug_str     0x0000000000000000     0x41b5 out/BSP_Common/libc/strtoull.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/strtoull.o
  .debug_frame   0x0000000000000000       0x20 out/BSP_Common/libc/strtoull.o
  .riscv.attributes
@@ -2549,7 +2551,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000      0x3eb out/BSP_Common/libc/strtoimax.o
  .debug_macro   0x0000000000000000       0x4c out/BSP_Common/libc/strtoimax.o
  .debug_line    0x0000000000000000      0x113 out/BSP_Common/libc/strtoimax.o
- .debug_str     0x0000000000000000     0x41b4 out/BSP_Common/libc/strtoimax.o
+ .debug_str     0x0000000000000000     0x41bf out/BSP_Common/libc/strtoimax.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/strtoimax.o
  .debug_frame   0x0000000000000000       0x20 out/BSP_Common/libc/strtoimax.o
  .riscv.attributes
@@ -2583,7 +2585,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000      0x3eb out/BSP_Common/libc/strtoumax.o
  .debug_macro   0x0000000000000000       0x4c out/BSP_Common/libc/strtoumax.o
  .debug_line    0x0000000000000000      0x113 out/BSP_Common/libc/strtoumax.o
- .debug_str     0x0000000000000000     0x41b7 out/BSP_Common/libc/strtoumax.o
+ .debug_str     0x0000000000000000     0x41c2 out/BSP_Common/libc/strtoumax.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/strtoumax.o
  .debug_frame   0x0000000000000000       0x20 out/BSP_Common/libc/strtoumax.o
  .riscv.attributes
@@ -2611,7 +2613,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000      0x1f6 out/BSP_Common/libc/strntoimax.o
  .debug_macro   0x0000000000000000      0x3eb out/BSP_Common/libc/strntoimax.o
  .debug_line    0x0000000000000000       0xdb out/BSP_Common/libc/strntoimax.o
- .debug_str     0x0000000000000000     0x3e0a out/BSP_Common/libc/strntoimax.o
+ .debug_str     0x0000000000000000     0x3e15 out/BSP_Common/libc/strntoimax.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/strntoimax.o
  .debug_frame   0x0000000000000000       0x20 out/BSP_Common/libc/strntoimax.o
  .riscv.attributes
@@ -2643,7 +2645,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x41 out/BSP_Common/libc/strntoumax.o
  .debug_macro   0x0000000000000000      0x3eb out/BSP_Common/libc/strntoumax.o
  .debug_line    0x0000000000000000      0x55d out/BSP_Common/libc/strntoumax.o
- .debug_str     0x0000000000000000     0x40a1 out/BSP_Common/libc/strntoumax.o
+ .debug_str     0x0000000000000000     0x40ac out/BSP_Common/libc/strntoumax.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/strntoumax.o
  .debug_frame   0x0000000000000000       0x68 out/BSP_Common/libc/strntoumax.o
  .riscv.attributes
@@ -2703,7 +2705,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000      0x182 out/BSP_Common/libc/stdlib.o
  .debug_macro   0x0000000000000000       0x3c out/BSP_Common/libc/stdlib.o
  .debug_line    0x0000000000000000      0x2d9 out/BSP_Common/libc/stdlib.o
- .debug_str     0x0000000000000000     0x4ba9 out/BSP_Common/libc/stdlib.o
+ .debug_str     0x0000000000000000     0x4bb4 out/BSP_Common/libc/stdlib.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/stdlib.o
  .debug_frame   0x0000000000000000       0x50 out/BSP_Common/libc/stdlib.o
  .riscv.attributes
@@ -2723,7 +2725,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x11 out/BSP_Common/libc/common.o
  .debug_macro   0x0000000000000000      0x7f6 out/BSP_Common/libc/common.o
  .debug_line    0x0000000000000000       0x76 out/BSP_Common/libc/common.o
- .debug_str     0x0000000000000000     0x28f9 out/BSP_Common/libc/common.o
+ .debug_str     0x0000000000000000     0x2904 out/BSP_Common/libc/common.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/common.o
  .debug_frame   0x0000000000000000       0x30 out/BSP_Common/libc/common.o
  .riscv.attributes
@@ -2748,7 +2750,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x58 out/BSP_Common/libc/ctype_isalnum.o
  .debug_macro   0x0000000000000000       0x41 out/BSP_Common/libc/ctype_isalnum.o
  .debug_line    0x0000000000000000       0xcc out/BSP_Common/libc/ctype_isalnum.o
- .debug_str     0x0000000000000000     0x2c72 out/BSP_Common/libc/ctype_isalnum.o
+ .debug_str     0x0000000000000000     0x2c7d out/BSP_Common/libc/ctype_isalnum.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/ctype_isalnum.o
  .debug_frame   0x0000000000000000       0x20 out/BSP_Common/libc/ctype_isalnum.o
  .riscv.attributes
@@ -2773,7 +2775,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x58 out/BSP_Common/libc/ctype_isalpha.o
  .debug_macro   0x0000000000000000       0x41 out/BSP_Common/libc/ctype_isalpha.o
  .debug_line    0x0000000000000000       0xcc out/BSP_Common/libc/ctype_isalpha.o
- .debug_str     0x0000000000000000     0x2c72 out/BSP_Common/libc/ctype_isalpha.o
+ .debug_str     0x0000000000000000     0x2c7d out/BSP_Common/libc/ctype_isalpha.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/ctype_isalpha.o
  .debug_frame   0x0000000000000000       0x20 out/BSP_Common/libc/ctype_isalpha.o
  .riscv.attributes
@@ -2798,7 +2800,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x58 out/BSP_Common/libc/ctype_isascii.o
  .debug_macro   0x0000000000000000       0x41 out/BSP_Common/libc/ctype_isascii.o
  .debug_line    0x0000000000000000       0xc6 out/BSP_Common/libc/ctype_isascii.o
- .debug_str     0x0000000000000000     0x2bf8 out/BSP_Common/libc/ctype_isascii.o
+ .debug_str     0x0000000000000000     0x2c03 out/BSP_Common/libc/ctype_isascii.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/ctype_isascii.o
  .debug_frame   0x0000000000000000       0x20 out/BSP_Common/libc/ctype_isascii.o
  .riscv.attributes
@@ -2823,7 +2825,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x58 out/BSP_Common/libc/ctype_isblank.o
  .debug_macro   0x0000000000000000       0x41 out/BSP_Common/libc/ctype_isblank.o
  .debug_line    0x0000000000000000       0xc6 out/BSP_Common/libc/ctype_isblank.o
- .debug_str     0x0000000000000000     0x2bf8 out/BSP_Common/libc/ctype_isblank.o
+ .debug_str     0x0000000000000000     0x2c03 out/BSP_Common/libc/ctype_isblank.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/ctype_isblank.o
  .debug_frame   0x0000000000000000       0x20 out/BSP_Common/libc/ctype_isblank.o
  .riscv.attributes
@@ -2848,7 +2850,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x58 out/BSP_Common/libc/ctype_iscntrl.o
  .debug_macro   0x0000000000000000       0x41 out/BSP_Common/libc/ctype_iscntrl.o
  .debug_line    0x0000000000000000       0xce out/BSP_Common/libc/ctype_iscntrl.o
- .debug_str     0x0000000000000000     0x2c72 out/BSP_Common/libc/ctype_iscntrl.o
+ .debug_str     0x0000000000000000     0x2c7d out/BSP_Common/libc/ctype_iscntrl.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/ctype_iscntrl.o
  .debug_frame   0x0000000000000000       0x20 out/BSP_Common/libc/ctype_iscntrl.o
  .riscv.attributes
@@ -2873,7 +2875,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x58 out/BSP_Common/libc/ctype_isdigit.o
  .debug_macro   0x0000000000000000       0x41 out/BSP_Common/libc/ctype_isdigit.o
  .debug_line    0x0000000000000000       0xc6 out/BSP_Common/libc/ctype_isdigit.o
- .debug_str     0x0000000000000000     0x2bf8 out/BSP_Common/libc/ctype_isdigit.o
+ .debug_str     0x0000000000000000     0x2c03 out/BSP_Common/libc/ctype_isdigit.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/ctype_isdigit.o
  .debug_frame   0x0000000000000000       0x20 out/BSP_Common/libc/ctype_isdigit.o
  .riscv.attributes
@@ -2898,7 +2900,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x58 out/BSP_Common/libc/ctype_isgraph.o
  .debug_macro   0x0000000000000000       0x41 out/BSP_Common/libc/ctype_isgraph.o
  .debug_line    0x0000000000000000       0xce out/BSP_Common/libc/ctype_isgraph.o
- .debug_str     0x0000000000000000     0x2c72 out/BSP_Common/libc/ctype_isgraph.o
+ .debug_str     0x0000000000000000     0x2c7d out/BSP_Common/libc/ctype_isgraph.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/ctype_isgraph.o
  .debug_frame   0x0000000000000000       0x20 out/BSP_Common/libc/ctype_isgraph.o
  .riscv.attributes
@@ -2923,7 +2925,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x58 out/BSP_Common/libc/ctype_ispunct.o
  .debug_macro   0x0000000000000000       0x41 out/BSP_Common/libc/ctype_ispunct.o
  .debug_line    0x0000000000000000       0xce out/BSP_Common/libc/ctype_ispunct.o
- .debug_str     0x0000000000000000     0x2c72 out/BSP_Common/libc/ctype_ispunct.o
+ .debug_str     0x0000000000000000     0x2c7d out/BSP_Common/libc/ctype_ispunct.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/ctype_ispunct.o
  .debug_frame   0x0000000000000000       0x20 out/BSP_Common/libc/ctype_ispunct.o
  .riscv.attributes
@@ -2948,7 +2950,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x58 out/BSP_Common/libc/ctype_islower.o
  .debug_macro   0x0000000000000000       0x41 out/BSP_Common/libc/ctype_islower.o
  .debug_line    0x0000000000000000       0xce out/BSP_Common/libc/ctype_islower.o
- .debug_str     0x0000000000000000     0x2c72 out/BSP_Common/libc/ctype_islower.o
+ .debug_str     0x0000000000000000     0x2c7d out/BSP_Common/libc/ctype_islower.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/ctype_islower.o
  .debug_frame   0x0000000000000000       0x20 out/BSP_Common/libc/ctype_islower.o
  .riscv.attributes
@@ -2973,7 +2975,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x58 out/BSP_Common/libc/ctype_isprint.o
  .debug_macro   0x0000000000000000       0x41 out/BSP_Common/libc/ctype_isprint.o
  .debug_line    0x0000000000000000       0xce out/BSP_Common/libc/ctype_isprint.o
- .debug_str     0x0000000000000000     0x2c72 out/BSP_Common/libc/ctype_isprint.o
+ .debug_str     0x0000000000000000     0x2c7d out/BSP_Common/libc/ctype_isprint.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/ctype_isprint.o
  .debug_frame   0x0000000000000000       0x20 out/BSP_Common/libc/ctype_isprint.o
  .riscv.attributes
@@ -2998,7 +3000,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x58 out/BSP_Common/libc/ctype_isspace.o
  .debug_macro   0x0000000000000000       0x41 out/BSP_Common/libc/ctype_isspace.o
  .debug_line    0x0000000000000000       0xce out/BSP_Common/libc/ctype_isspace.o
- .debug_str     0x0000000000000000     0x2c72 out/BSP_Common/libc/ctype_isspace.o
+ .debug_str     0x0000000000000000     0x2c7d out/BSP_Common/libc/ctype_isspace.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/ctype_isspace.o
  .debug_frame   0x0000000000000000       0x20 out/BSP_Common/libc/ctype_isspace.o
  .riscv.attributes
@@ -3023,7 +3025,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x58 out/BSP_Common/libc/ctype_isupper.o
  .debug_macro   0x0000000000000000       0x41 out/BSP_Common/libc/ctype_isupper.o
  .debug_line    0x0000000000000000       0xce out/BSP_Common/libc/ctype_isupper.o
- .debug_str     0x0000000000000000     0x2c72 out/BSP_Common/libc/ctype_isupper.o
+ .debug_str     0x0000000000000000     0x2c7d out/BSP_Common/libc/ctype_isupper.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/ctype_isupper.o
  .debug_frame   0x0000000000000000       0x20 out/BSP_Common/libc/ctype_isupper.o
  .riscv.attributes
@@ -3048,7 +3050,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x58 out/BSP_Common/libc/ctype_tolower.o
  .debug_macro   0x0000000000000000       0x41 out/BSP_Common/libc/ctype_tolower.o
  .debug_line    0x0000000000000000       0xd4 out/BSP_Common/libc/ctype_tolower.o
- .debug_str     0x0000000000000000     0x2c82 out/BSP_Common/libc/ctype_tolower.o
+ .debug_str     0x0000000000000000     0x2c8d out/BSP_Common/libc/ctype_tolower.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/ctype_tolower.o
  .debug_frame   0x0000000000000000       0x20 out/BSP_Common/libc/ctype_tolower.o
  .riscv.attributes
@@ -3073,7 +3075,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x58 out/BSP_Common/libc/ctype_toupper.o
  .debug_macro   0x0000000000000000       0x41 out/BSP_Common/libc/ctype_toupper.o
  .debug_line    0x0000000000000000       0xd4 out/BSP_Common/libc/ctype_toupper.o
- .debug_str     0x0000000000000000     0x2c82 out/BSP_Common/libc/ctype_toupper.o
+ .debug_str     0x0000000000000000     0x2c8d out/BSP_Common/libc/ctype_toupper.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/ctype_toupper.o
  .debug_frame   0x0000000000000000       0x20 out/BSP_Common/libc/ctype_toupper.o
  .riscv.attributes
@@ -3099,7 +3101,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x58 out/BSP_Common/libc/ctype_isxdigit.o
  .debug_macro   0x0000000000000000       0x41 out/BSP_Common/libc/ctype_isxdigit.o
  .debug_line    0x0000000000000000       0xcf out/BSP_Common/libc/ctype_isxdigit.o
- .debug_str     0x0000000000000000     0x2c75 out/BSP_Common/libc/ctype_isxdigit.o
+ .debug_str     0x0000000000000000     0x2c80 out/BSP_Common/libc/ctype_isxdigit.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/ctype_isxdigit.o
  .debug_frame   0x0000000000000000       0x20 out/BSP_Common/libc/ctype_isxdigit.o
  .riscv.attributes
@@ -3123,7 +3125,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x58 out/BSP_Common/libc/ctypes.o
  .debug_macro   0x0000000000000000       0x41 out/BSP_Common/libc/ctypes.o
  .debug_line    0x0000000000000000       0x7b out/BSP_Common/libc/ctypes.o
- .debug_str     0x0000000000000000     0x2c17 out/BSP_Common/libc/ctypes.o
+ .debug_str     0x0000000000000000     0x2c22 out/BSP_Common/libc/ctypes.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/libc/ctypes.o
  .riscv.attributes
                 0x0000000000000000       0x30 out/BSP_Common/libc/ctypes.o
@@ -3326,7 +3328,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x22 out/BSP_Common/cipher_suite/bflb_crypt.o
  .debug_macro   0x0000000000000000       0x4c out/BSP_Common/cipher_suite/bflb_crypt.o
  .debug_line    0x0000000000000000      0x926 out/BSP_Common/cipher_suite/bflb_crypt.o
- .debug_str     0x0000000000000000    0x7f6e0 out/BSP_Common/cipher_suite/bflb_crypt.o
+ .debug_str     0x0000000000000000    0x7f6eb out/BSP_Common/cipher_suite/bflb_crypt.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/cipher_suite/bflb_crypt.o
  .debug_frame   0x0000000000000000      0x228 out/BSP_Common/cipher_suite/bflb_crypt.o
  .riscv.attributes
@@ -3423,7 +3425,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x16 out/BSP_Common/cipher_suite/bflb_hash.o
  .debug_macro   0x0000000000000000       0x46 out/BSP_Common/cipher_suite/bflb_hash.o
  .debug_line    0x0000000000000000      0x764 out/BSP_Common/cipher_suite/bflb_hash.o
- .debug_str     0x0000000000000000    0x7f3ea out/BSP_Common/cipher_suite/bflb_hash.o
+ .debug_str     0x0000000000000000    0x7f3f5 out/BSP_Common/cipher_suite/bflb_hash.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/cipher_suite/bflb_hash.o
  .debug_frame   0x0000000000000000       0xd0 out/BSP_Common/cipher_suite/bflb_hash.o
  .riscv.attributes
@@ -3583,7 +3585,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x1c out/BSP_Common/cipher_suite/bflb_ecdsa.o
  .debug_macro   0x0000000000000000       0x46 out/BSP_Common/cipher_suite/bflb_ecdsa.o
  .debug_line    0x0000000000000000     0x148d out/BSP_Common/cipher_suite/bflb_ecdsa.o
- .debug_str     0x0000000000000000    0x7fb10 out/BSP_Common/cipher_suite/bflb_ecdsa.o
+ .debug_str     0x0000000000000000    0x7fb1b out/BSP_Common/cipher_suite/bflb_ecdsa.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/cipher_suite/bflb_ecdsa.o
  .debug_frame   0x0000000000000000      0x290 out/BSP_Common/cipher_suite/bflb_ecdsa.o
  .riscv.attributes
@@ -3684,7 +3686,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x10 out/BSP_Common/cipher_suite/bflb_dsa.o
  .debug_macro   0x0000000000000000       0x46 out/BSP_Common/cipher_suite/bflb_dsa.o
  .debug_line    0x0000000000000000      0xbf4 out/BSP_Common/cipher_suite/bflb_dsa.o
- .debug_str     0x0000000000000000    0x7f5e6 out/BSP_Common/cipher_suite/bflb_dsa.o
+ .debug_str     0x0000000000000000    0x7f5f1 out/BSP_Common/cipher_suite/bflb_dsa.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/cipher_suite/bflb_dsa.o
  .debug_frame   0x0000000000000000      0x180 out/BSP_Common/cipher_suite/bflb_dsa.o
  .riscv.attributes
@@ -3791,7 +3793,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x58 out/BSP_Common/xz/xz_decompress.o
  .debug_macro   0x0000000000000000       0x16 out/BSP_Common/xz/xz_decompress.o
  .debug_line    0x0000000000000000      0x2eb out/BSP_Common/xz/xz_decompress.o
- .debug_str     0x0000000000000000     0x354d out/BSP_Common/xz/xz_decompress.o
+ .debug_str     0x0000000000000000     0x3558 out/BSP_Common/xz/xz_decompress.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/xz/xz_decompress.o
  .debug_frame   0x0000000000000000       0x88 out/BSP_Common/xz/xz_decompress.o
  .riscv.attributes
@@ -3912,7 +3914,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x10 out/BSP_Common/partition/partition.o
  .debug_macro   0x0000000000000000       0x2e out/BSP_Common/partition/partition.o
  .debug_line    0x0000000000000000      0xe1c out/BSP_Common/partition/partition.o
- .debug_str     0x0000000000000000    0x7f5dc out/BSP_Common/partition/partition.o
+ .debug_str     0x0000000000000000    0x7f5e7 out/BSP_Common/partition/partition.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/partition/partition.o
  .debug_frame   0x0000000000000000      0x1c4 out/BSP_Common/partition/partition.o
  .riscv.attributes
@@ -4075,7 +4077,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0xb5 out/BSP_Common/FreeRTOS/port.o
  .debug_macro   0x0000000000000000       0xaa out/BSP_Common/FreeRTOS/port.o
  .debug_line    0x0000000000000000      0x34e out/BSP_Common/FreeRTOS/port.o
- .debug_str     0x0000000000000000     0x6e84 out/BSP_Common/FreeRTOS/port.o
+ .debug_str     0x0000000000000000     0x6e8f out/BSP_Common/FreeRTOS/port.o
  .comment       0x0000000000000000       0x46 out/BSP_Common/FreeRTOS/port.o
  .debug_frame   0x0000000000000000       0x58 out/BSP_Common/FreeRTOS/port.o
  .riscv.attributes
@@ -4088,7 +4090,7 @@ Discarded input sections
  .debug_abbrev  0x0000000000000000       0x14 out/BSP_Common/FreeRTOS/portASM.o
  .debug_aranges
                 0x0000000000000000       0x20 out/BSP_Common/FreeRTOS/portASM.o
- .debug_str     0x0000000000000000       0x72 out/BSP_Common/FreeRTOS/portASM.o
+ .debug_str     0x0000000000000000       0x7d out/BSP_Common/FreeRTOS/portASM.o
  .riscv.attributes
                 0x0000000000000000       0x32 out/BSP_Common/FreeRTOS/portASM.o
  .group         0x0000000000000000        0xc out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_common.o
@@ -4305,7 +4307,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x22 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_dma.o
  .debug_macro   0x0000000000000000       0x5f out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_dma.o
  .debug_line    0x0000000000000000     0x1980 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_dma.o
- .debug_str     0x0000000000000000     0xc331 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_dma.o
+ .debug_str     0x0000000000000000     0xc33c out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_dma.o
  .comment       0x0000000000000000       0x46 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_dma.o
  .debug_frame   0x0000000000000000      0x214 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_dma.o
  .riscv.attributes
@@ -4586,7 +4588,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x22 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_timer.o
  .debug_macro   0x0000000000000000       0x3c out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_timer.o
  .debug_line    0x0000000000000000     0x111e out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_timer.o
- .debug_str     0x0000000000000000     0xc088 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_timer.o
+ .debug_str     0x0000000000000000     0xc093 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_timer.o
  .comment       0x0000000000000000       0x46 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_timer.o
  .debug_frame   0x0000000000000000      0x22c out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_timer.o
  .riscv.attributes
@@ -4738,7 +4740,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x22 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_aon.o
  .debug_macro   0x0000000000000000       0x3c out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_aon.o
  .debug_line    0x0000000000000000      0x360 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_aon.o
- .debug_str     0x0000000000000000    0x4dda0 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_aon.o
+ .debug_str     0x0000000000000000    0x4ddab out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_aon.o
  .comment       0x0000000000000000       0x46 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_aon.o
  .debug_frame   0x0000000000000000       0x20 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_aon.o
  .riscv.attributes
@@ -5174,7 +5176,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x22 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_dac.o
  .debug_macro   0x0000000000000000       0x35 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_dac.o
  .debug_line    0x0000000000000000      0xdae out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_dac.o
- .debug_str     0x0000000000000000    0x3abef out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_dac.o
+ .debug_str     0x0000000000000000    0x3abfa out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_dac.o
  .comment       0x0000000000000000       0x46 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_dac.o
  .debug_frame   0x0000000000000000      0x140 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_dac.o
  .riscv.attributes
@@ -5248,7 +5250,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x22 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_l1c.o
  .debug_macro   0x0000000000000000       0x4f out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_l1c.o
  .debug_line    0x0000000000000000      0x727 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_l1c.o
- .debug_str     0x0000000000000000     0xb553 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_l1c.o
+ .debug_str     0x0000000000000000     0xb55e out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_l1c.o
  .comment       0x0000000000000000       0x46 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_l1c.o
  .debug_frame   0x0000000000000000       0xdc out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_l1c.o
  .riscv.attributes
@@ -5326,7 +5328,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x22 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_pwm.o
  .debug_macro   0x0000000000000000       0x2d out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_pwm.o
  .debug_line    0x0000000000000000      0xf8f out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_pwm.o
- .debug_str     0x0000000000000000     0xac0d out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_pwm.o
+ .debug_str     0x0000000000000000     0xac18 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_pwm.o
  .comment       0x0000000000000000       0x46 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_pwm.o
  .debug_frame   0x0000000000000000      0x14c out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_pwm.o
  .riscv.attributes
@@ -5380,8 +5382,12 @@ Discarded input sections
                 0x0000000000000000       0x6e out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
  .text.I2C_SetPrd
                 0x0000000000000000       0x84 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
+ .text.I2C_SetTimingPhase
+                0x0000000000000000       0xc6 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
+ .text.I2C_GetTimingPhase
+                0x0000000000000000       0x66 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
  .text.I2C_ClockSet
-                0x0000000000000000      0x110 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
+                0x0000000000000000      0x292 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
  .text.I2C_SetSclSync
                 0x0000000000000000       0x1c out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
  .text.I2C_IsBusy
@@ -5398,12 +5404,12 @@ Discarded input sections
                 0x0000000000000000       0x1c out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
  .bss.i2cIntCbfArra
                 0x0000000000000000       0x18 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
- .debug_info    0x0000000000000000      0xf26 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
- .debug_abbrev  0x0000000000000000      0x363 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
- .debug_loc     0x0000000000000000      0xc9b out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
+ .debug_info    0x0000000000000000     0x10a5 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
+ .debug_abbrev  0x0000000000000000      0x35f out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
+ .debug_loc     0x0000000000000000     0x1177 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
  .debug_aranges
-                0x0000000000000000       0x98 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
- .debug_ranges  0x0000000000000000      0x298 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
+                0x0000000000000000       0xa8 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
+ .debug_ranges  0x0000000000000000      0x290 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
  .debug_macro   0x0000000000000000      0x193 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
  .debug_macro   0x0000000000000000      0x7f0 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
  .debug_macro   0x0000000000000000      0x20a out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
@@ -5418,7 +5424,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x1c out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
  .debug_macro   0x0000000000000000       0x40 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
  .debug_macro   0x0000000000000000       0x22 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
- .debug_macro   0x0000000000000000       0x19 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
+ .debug_macro   0x0000000000000000       0x18 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
  .debug_macro   0x0000000000000000     0x47b7 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
  .debug_macro   0x0000000000000000     0x11f8 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
  .debug_macro   0x0000000000000000      0x7c0 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
@@ -5435,10 +5441,10 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x70 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
  .debug_macro   0x0000000000000000       0x96 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
  .debug_macro   0x0000000000000000      0x100 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
- .debug_line    0x0000000000000000     0x1e08 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
- .debug_str     0x0000000000000000    0x6af7b out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
+ .debug_line    0x0000000000000000     0x2729 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
+ .debug_str     0x0000000000000000    0x6b08e out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
  .comment       0x0000000000000000       0x46 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
- .debug_frame   0x0000000000000000      0x1a4 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
+ .debug_frame   0x0000000000000000      0x1c8 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
  .riscv.attributes
                 0x0000000000000000       0x30 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
  .group         0x0000000000000000        0xc out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sec_dbg.o
@@ -5486,7 +5492,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x40 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sec_dbg.o
  .debug_macro   0x0000000000000000       0x22 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sec_dbg.o
  .debug_line    0x0000000000000000      0x433 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sec_dbg.o
- .debug_str     0x0000000000000000     0xa4d5 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sec_dbg.o
+ .debug_str     0x0000000000000000     0xa4e0 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sec_dbg.o
  .comment       0x0000000000000000       0x46 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sec_dbg.o
  .debug_frame   0x0000000000000000       0x50 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sec_dbg.o
  .riscv.attributes
@@ -5627,7 +5633,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x96 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_ir.o
  .debug_macro   0x0000000000000000      0x100 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_ir.o
  .debug_line    0x0000000000000000     0x2991 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_ir.o
- .debug_str     0x0000000000000000    0x6b0a0 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_ir.o
+ .debug_str     0x0000000000000000    0x6b0ab out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_ir.o
  .comment       0x0000000000000000       0x46 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_ir.o
  .debug_frame   0x0000000000000000      0x278 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_ir.o
  .riscv.attributes
@@ -5777,7 +5783,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x96 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_spi.o
  .debug_macro   0x0000000000000000      0x100 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_spi.o
  .debug_line    0x0000000000000000     0x394f out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_spi.o
- .debug_str     0x0000000000000000    0x6adf6 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_spi.o
+ .debug_str     0x0000000000000000    0x6ae01 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_spi.o
  .comment       0x0000000000000000       0x46 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_spi.o
  .debug_frame   0x0000000000000000      0x294 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_spi.o
  .riscv.attributes
@@ -5861,7 +5867,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0xba out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_pds.o
  .debug_macro   0x0000000000000000       0x90 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_pds.o
  .debug_line    0x0000000000000000      0x808 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_pds.o
- .debug_str     0x0000000000000000    0x62208 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_pds.o
+ .debug_str     0x0000000000000000    0x62213 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_pds.o
  .comment       0x0000000000000000       0x46 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_pds.o
  .debug_frame   0x0000000000000000       0xdc out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_pds.o
  .riscv.attributes
@@ -5913,7 +5919,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x40 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_tzc_sec.o
  .debug_macro   0x0000000000000000       0x22 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_tzc_sec.o
  .debug_line    0x0000000000000000      0x5cf out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_tzc_sec.o
- .debug_str     0x0000000000000000     0xb336 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_tzc_sec.o
+ .debug_str     0x0000000000000000     0xb341 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_tzc_sec.o
  .comment       0x0000000000000000       0x46 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_tzc_sec.o
  .debug_frame   0x0000000000000000       0x60 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_tzc_sec.o
  .riscv.attributes
@@ -6028,7 +6034,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000      0xd67 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
  .debug_macro   0x0000000000000000       0x3c out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
  .debug_line    0x0000000000000000     0x3560 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
- .debug_str     0x0000000000000000    0x224ef out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
+ .debug_str     0x0000000000000000    0x224fa out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
  .comment       0x0000000000000000       0x46 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
  .debug_frame   0x0000000000000000      0x2b4 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
  .riscv.attributes
@@ -6078,7 +6084,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x22 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_acomp.o
  .debug_macro   0x0000000000000000       0x27 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_acomp.o
  .debug_line    0x0000000000000000      0x64f out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_acomp.o
- .debug_str     0x0000000000000000    0x17105 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_acomp.o
+ .debug_str     0x0000000000000000    0x17110 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_acomp.o
  .comment       0x0000000000000000       0x46 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_acomp.o
  .debug_frame   0x0000000000000000       0x40 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_acomp.o
  .riscv.attributes
@@ -6395,11 +6401,269 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x19 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_xip_sflash_ext.o
  .debug_macro   0x0000000000000000       0x6a out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_xip_sflash_ext.o
  .debug_line    0x0000000000000000      0xdfc out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_xip_sflash_ext.o
- .debug_str     0x0000000000000000    0x1c442 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_xip_sflash_ext.o
+ .debug_str     0x0000000000000000    0x1c44d out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_xip_sflash_ext.o
  .comment       0x0000000000000000       0x46 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_xip_sflash_ext.o
  .debug_frame   0x0000000000000000      0x354 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_xip_sflash_ext.o
  .riscv.attributes
                 0x0000000000000000       0x34 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_xip_sflash_ext.o
+ .group         0x0000000000000000        0xc out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .group         0x0000000000000000        0xc out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .group         0x0000000000000000        0xc out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .group         0x0000000000000000        0xc out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .group         0x0000000000000000        0xc out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .group         0x0000000000000000        0xc out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .group         0x0000000000000000        0xc out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .group         0x0000000000000000        0xc out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .group         0x0000000000000000        0xc out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .group         0x0000000000000000        0xc out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .group         0x0000000000000000        0xc out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .group         0x0000000000000000        0xc out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .group         0x0000000000000000        0xc out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .group         0x0000000000000000        0xc out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .group         0x0000000000000000        0xc out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .group         0x0000000000000000        0xc out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .group         0x0000000000000000        0xc out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .text          0x0000000000000000        0x0 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .data          0x0000000000000000        0x0 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .bss           0x0000000000000000        0x0 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .text.rf_pri_save_state_for_cal
+                0x0000000000000000      0x12e out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .text.rf_pri_restore_state_for_cal
+                0x0000000000000000      0x12e out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .text.rf_pri_pm_pwr
+                0x0000000000000000       0x60 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .text.rf_pri_pm_pwr_avg
+                0x0000000000000000       0x6a out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .text.rf_pri_txcal_config_hw
+                0x0000000000000000      0x276 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .text.rf_pri_fcal_meas
+                0x0000000000000000       0x5a out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .text.rf_pri_txcal_config
+                0x0000000000000000       0x86 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .text.rf_pri_txcal_search_core
+                0x0000000000000000      0x128 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .rodata.rf_pri_config_channel.constprop.0.str1.4
+                0x0000000000000000       0x18 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .text.rf_pri_config_channel.constprop.0
+                0x0000000000000000      0x14e out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .text.rf_pri_roscal_iq.constprop.0
+                0x0000000000000000       0xfa out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .rodata.rf_pri_roscal.part.0.str1.4
+                0x0000000000000000       0x9f out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .text.rf_pri_roscal.part.0
+                0x0000000000000000      0x274 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .text.rf_pri_rccal_iq
+                0x0000000000000000      0x340 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .rodata.rf_pri_rccal.part.0.str1.4
+                0x0000000000000000       0x9a out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .text.rf_pri_rccal.part.0
+                0x0000000000000000      0x2a8 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .text.rf_pri_chipv
+                0x0000000000000000      0x1c0 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .text.rf_pri_init_fast
+                0x0000000000000000        0xa out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .text.rf_pri_notch_param
+                0x0000000000000000       0x3a out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .text.rf_pri_update_param
+                0x0000000000000000      0x1ba out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .text.rf_pri_xtalfreq
+                0x0000000000000000      0xd3c out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .text.rf_pri_get_vco_freq_cw
+                0x0000000000000000       0x56 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .text.rf_pri_get_vco_idac_cw
+                0x0000000000000000       0x56 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .text.rf_pri_update_txgain_tempos
+                0x0000000000000000        0xa out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .text.rf_pri_get_txgain_max
+                0x0000000000000000       0x1e out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .text.rf_pri_get_txgain_min
+                0x0000000000000000       0x1e out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .text.rf_pri_get_txgain_index
+                0x0000000000000000       0x2e out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .text.rf_pri_query_txgain_table
+                0x0000000000000000       0x2e out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .text.rf_pri_config_bandwidth
+                0x0000000000000000       0x1a out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .rodata.rf_pri_txcal.str1.4
+                0x0000000000000000       0x69 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .text.rf_pri_txcal
+                0x0000000000000000      0x4de out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .text.rf_pri_roscal
+                0x0000000000000000       0x20 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .text.rf_pri_rccal
+                0x0000000000000000       0x22 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .rodata.rf_pri_lo_acal.str1.4
+                0x0000000000000000       0x20 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .text.rf_pri_lo_acal
+                0x0000000000000000      0x1ac out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .rodata.rf_pri_fcal.str1.4
+                0x0000000000000000       0x37 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .text.rf_pri_fcal
+                0x0000000000000000      0x30c out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .text.rf_pri_full_cal
+                0x0000000000000000       0xee out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .text.rf_pri_restore_cal_reg
+                0x0000000000000000      0x166 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .text.rf_pri_init
+                0x0000000000000000      0x3a8 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .rodata.cst8   0x0000000000000000       0x10 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .bss.channel_cnt_opt_table
+                0x0000000000000000       0x50 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .bss.channel_cw_table
+                0x0000000000000000       0x2a out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .bss.data      0x0000000000000000        0x8 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .bss.opti_regs_data
+                0x0000000000000000       0x34 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .bss.tx_pwr_ch_os
+                0x0000000000000000       0x38 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .bss.tx_pwr_table
+                0x0000000000000000      0x1c0 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .bss.txcal_para
+                0x0000000000000000       0x80 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .data.channel_cnt_range
+                0x0000000000000000        0x6 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .data.channel_cnt_table
+                0x0000000000000000       0x2a out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .data.channel_div_table
+                0x0000000000000000       0x54 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .data.rx_notch_para_40M
+                0x0000000000000000       0x70 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .data.tmxcss   0x0000000000000000        0x6 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .rodata.tx_pwr_ch_os_a0
+                0x0000000000000000       0x38 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .rodata.tx_pwr_ch_os_a1
+                0x0000000000000000       0x38 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .rodata.tx_pwr_table_a0
+                0x0000000000000000      0x1c0 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .rodata.tx_pwr_table_a1
+                0x0000000000000000      0x1c0 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .rodata.txcal_para_a0
+                0x0000000000000000       0x80 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .rodata.txcal_para_a1
+                0x0000000000000000       0x80 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .sbss.init_fast
+                0x0000000000000000        0x4 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .sbss.state_adda1
+                0x0000000000000000        0x4 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .sbss.state_dfe_ctrl_0
+                0x0000000000000000        0x4 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .sbss.state_dfe_ctrl_3
+                0x0000000000000000        0x4 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .sbss.state_dfe_ctrl_6
+                0x0000000000000000        0x4 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .sbss.state_dfe_ctrl_7
+                0x0000000000000000        0x4 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .sbss.state_fbdv
+                0x0000000000000000        0x4 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .sbss.state_pa1
+                0x0000000000000000        0x4 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .sbss.state_pucr1
+                0x0000000000000000        0x4 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .sbss.state_rbb3
+                0x0000000000000000        0x4 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .sbss.state_rf_fsm_ctrl_hw
+                0x0000000000000000        0x4 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .sbss.state_rf_resv_reg_1
+                0x0000000000000000        0x4 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .sbss.state_rfcal_ctrlen
+                0x0000000000000000        0x4 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .sbss.state_rfctrl_hw_en
+                0x0000000000000000        0x4 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .sbss.state_rfif_dfe_ctrl0
+                0x0000000000000000        0x4 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .sbss.state_sdm1
+                0x0000000000000000        0x4 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .sbss.state_sdm2
+                0x0000000000000000        0x4 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .sbss.state_singen_ctrl0
+                0x0000000000000000        0x4 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .sbss.state_singen_ctrl2
+                0x0000000000000000        0x4 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .sbss.state_singen_ctrl3
+                0x0000000000000000        0x4 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .sbss.state_sram_ctrl0
+                0x0000000000000000        0x4 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .sbss.state_sram_ctrl1
+                0x0000000000000000        0x4 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .sbss.state_sram_ctrl2
+                0x0000000000000000        0x4 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .sbss.state_tbb
+                0x0000000000000000        0x4 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .sbss.state_ten_ac
+                0x0000000000000000        0x4 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .sbss.state_trx_gain1
+                0x0000000000000000        0x4 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .sbss.state_vco2
+                0x0000000000000000        0x4 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .sbss.tx_pwr_os
+                0x0000000000000000        0x4 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .sbss.tx_pwr_os_temperature
+                0x0000000000000000        0x4 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .sdata.fcal_div
+                0x0000000000000000        0x2 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .sdata.opti_regs
+                0x0000000000000000        0x4 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .sdata.tp_index
+                0x0000000000000000        0x4 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .debug_info    0x0000000000000000     0x2bcc out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .debug_abbrev  0x0000000000000000      0x410 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .debug_loc     0x0000000000000000     0x35e3 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .debug_aranges
+                0x0000000000000000      0x128 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .debug_ranges  0x0000000000000000      0x8c0 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .debug_macro   0x0000000000000000      0x149 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .debug_macro   0x0000000000000000      0x7f0 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .debug_macro   0x0000000000000000      0x1f6 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .debug_macro   0x0000000000000000      0x20a out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .debug_macro   0x0000000000000000       0x88 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .debug_macro   0x0000000000000000       0x52 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .debug_macro   0x0000000000000000     0x163c out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .debug_macro   0x0000000000000000     0x6ff8 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .debug_macro   0x0000000000000000     0x47b7 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .debug_macro   0x0000000000000000     0x11f8 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .debug_macro   0x0000000000000000     0x1a74 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .debug_macro   0x0000000000000000      0xaec out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .debug_macro   0x0000000000000000       0x16 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .debug_macro   0x0000000000000000       0x58 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .debug_macro   0x0000000000000000       0x34 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .debug_macro   0x0000000000000000       0x1c out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .debug_macro   0x0000000000000000       0x40 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .debug_macro   0x0000000000000000       0x22 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .debug_line    0x0000000000000000     0x8a5f out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .debug_str     0x0000000000000000    0x7aab9 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .comment       0x0000000000000000       0x46 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .debug_frame   0x0000000000000000      0x4b0 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .riscv.attributes
+                0x0000000000000000       0x30 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+ .group         0x0000000000000000        0xc out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_calib_data.o
+ .group         0x0000000000000000        0xc out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_calib_data.o
+ .group         0x0000000000000000        0xc out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_calib_data.o
+ .group         0x0000000000000000        0xc out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_calib_data.o
+ .text          0x0000000000000000        0x0 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_calib_data.o
+ .data          0x0000000000000000        0x0 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_calib_data.o
+ .bss           0x0000000000000000        0x0 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_calib_data.o
+ .text.rf_pri_init_calib_mem
+                0x0000000000000000      0x134 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_calib_data.o
+ .bss.data      0x0000000000000000       0xa8 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_calib_data.o
+ .sdata.rf_calib_data
+                0x0000000000000000        0x4 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_calib_data.o
+ .debug_info    0x0000000000000000      0x47b out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_calib_data.o
+ .debug_abbrev  0x0000000000000000      0x14a out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_calib_data.o
+ .debug_loc     0x0000000000000000       0x36 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_calib_data.o
+ .debug_aranges
+                0x0000000000000000       0x20 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_calib_data.o
+ .debug_ranges  0x0000000000000000       0x10 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_calib_data.o
+ .debug_macro   0x0000000000000000       0x4a out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_calib_data.o
+ .debug_macro   0x0000000000000000      0x7f0 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_calib_data.o
+ .debug_macro   0x0000000000000000       0x16 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_calib_data.o
+ .debug_macro   0x0000000000000000       0x34 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_calib_data.o
+ .debug_macro   0x0000000000000000      0x1f6 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_calib_data.o
+ .debug_line    0x0000000000000000      0x403 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_calib_data.o
+ .debug_str     0x0000000000000000     0x357d out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_calib_data.o
+ .comment       0x0000000000000000       0x46 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_calib_data.o
+ .debug_frame   0x0000000000000000       0x34 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_calib_data.o
+ .riscv.attributes
+                0x0000000000000000       0x30 out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_calib_data.o
  .group         0x0000000000000000        0xc out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_device.o
  .group         0x0000000000000000        0xc out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_device.o
  .group         0x0000000000000000        0xc out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_device.o
@@ -6787,7 +7051,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x91 out/3rdParty/FreeRTOS/Source/tasks.o
  .debug_macro   0x0000000000000000       0x10 out/3rdParty/FreeRTOS/Source/tasks.o
  .debug_line    0x0000000000000000     0x5ad7 out/3rdParty/FreeRTOS/Source/tasks.o
- .debug_str     0x0000000000000000     0x92cf out/3rdParty/FreeRTOS/Source/tasks.o
+ .debug_str     0x0000000000000000     0x92da out/3rdParty/FreeRTOS/Source/tasks.o
  .comment       0x0000000000000000       0x46 out/3rdParty/FreeRTOS/Source/tasks.o
  .debug_frame   0x0000000000000000      0xa1c out/3rdParty/FreeRTOS/Source/tasks.o
  .riscv.attributes
@@ -6839,7 +7103,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000      0x4b7 out/3rdParty/FreeRTOS/Source/list.o
  .debug_macro   0x0000000000000000       0xb5 out/3rdParty/FreeRTOS/Source/list.o
  .debug_line    0x0000000000000000      0x548 out/3rdParty/FreeRTOS/Source/list.o
- .debug_str     0x0000000000000000     0x69c8 out/3rdParty/FreeRTOS/Source/list.o
+ .debug_str     0x0000000000000000     0x69d3 out/3rdParty/FreeRTOS/Source/list.o
  .comment       0x0000000000000000       0x46 out/3rdParty/FreeRTOS/Source/list.o
  .debug_frame   0x0000000000000000       0x60 out/3rdParty/FreeRTOS/Source/list.o
  .riscv.attributes
@@ -6955,7 +7219,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0xaa out/3rdParty/FreeRTOS/Source/queue.o
  .debug_macro   0x0000000000000000       0x87 out/3rdParty/FreeRTOS/Source/queue.o
  .debug_line    0x0000000000000000     0x3764 out/3rdParty/FreeRTOS/Source/queue.o
- .debug_str     0x0000000000000000     0x840f out/3rdParty/FreeRTOS/Source/queue.o
+ .debug_str     0x0000000000000000     0x841a out/3rdParty/FreeRTOS/Source/queue.o
  .comment       0x0000000000000000       0x46 out/3rdParty/FreeRTOS/Source/queue.o
  .debug_frame   0x0000000000000000      0x60c out/3rdParty/FreeRTOS/Source/queue.o
  .riscv.attributes
@@ -7063,7 +7327,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x87 out/3rdParty/FreeRTOS/Source/timers.o
  .debug_macro   0x0000000000000000       0x97 out/3rdParty/FreeRTOS/Source/timers.o
  .debug_line    0x0000000000000000     0x16a1 out/3rdParty/FreeRTOS/Source/timers.o
- .debug_str     0x0000000000000000     0x8a19 out/3rdParty/FreeRTOS/Source/timers.o
+ .debug_str     0x0000000000000000     0x8a24 out/3rdParty/FreeRTOS/Source/timers.o
  .comment       0x0000000000000000       0x46 out/3rdParty/FreeRTOS/Source/timers.o
  .debug_frame   0x0000000000000000      0x30c out/3rdParty/FreeRTOS/Source/timers.o
  .riscv.attributes
@@ -7147,7 +7411,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0xaa out/3rdParty/FreeRTOS/Source/stream_buffer.o
  .debug_macro   0x0000000000000000       0x18 out/3rdParty/FreeRTOS/Source/stream_buffer.o
  .debug_line    0x0000000000000000     0x2135 out/3rdParty/FreeRTOS/Source/stream_buffer.o
- .debug_str     0x0000000000000000     0x7d1a out/3rdParty/FreeRTOS/Source/stream_buffer.o
+ .debug_str     0x0000000000000000     0x7d25 out/3rdParty/FreeRTOS/Source/stream_buffer.o
  .comment       0x0000000000000000       0x46 out/3rdParty/FreeRTOS/Source/stream_buffer.o
  .debug_frame   0x0000000000000000      0x390 out/3rdParty/FreeRTOS/Source/stream_buffer.o
  .riscv.attributes
@@ -7185,7 +7449,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0xaa out/3rdParty/FreeRTOS/Source/croutine.o
  .debug_macro   0x0000000000000000       0x43 out/3rdParty/FreeRTOS/Source/croutine.o
  .debug_line    0x0000000000000000      0x167 out/3rdParty/FreeRTOS/Source/croutine.o
- .debug_str     0x0000000000000000     0x7281 out/3rdParty/FreeRTOS/Source/croutine.o
+ .debug_str     0x0000000000000000     0x728c out/3rdParty/FreeRTOS/Source/croutine.o
  .comment       0x0000000000000000       0x46 out/3rdParty/FreeRTOS/Source/croutine.o
  .riscv.attributes
                 0x0000000000000000       0x30 out/3rdParty/FreeRTOS/Source/croutine.o
@@ -7254,129 +7518,144 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0xb5 out/3rdParty/FreeRTOS/Source/portable/MemMang/heap_5.o
  .debug_macro   0x0000000000000000       0xaa out/3rdParty/FreeRTOS/Source/portable/MemMang/heap_5.o
  .debug_line    0x0000000000000000      0xd11 out/3rdParty/FreeRTOS/Source/portable/MemMang/heap_5.o
- .debug_str     0x0000000000000000     0x7389 out/3rdParty/FreeRTOS/Source/portable/MemMang/heap_5.o
+ .debug_str     0x0000000000000000     0x7394 out/3rdParty/FreeRTOS/Source/portable/MemMang/heap_5.o
  .comment       0x0000000000000000       0x46 out/3rdParty/FreeRTOS/Source/portable/MemMang/heap_5.o
  .debug_frame   0x0000000000000000      0x118 out/3rdParty/FreeRTOS/Source/portable/MemMang/heap_5.o
  .riscv.attributes
                 0x0000000000000000       0x30 out/3rdParty/FreeRTOS/Source/portable/MemMang/heap_5.o
- .data          0x0000000000000000        0x0 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/../../../../riscv64-unknown-elf/lib/rv32imafc/ilp32f/libc.a(lib_a-memmove-stub.o)
- .bss           0x0000000000000000        0x0 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/../../../../riscv64-unknown-elf/lib/rv32imafc/ilp32f/libc.a(lib_a-memmove-stub.o)
- .text          0x0000000000000000       0x3c /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clzsi2.o)
- .data          0x0000000000000000        0x0 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clzsi2.o)
- .bss           0x0000000000000000        0x0 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clzsi2.o)
- .debug_info    0x0000000000000000      0x152 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clzsi2.o)
- .debug_abbrev  0x0000000000000000       0xca /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clzsi2.o)
- .debug_loc     0x0000000000000000       0x6b /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clzsi2.o)
+ .data          0x0000000000000000        0x0 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/../../../../riscv64-unknown-elf/lib/rv32imafc/ilp32f/libc.a(lib_a-memmove-stub.o)
+ .bss           0x0000000000000000        0x0 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/../../../../riscv64-unknown-elf/lib/rv32imafc/ilp32f/libc.a(lib_a-memmove-stub.o)
+ .text          0x0000000000000000       0x3c /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clzsi2.o)
+ .data          0x0000000000000000        0x0 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clzsi2.o)
+ .bss           0x0000000000000000        0x0 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clzsi2.o)
+ .debug_info    0x0000000000000000      0x152 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clzsi2.o)
+ .debug_abbrev  0x0000000000000000       0xca /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clzsi2.o)
+ .debug_loc     0x0000000000000000       0x6b /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clzsi2.o)
  .debug_aranges
-                0x0000000000000000       0x20 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clzsi2.o)
- .debug_ranges  0x0000000000000000       0x20 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clzsi2.o)
- .debug_line    0x0000000000000000      0x124 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clzsi2.o)
- .debug_str     0x0000000000000000      0x2f0 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clzsi2.o)
- .comment       0x0000000000000000       0x46 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clzsi2.o)
- .debug_frame   0x0000000000000000       0x20 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clzsi2.o)
+                0x0000000000000000       0x20 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clzsi2.o)
+ .debug_ranges  0x0000000000000000       0x20 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clzsi2.o)
+ .debug_line    0x0000000000000000      0x124 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clzsi2.o)
+ .debug_str     0x0000000000000000      0x2f0 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clzsi2.o)
+ .comment       0x0000000000000000       0x46 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clzsi2.o)
+ .debug_frame   0x0000000000000000       0x20 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clzsi2.o)
  .riscv.attributes
-                0x0000000000000000       0x30 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clzsi2.o)
- .data          0x0000000000000000        0x0 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_udivdi3.o)
- .bss           0x0000000000000000        0x0 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_udivdi3.o)
- .eh_frame      0x0000000000000000       0x28 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_udivdi3.o)
- .data          0x0000000000000000        0x0 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_umoddi3.o)
- .bss           0x0000000000000000        0x0 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_umoddi3.o)
- .eh_frame      0x0000000000000000       0x28 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_umoddi3.o)
- .text          0x0000000000000000      0x8c0 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(adddf3.o)
- .data          0x0000000000000000        0x0 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(adddf3.o)
- .bss           0x0000000000000000        0x0 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(adddf3.o)
- .debug_info    0x0000000000000000      0x5cc /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(adddf3.o)
- .debug_abbrev  0x0000000000000000      0x166 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(adddf3.o)
- .debug_loc     0x0000000000000000     0x1a56 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(adddf3.o)
+                0x0000000000000000       0x30 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clzsi2.o)
+ .data          0x0000000000000000        0x0 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_udivdi3.o)
+ .bss           0x0000000000000000        0x0 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_udivdi3.o)
+ .eh_frame      0x0000000000000000       0x28 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_udivdi3.o)
+ .data          0x0000000000000000        0x0 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_umoddi3.o)
+ .bss           0x0000000000000000        0x0 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_umoddi3.o)
+ .eh_frame      0x0000000000000000       0x28 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_umoddi3.o)
+ .text          0x0000000000000000      0x8c0 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(adddf3.o)
+ .data          0x0000000000000000        0x0 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(adddf3.o)
+ .bss           0x0000000000000000        0x0 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(adddf3.o)
+ .debug_info    0x0000000000000000      0x5cc /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(adddf3.o)
+ .debug_abbrev  0x0000000000000000      0x166 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(adddf3.o)
+ .debug_loc     0x0000000000000000     0x1a56 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(adddf3.o)
  .debug_aranges
-                0x0000000000000000       0x20 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(adddf3.o)
- .debug_ranges  0x0000000000000000      0x3b8 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(adddf3.o)
- .debug_line    0x0000000000000000     0x15e6 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(adddf3.o)
- .debug_str     0x0000000000000000      0x3cd /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(adddf3.o)
- .comment       0x0000000000000000       0x46 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(adddf3.o)
- .debug_frame   0x0000000000000000       0x44 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(adddf3.o)
+                0x0000000000000000       0x20 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(adddf3.o)
+ .debug_ranges  0x0000000000000000      0x3b8 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(adddf3.o)
+ .debug_line    0x0000000000000000     0x15e6 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(adddf3.o)
+ .debug_str     0x0000000000000000      0x3cd /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(adddf3.o)
+ .comment       0x0000000000000000       0x46 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(adddf3.o)
+ .debug_frame   0x0000000000000000       0x44 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(adddf3.o)
  .riscv.attributes
-                0x0000000000000000       0x34 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(adddf3.o)
- .text          0x0000000000000000      0x69c /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(divdf3.o)
- .data          0x0000000000000000        0x0 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(divdf3.o)
- .bss           0x0000000000000000        0x0 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(divdf3.o)
- .rodata        0x0000000000000000       0x3c /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(divdf3.o)
- .debug_info    0x0000000000000000      0x761 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(divdf3.o)
- .debug_abbrev  0x0000000000000000      0x162 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(divdf3.o)
- .debug_loc     0x0000000000000000     0x15e6 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(divdf3.o)
+                0x0000000000000000       0x34 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(adddf3.o)
+ .text          0x0000000000000000      0x69c /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(divdf3.o)
+ .data          0x0000000000000000        0x0 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(divdf3.o)
+ .bss           0x0000000000000000        0x0 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(divdf3.o)
+ .rodata        0x0000000000000000       0x3c /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(divdf3.o)
+ .debug_info    0x0000000000000000      0x761 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(divdf3.o)
+ .debug_abbrev  0x0000000000000000      0x162 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(divdf3.o)
+ .debug_loc     0x0000000000000000     0x15e6 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(divdf3.o)
  .debug_aranges
-                0x0000000000000000       0x20 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(divdf3.o)
- .debug_ranges  0x0000000000000000      0x1e8 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(divdf3.o)
- .debug_line    0x0000000000000000     0x125b /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(divdf3.o)
- .debug_str     0x0000000000000000      0x48f /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(divdf3.o)
- .comment       0x0000000000000000       0x46 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(divdf3.o)
- .debug_frame   0x0000000000000000       0x58 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(divdf3.o)
+                0x0000000000000000       0x20 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(divdf3.o)
+ .debug_ranges  0x0000000000000000      0x1e8 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(divdf3.o)
+ .debug_line    0x0000000000000000     0x125b /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(divdf3.o)
+ .debug_str     0x0000000000000000      0x48f /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(divdf3.o)
+ .comment       0x0000000000000000       0x46 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(divdf3.o)
+ .debug_frame   0x0000000000000000       0x58 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(divdf3.o)
  .riscv.attributes
-                0x0000000000000000       0x34 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(divdf3.o)
- .text          0x0000000000000000      0x5ae /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(muldf3.o)
- .data          0x0000000000000000        0x0 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(muldf3.o)
- .bss           0x0000000000000000        0x0 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(muldf3.o)
- .rodata        0x0000000000000000       0x3c /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(muldf3.o)
- .debug_info    0x0000000000000000      0x7a1 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(muldf3.o)
- .debug_abbrev  0x0000000000000000      0x17d /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(muldf3.o)
- .debug_loc     0x0000000000000000     0x10e9 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(muldf3.o)
+                0x0000000000000000       0x34 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(divdf3.o)
+ .text          0x0000000000000000      0x5ae /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(muldf3.o)
+ .data          0x0000000000000000        0x0 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(muldf3.o)
+ .bss           0x0000000000000000        0x0 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(muldf3.o)
+ .rodata        0x0000000000000000       0x3c /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(muldf3.o)
+ .debug_info    0x0000000000000000      0x7a1 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(muldf3.o)
+ .debug_abbrev  0x0000000000000000      0x17d /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(muldf3.o)
+ .debug_loc     0x0000000000000000     0x10e9 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(muldf3.o)
  .debug_aranges
-                0x0000000000000000       0x20 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(muldf3.o)
- .debug_ranges  0x0000000000000000      0x240 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(muldf3.o)
- .debug_line    0x0000000000000000     0x106b /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(muldf3.o)
- .debug_str     0x0000000000000000      0x4e7 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(muldf3.o)
- .comment       0x0000000000000000       0x46 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(muldf3.o)
- .debug_frame   0x0000000000000000       0x58 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(muldf3.o)
+                0x0000000000000000       0x20 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(muldf3.o)
+ .debug_ranges  0x0000000000000000      0x240 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(muldf3.o)
+ .debug_line    0x0000000000000000     0x106b /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(muldf3.o)
+ .debug_str     0x0000000000000000      0x4e7 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(muldf3.o)
+ .comment       0x0000000000000000       0x46 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(muldf3.o)
+ .debug_frame   0x0000000000000000       0x58 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(muldf3.o)
  .riscv.attributes
-                0x0000000000000000       0x34 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(muldf3.o)
- .text          0x0000000000000000       0x9a /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(fixunsdfsi.o)
- .data          0x0000000000000000        0x0 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(fixunsdfsi.o)
- .bss           0x0000000000000000        0x0 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(fixunsdfsi.o)
- .debug_info    0x0000000000000000      0x1d2 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(fixunsdfsi.o)
- .debug_abbrev  0x0000000000000000      0x13a /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(fixunsdfsi.o)
- .debug_loc     0x0000000000000000      0x247 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(fixunsdfsi.o)
+                0x0000000000000000       0x34 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(muldf3.o)
+ .text          0x0000000000000000       0xc6 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(fixdfsi.o)
+ .data          0x0000000000000000        0x0 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(fixdfsi.o)
+ .bss           0x0000000000000000        0x0 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(fixdfsi.o)
+ .debug_info    0x0000000000000000      0x1ea /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(fixdfsi.o)
+ .debug_abbrev  0x0000000000000000      0x144 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(fixdfsi.o)
+ .debug_loc     0x0000000000000000      0x2a8 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(fixdfsi.o)
  .debug_aranges
-                0x0000000000000000       0x20 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(fixunsdfsi.o)
- .debug_ranges  0x0000000000000000       0x30 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(fixunsdfsi.o)
- .debug_line    0x0000000000000000      0x2bc /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(fixunsdfsi.o)
- .debug_str     0x0000000000000000      0x2da /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(fixunsdfsi.o)
- .comment       0x0000000000000000       0x46 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(fixunsdfsi.o)
- .debug_frame   0x0000000000000000       0x20 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(fixunsdfsi.o)
+                0x0000000000000000       0x20 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(fixdfsi.o)
+ .debug_ranges  0x0000000000000000       0x58 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(fixdfsi.o)
+ .debug_line    0x0000000000000000      0x317 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(fixdfsi.o)
+ .debug_str     0x0000000000000000      0x2db /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(fixdfsi.o)
+ .comment       0x0000000000000000       0x46 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(fixdfsi.o)
+ .debug_frame   0x0000000000000000       0x20 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(fixdfsi.o)
  .riscv.attributes
-                0x0000000000000000       0x34 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(fixunsdfsi.o)
- .text          0x0000000000000000       0x6c /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatsidf.o)
- .data          0x0000000000000000        0x0 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatsidf.o)
- .bss           0x0000000000000000        0x0 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatsidf.o)
- .debug_info    0x0000000000000000      0x29b /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatsidf.o)
- .debug_abbrev  0x0000000000000000      0x164 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatsidf.o)
- .debug_loc     0x0000000000000000      0x159 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatsidf.o)
+                0x0000000000000000       0x34 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(fixdfsi.o)
+ .text          0x0000000000000000       0x9a /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(fixunsdfsi.o)
+ .data          0x0000000000000000        0x0 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(fixunsdfsi.o)
+ .bss           0x0000000000000000        0x0 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(fixunsdfsi.o)
+ .debug_info    0x0000000000000000      0x1d2 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(fixunsdfsi.o)
+ .debug_abbrev  0x0000000000000000      0x13a /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(fixunsdfsi.o)
+ .debug_loc     0x0000000000000000      0x247 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(fixunsdfsi.o)
  .debug_aranges
-                0x0000000000000000       0x20 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatsidf.o)
- .debug_ranges  0x0000000000000000       0x68 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatsidf.o)
- .debug_line    0x0000000000000000      0x28d /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatsidf.o)
- .debug_str     0x0000000000000000      0x37a /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatsidf.o)
- .comment       0x0000000000000000       0x46 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatsidf.o)
- .debug_frame   0x0000000000000000       0x38 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatsidf.o)
+                0x0000000000000000       0x20 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(fixunsdfsi.o)
+ .debug_ranges  0x0000000000000000       0x30 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(fixunsdfsi.o)
+ .debug_line    0x0000000000000000      0x2bc /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(fixunsdfsi.o)
+ .debug_str     0x0000000000000000      0x2da /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(fixunsdfsi.o)
+ .comment       0x0000000000000000       0x46 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(fixunsdfsi.o)
+ .debug_frame   0x0000000000000000       0x20 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(fixunsdfsi.o)
  .riscv.attributes
-                0x0000000000000000       0x30 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatsidf.o)
- .text          0x0000000000000000       0x54 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatunsidf.o)
- .data          0x0000000000000000        0x0 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatunsidf.o)
- .bss           0x0000000000000000        0x0 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatunsidf.o)
- .debug_info    0x0000000000000000      0x28e /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatunsidf.o)
- .debug_abbrev  0x0000000000000000      0x164 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatunsidf.o)
- .debug_loc     0x0000000000000000      0x14f /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatunsidf.o)
+                0x0000000000000000       0x34 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(fixunsdfsi.o)
+ .text          0x0000000000000000       0x6c /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatsidf.o)
+ .data          0x0000000000000000        0x0 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatsidf.o)
+ .bss           0x0000000000000000        0x0 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatsidf.o)
+ .debug_info    0x0000000000000000      0x29b /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatsidf.o)
+ .debug_abbrev  0x0000000000000000      0x164 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatsidf.o)
+ .debug_loc     0x0000000000000000      0x159 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatsidf.o)
  .debug_aranges
-                0x0000000000000000       0x20 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatunsidf.o)
- .debug_ranges  0x0000000000000000       0x70 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatunsidf.o)
- .debug_line    0x0000000000000000      0x2ad /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatunsidf.o)
- .debug_str     0x0000000000000000      0x377 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatunsidf.o)
- .comment       0x0000000000000000       0x46 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatunsidf.o)
- .debug_frame   0x0000000000000000       0x34 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatunsidf.o)
+                0x0000000000000000       0x20 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatsidf.o)
+ .debug_ranges  0x0000000000000000       0x68 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatsidf.o)
+ .debug_line    0x0000000000000000      0x28d /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatsidf.o)
+ .debug_str     0x0000000000000000      0x37a /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatsidf.o)
+ .comment       0x0000000000000000       0x46 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatsidf.o)
+ .debug_frame   0x0000000000000000       0x38 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatsidf.o)
  .riscv.attributes
-                0x0000000000000000       0x30 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatunsidf.o)
- .text          0x0000000000000000        0x0 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clz.o)
- .data          0x0000000000000000        0x0 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clz.o)
- .bss           0x0000000000000000        0x0 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clz.o)
+                0x0000000000000000       0x30 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatsidf.o)
+ .text          0x0000000000000000       0x54 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatunsidf.o)
+ .data          0x0000000000000000        0x0 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatunsidf.o)
+ .bss           0x0000000000000000        0x0 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatunsidf.o)
+ .debug_info    0x0000000000000000      0x28e /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatunsidf.o)
+ .debug_abbrev  0x0000000000000000      0x164 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatunsidf.o)
+ .debug_loc     0x0000000000000000      0x14f /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatunsidf.o)
+ .debug_aranges
+                0x0000000000000000       0x20 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatunsidf.o)
+ .debug_ranges  0x0000000000000000       0x70 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatunsidf.o)
+ .debug_line    0x0000000000000000      0x2ad /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatunsidf.o)
+ .debug_str     0x0000000000000000      0x377 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatunsidf.o)
+ .comment       0x0000000000000000       0x46 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatunsidf.o)
+ .debug_frame   0x0000000000000000       0x34 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatunsidf.o)
+ .riscv.attributes
+                0x0000000000000000       0x30 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatunsidf.o)
+ .text          0x0000000000000000        0x0 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clz.o)
+ .data          0x0000000000000000        0x0 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clz.o)
+ .bss           0x0000000000000000        0x0 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clz.o)
 
 Memory Configuration
 
@@ -7520,6 +7799,8 @@ LOAD out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_romapi.o
 LOAD out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sflash_ext.o
 LOAD out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sf_cfg_ext.o
 LOAD out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_xip_sflash_ext.o
+LOAD out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+LOAD out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_calib_data.o
 LOAD out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_device.o
 LOAD out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_gpio.o
 LOAD out/3rdParty/FreeRTOS/Source/tasks.o
@@ -7529,20 +7810,20 @@ LOAD out/3rdParty/FreeRTOS/Source/timers.o
 LOAD out/3rdParty/FreeRTOS/Source/stream_buffer.o
 LOAD out/3rdParty/FreeRTOS/Source/croutine.o
 LOAD out/3rdParty/FreeRTOS/Source/portable/MemMang/heap_5.o
-LOAD /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/../../../../riscv64-unknown-elf/lib/rv32imafc/ilp32f/libc.a
-LOAD /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/../../../../riscv64-unknown-elf/lib/rv32imafc/ilp32f/libm.a
-LOAD /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a
+LOAD /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/../../../../riscv64-unknown-elf/lib/rv32imafc/ilp32f/libc.a
+LOAD /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/../../../../riscv64-unknown-elf/lib/rv32imafc/ilp32f/libm.a
+LOAD /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a
 START GROUP
-LOAD /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/../../../../riscv64-unknown-elf/lib/rv32imafc/ilp32f/libc.a
-LOAD /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/../../../../riscv64-unknown-elf/lib/rv32imafc/ilp32f/libgloss.a
+LOAD /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/../../../../riscv64-unknown-elf/lib/rv32imafc/ilp32f/libc.a
+LOAD /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/../../../../riscv64-unknown-elf/lib/rv32imafc/ilp32f/libgloss.a
 END GROUP
-LOAD /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a
-LOAD /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/../../../../riscv64-unknown-elf/lib/rv32imafc/ilp32f/libc.a
-LOAD /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a
+LOAD /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a
+LOAD /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/../../../../riscv64-unknown-elf/lib/rv32imafc/ilp32f/libc.a
+LOAD /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a
                 0x0000000000000400                StackSize = 0x400
                 0x0000000000000000                PROVIDE (__metal_chicken_bit = 0x0)
 
-.text           0x0000000022010000     0x9550
+.text           0x0000000022010000     0x95cc
                 0x0000000022010000                . = ALIGN (0x4)
                 0x0000000022010000                __text_code_start__ = .
  *(.text.metal.init.enter)
@@ -7554,11 +7835,11 @@ LOAD /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-un
  .init          0x00000000220100c0      0x142 out/startup/interrupt.o
                 0x00000000220100c0                __Vectors
  *(.text)
- .text          0x0000000022010202       0xd0 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/../../../../riscv64-unknown-elf/lib/rv32imafc/ilp32f/libc.a(lib_a-memmove-stub.o)
+ .text          0x0000000022010202       0xd0 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/../../../../riscv64-unknown-elf/lib/rv32imafc/ilp32f/libc.a(lib_a-memmove-stub.o)
                 0x0000000022010202                memmove
- .text          0x00000000220102d2      0x360 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_udivdi3.o)
+ .text          0x00000000220102d2      0x360 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_udivdi3.o)
                 0x00000000220102d2                __udivdi3
- .text          0x0000000022010632      0x340 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_umoddi3.o)
+ .text          0x0000000022010632      0x340 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_umoddi3.o)
                 0x0000000022010632                __umoddi3
  *(.text.*)
  .text.startup.main
@@ -8130,7 +8411,7 @@ LOAD /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-un
  *(.rodata)
  *fill*         0x00000000220174a6        0x2 
  .rodata        0x00000000220174a8       0x10 out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_device.o
- .rodata        0x00000000220174b8      0x100 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clz.o)
+ .rodata        0x00000000220174b8      0x100 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clz.o)
                 0x00000000220174b8                __clz_tab
  *(.rodata.*)
  .rodata.main.str1.4
@@ -8423,72 +8704,72 @@ LOAD /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-un
                 0x00000000220189e6                SFlash_Program_Security_Register
                 0x0000000022018b84                SFlash_Read_Security_Register
                 0x0000000022018d06                SFlash_Clear_Status_Register
- .tcm_code      0x0000000022018e3a      0x13a out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sf_cfg_ext.o
+ .tcm_code      0x0000000022018e3a      0x13e out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sf_cfg_ext.o
                 0x0000000022018e3a                SF_Cfg_Get_Flash_Cfg_Need_Lock_Ext
-                0x0000000022018ee8                SF_Cfg_Flash_Identify_Ext
+                0x0000000022018eea                SF_Cfg_Flash_Identify_Ext
  *(.tcm_const)
- *fill*         0x0000000022018f74        0x0 
- .tcm_const     0x0000000022018f74      0x2dc out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sf_cfg_ext.o
+ *fill*         0x0000000022018f78        0x0 
+ .tcm_const     0x0000000022018f78      0x354 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sf_cfg_ext.o
  *(.sclock_rlt_code)
  .sclock_rlt_code
-                0x0000000022019250      0x1c8 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_glb.o
-                0x0000000022019250                GLB_Set_System_CLK_Div
-                0x00000000220192aa                GLB_Switch_System_CLK
+                0x00000000220192cc      0x1c8 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_glb.o
+                0x00000000220192cc                GLB_Set_System_CLK_Div
+                0x0000000022019326                GLB_Switch_System_CLK
  .sclock_rlt_code
-                0x0000000022019418      0x136 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_romapi.o
-                0x0000000022019418                AON_Power_On_MBG
-                0x0000000022019422                AON_Power_Off_MBG
-                0x000000002201942c                AON_Power_On_XTAL
-                0x0000000022019436                AON_Set_Xtal_CapCode
-                0x0000000022019440                AON_Get_Xtal_CapCode
-                0x000000002201944a                AON_Power_Off_XTAL
-                0x0000000022019454                EF_Ctrl_Get_Trim_Parity
-                0x000000002201945e                EF_Ctrl_Read_RC32M_Trim
-                0x0000000022019468                EF_Ctrl_Read_RC32K_Trim
-                0x0000000022019472                GLB_Get_Root_CLK_Sel
-                0x000000002201947c                GLB_Get_BCLK_Div
-                0x0000000022019486                GLB_Get_HCLK_Div
-                0x0000000022019490                Update_SystemCoreClockWith_XTAL
-                0x000000002201949a                GLB_Set_System_CLK
-                0x00000000220194a4                System_Core_Clock_Update_From_RC32M
-                0x00000000220194ae                GLB_Set_SF_CLK
-                0x00000000220194b8                GLB_Set_PKA_CLK_Sel
-                0x00000000220194c2                HBN_32K_Sel
-                0x00000000220194cc                HBN_Set_ROOT_CLK_Sel
-                0x00000000220194d6                HBN_Power_On_Xtal_32K
-                0x00000000220194e0                HBN_Power_Off_Xtal_32K
-                0x00000000220194ea                HBN_Trim_RC32K
-                0x00000000220194f4                PDS_Trim_RC32M
-                0x00000000220194fe                PDS_Select_RC32M_As_PLL_Ref
-                0x0000000022019508                PDS_Select_XTAL_As_PLL_Ref
-                0x0000000022019512                PDS_Power_On_PLL
-                0x000000002201951c                PDS_Enable_PLL_All_Clks
-                0x0000000022019526                PDS_Disable_PLL_All_Clks
-                0x0000000022019530                PDS_Enable_PLL_Clk
-                0x000000002201953a                PDS_Disable_PLL_Clk
-                0x0000000022019544                PDS_Power_Off_PLL
+                0x0000000022019494      0x136 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_romapi.o
+                0x0000000022019494                AON_Power_On_MBG
+                0x000000002201949e                AON_Power_Off_MBG
+                0x00000000220194a8                AON_Power_On_XTAL
+                0x00000000220194b2                AON_Set_Xtal_CapCode
+                0x00000000220194bc                AON_Get_Xtal_CapCode
+                0x00000000220194c6                AON_Power_Off_XTAL
+                0x00000000220194d0                EF_Ctrl_Get_Trim_Parity
+                0x00000000220194da                EF_Ctrl_Read_RC32M_Trim
+                0x00000000220194e4                EF_Ctrl_Read_RC32K_Trim
+                0x00000000220194ee                GLB_Get_Root_CLK_Sel
+                0x00000000220194f8                GLB_Get_BCLK_Div
+                0x0000000022019502                GLB_Get_HCLK_Div
+                0x000000002201950c                Update_SystemCoreClockWith_XTAL
+                0x0000000022019516                GLB_Set_System_CLK
+                0x0000000022019520                System_Core_Clock_Update_From_RC32M
+                0x000000002201952a                GLB_Set_SF_CLK
+                0x0000000022019534                GLB_Set_PKA_CLK_Sel
+                0x000000002201953e                HBN_32K_Sel
+                0x0000000022019548                HBN_Set_ROOT_CLK_Sel
+                0x0000000022019552                HBN_Power_On_Xtal_32K
+                0x000000002201955c                HBN_Power_Off_Xtal_32K
+                0x0000000022019566                HBN_Trim_RC32K
+                0x0000000022019570                PDS_Trim_RC32M
+                0x000000002201957a                PDS_Select_RC32M_As_PLL_Ref
+                0x0000000022019584                PDS_Select_XTAL_As_PLL_Ref
+                0x000000002201958e                PDS_Power_On_PLL
+                0x0000000022019598                PDS_Enable_PLL_All_Clks
+                0x00000000220195a2                PDS_Disable_PLL_All_Clks
+                0x00000000220195ac                PDS_Enable_PLL_Clk
+                0x00000000220195b6                PDS_Disable_PLL_Clk
+                0x00000000220195c0                PDS_Power_Off_PLL
  *(.sclock_rlt_const)
-                0x0000000022019550                . = ALIGN (0x4)
- *fill*         0x000000002201954e        0x2 
-                0x0000000022019550                __text_code_end__ = .
+                0x00000000220195cc                . = ALIGN (0x4)
+ *fill*         0x00000000220195ca        0x2 
+                0x00000000220195cc                __text_code_end__ = .
 
-.rela.dyn       0x0000000022019550        0x0
+.rela.dyn       0x00000000220195cc        0x0
  .rela.text.start_load
-                0x0000000022019550        0x0 out/ChipTest/Eflash_Loader/main.o
- .rela.init     0x0000000022019550        0x0 out/ChipTest/Eflash_Loader/main.o
+                0x00000000220195cc        0x0 out/ChipTest/Eflash_Loader/main.o
+ .rela.init     0x00000000220195cc        0x0 out/ChipTest/Eflash_Loader/main.o
  .rela.text.metal.init.enter
-                0x0000000022019550        0x0 out/ChipTest/Eflash_Loader/main.o
-                0x0000000022019550                . = ALIGN (0x4)
-                0x0000000022019550                __itcm_load_addr = .
+                0x00000000220195cc        0x0 out/ChipTest/Eflash_Loader/main.o
+                0x00000000220195cc                . = ALIGN (0x4)
+                0x00000000220195cc                __itcm_load_addr = .
 
-.itcm_region    0x0000000022019550        0x0
-                0x0000000022019550                . = ALIGN (0x4)
-                0x0000000022019550                __tcm_code_start__ = .
-                0x0000000022019550                . = ALIGN (0x4)
-                0x0000000022019550                __tcm_code_end__ = .
-                0x0000000022019550                __dtcm_load_addr = (__itcm_load_addr + SIZEOF (.itcm_region))
+.itcm_region    0x00000000220195cc        0x0
+                0x00000000220195cc                . = ALIGN (0x4)
+                0x00000000220195cc                __tcm_code_start__ = .
+                0x00000000220195cc                . = ALIGN (0x4)
+                0x00000000220195cc                __tcm_code_end__ = .
+                0x00000000220195cc                __dtcm_load_addr = (__itcm_load_addr + SIZEOF (.itcm_region))
 
-.dtcm_region    0x000000004201c000        0x0 load address 0x0000000022019550
+.dtcm_region    0x000000004201c000        0x0 load address 0x00000000220195cc
                 0x000000004201c000                . = ALIGN (0x4)
                 0x000000004201c000                __tcm_data_start__ = .
  *(.tcm_data)
@@ -8503,17 +8784,17 @@ LOAD /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-un
                 0x0000000042020000                __StackTop = (ORIGIN (dtcm_memory) + LENGTH (dtcm_memory))
                 0x000000004201fc00                __StackLimit = (__StackTop - SIZEOF (.stack_dummy))
                 0x0000000000000001                ASSERT ((__StackLimit >= __tcm_data_end__), region RAM overflowed with stack)
-                0x0000000022019550                __system_ram_load_addr = (__dtcm_load_addr + SIZEOF (.dtcm_region))
+                0x00000000220195cc                __system_ram_load_addr = (__dtcm_load_addr + SIZEOF (.dtcm_region))
 
 .system_ram_data_region
-                0x0000000042020000        0x0 load address 0x0000000022019550
+                0x0000000042020000        0x0 load address 0x00000000220195cc
                 0x0000000042020000                . = ALIGN (0x4)
                 0x0000000042020000                __system_ram_data_start__ = .
                 0x0000000042020000                . = ALIGN (0x4)
                 0x0000000042020000                __system_ram_data_end__ = .
-                0x0000000022019550                __ram_load_addr = (__system_ram_load_addr + SIZEOF (.system_ram_data_region))
+                0x00000000220195cc                __ram_load_addr = (__system_ram_load_addr + SIZEOF (.system_ram_data_region))
 
-RAM_DATA        0x0000000042020000       0xec load address 0x0000000022019550
+RAM_DATA        0x0000000042020000       0xec load address 0x00000000220195cc
                 0x0000000042020000                . = ALIGN (0x4)
                 0x0000000042020000                __ram_data_start__ = .
                 0x0000000042020800                PROVIDE (__global_pointer$ = (. + 0x800))
@@ -8547,7 +8828,7 @@ RAM_DATA        0x0000000042020000       0xec load address 0x0000000022019550
                 0x00000000420200ec                . = ALIGN (0x4)
                 0x00000000420200ec                __ram_data_end__ = .
 
-.bss            0x00000000420200ec     0xdbbc load address 0x000000002201963c
+.bss            0x00000000420200ec     0xdbbc load address 0x00000000220196b8
                 0x00000000420200ec                . = ALIGN (0x4)
                 0x00000000420200ec                __bss_start__ = .
  *(.bss*)
@@ -8695,9 +8976,9 @@ OUTPUT(out/ChipTest/Eflash_Loader/eflash_loader.elf elf32-littleriscv)
  .debug_info    0x0000000000020d0e      0x877 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sf_cfg_ext.o
  .debug_info    0x0000000000021585     0x12ac out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_device.o
  .debug_info    0x0000000000022831      0x2f7 out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_gpio.o
- .debug_info    0x0000000000022b28      0x7c0 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_udivdi3.o)
- .debug_info    0x00000000000232e8      0x81a /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_umoddi3.o)
- .debug_info    0x0000000000023b02       0xe5 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clz.o)
+ .debug_info    0x0000000000022b28      0x7c0 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_udivdi3.o)
+ .debug_info    0x00000000000232e8      0x81a /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_umoddi3.o)
+ .debug_info    0x0000000000023b02       0xe5 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clz.o)
 
 .debug_abbrev   0x0000000000000000     0x558a
  .debug_abbrev  0x0000000000000000      0x21a out/ChipTest/Eflash_Loader/main.o
@@ -8740,9 +9021,9 @@ OUTPUT(out/ChipTest/Eflash_Loader/eflash_loader.elf elf32-littleriscv)
  .debug_abbrev  0x0000000000004bd7      0x166 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sf_cfg_ext.o
  .debug_abbrev  0x0000000000004d3d      0x3ab out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_device.o
  .debug_abbrev  0x00000000000050e8       0xdc out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_gpio.o
- .debug_abbrev  0x00000000000051c4      0x19d /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_udivdi3.o)
- .debug_abbrev  0x0000000000005361      0x1b9 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_umoddi3.o)
- .debug_abbrev  0x000000000000551a       0x70 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clz.o)
+ .debug_abbrev  0x00000000000051c4      0x19d /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_udivdi3.o)
+ .debug_abbrev  0x0000000000005361      0x1b9 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_umoddi3.o)
+ .debug_abbrev  0x000000000000551a       0x70 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clz.o)
 
 .debug_loc      0x0000000000000000    0x190e2
  .debug_loc     0x0000000000000000       0x43 out/ChipTest/Eflash_Loader/main.o
@@ -8781,8 +9062,8 @@ OUTPUT(out/ChipTest/Eflash_Loader/eflash_loader.elf elf32-littleriscv)
  .debug_loc     0x00000000000166ab      0xa30 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sflash_ext.o
  .debug_loc     0x00000000000170db      0x1f6 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sf_cfg_ext.o
  .debug_loc     0x00000000000172d1      0x8ac out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_device.o
- .debug_loc     0x0000000000017b7d      0xbdd /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_udivdi3.o)
- .debug_loc     0x000000000001875a      0x988 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_umoddi3.o)
+ .debug_loc     0x0000000000017b7d      0xbdd /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_udivdi3.o)
+ .debug_loc     0x000000000001875a      0x988 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_umoddi3.o)
 
 .debug_aranges  0x0000000000000000     0x18a8
  .debug_aranges
@@ -8866,11 +9147,11 @@ OUTPUT(out/ChipTest/Eflash_Loader/eflash_loader.elf elf32-littleriscv)
  .debug_aranges
                 0x0000000000001828       0x28 out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_gpio.o
  .debug_aranges
-                0x0000000000001850       0x20 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_udivdi3.o)
+                0x0000000000001850       0x20 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_udivdi3.o)
  .debug_aranges
-                0x0000000000001870       0x20 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_umoddi3.o)
+                0x0000000000001870       0x20 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_umoddi3.o)
  .debug_aranges
-                0x0000000000001890       0x18 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clz.o)
+                0x0000000000001890       0x18 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clz.o)
 
 .debug_ranges   0x0000000000000000     0x2f90
  .debug_ranges  0x0000000000000000       0x10 out/ChipTest/Eflash_Loader/main.o
@@ -8913,8 +9194,8 @@ OUTPUT(out/ChipTest/Eflash_Loader/eflash_loader.elf elf32-littleriscv)
  .debug_ranges  0x0000000000002bc0       0x18 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sf_cfg_ext.o
  .debug_ranges  0x0000000000002bd8      0x1d8 out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_device.o
  .debug_ranges  0x0000000000002db0       0x18 out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_gpio.o
- .debug_ranges  0x0000000000002dc8       0xf0 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_udivdi3.o)
- .debug_ranges  0x0000000000002eb8       0xd8 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_umoddi3.o)
+ .debug_ranges  0x0000000000002dc8       0xf0 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_udivdi3.o)
+ .debug_ranges  0x0000000000002eb8       0xd8 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_umoddi3.o)
 
 .debug_macro    0x0000000000000000    0x1acef
  .debug_macro   0x0000000000000000      0x223 out/ChipTest/Eflash_Loader/main.o
@@ -9055,95 +9336,95 @@ OUTPUT(out/ChipTest/Eflash_Loader/eflash_loader.elf elf32-littleriscv)
  .debug_line    0x000000000002a0c4      0x700 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sf_cfg_ext.o
  .debug_line    0x000000000002a7c4     0x165c out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_device.o
  .debug_line    0x000000000002be20      0x4fe out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_gpio.o
- .debug_line    0x000000000002c31e      0x784 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_udivdi3.o)
- .debug_line    0x000000000002caa2      0x84c /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_umoddi3.o)
- .debug_line    0x000000000002d2ee       0x98 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clz.o)
+ .debug_line    0x000000000002c31e      0x784 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_udivdi3.o)
+ .debug_line    0x000000000002caa2      0x84c /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_umoddi3.o)
+ .debug_line    0x000000000002d2ee       0x98 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clz.o)
 
-.debug_str      0x0000000000000000    0x9ecb0
- .debug_str     0x0000000000000000    0x858d5 out/ChipTest/Eflash_Loader/main.o
-                                      0x85a8b (size before relaxing)
- .debug_str     0x00000000000858d5     0x16e7 out/ChipTest/Eflash_Loader/bflb_eflash_loader_cmds.o
-                                      0x86bab (size before relaxing)
- .debug_str     0x0000000000086fbc     0x121e out/ChipTest/Eflash_Loader/bflb_eflash_loader_gpio.o
-                                      0x85c07 (size before relaxing)
- .debug_str     0x00000000000881da      0xdb9 out/ChipTest/Eflash_Loader/bflb_eflash_loader_interface.o
-                                      0x86a17 (size before relaxing)
- .debug_str     0x0000000000088f93      0x170 out/ChipTest/Eflash_Loader/bflb_eflash_loader_jlink.o
-                                      0x854b7 (size before relaxing)
- .debug_str     0x0000000000089103      0xcbc out/ChipTest/Eflash_Loader/bflb_eflash_loader_uart.o
-                                      0x8608a (size before relaxing)
- .debug_str     0x0000000000089dbf      0x139 out/ChipTest/Eflash_Loader/bflb_eflash_loader_sdio.o
-                                      0x85f6a (size before relaxing)
- .debug_str     0x0000000000089ef8      0x58d out/ChipTest/Eflash_Loader/bflb_eflash_loader_boot.o
-                                      0x86745 (size before relaxing)
- .debug_str     0x000000000008a485      0x3b2 out/ChipTest/Eflash_Loader/bflb_spi_flash.o
-                                      0x861ac (size before relaxing)
- .debug_str     0x000000000008a837      0x2bf out/ChipTest/Eflash_Loader/bflb_efuse.o
-                                      0x84d7f (size before relaxing)
- .debug_str     0x000000000008aaf6       0x30 out/ChipTest/Eflash_Loader/bflb_eflash_loader_cfg.o
-                                      0x847b9 (size before relaxing)
- .debug_str     0x000000000008ab26       0xd6 out/ChipTest/Eflash_Loader/bflb_set_clock.o
-                                      0x8499b (size before relaxing)
- .debug_str     0x000000000008abfc      0x371 out/ChipTest/Eflash_Loader/sdu.o
-                                      0x85da5 (size before relaxing)
- .debug_str     0x000000000008af6d       0x49 out/BSP_Common/libc/memcpy.o
-                                       0x3157 (size before relaxing)
- .debug_str     0x000000000008afb6       0x1d out/BSP_Common/libc/memset.o
-                                       0x3157 (size before relaxing)
- .debug_str     0x000000000008afd3       0x1d out/BSP_Common/libc/memcmp.o
-                                       0x3152 (size before relaxing)
- .debug_str     0x000000000008aff0     0x106a out/BSP_Common/libc/vsnprintf.o
-                                       0x4352 (size before relaxing)
- .debug_str     0x000000000008c05a       0x1d out/BSP_Common/libc/strlen.o
-                                       0x3157 (size before relaxing)
- .debug_str     0x000000000008c077       0xee out/BSP_Common/soft_crc/softcrc.o
-                                      0x7ef10 (size before relaxing)
- .debug_str     0x000000000008c165      0x2cd out/BSP_Common/xz/xz_crc32.o
-                                       0x369e (size before relaxing)
- .debug_str     0x000000000008c432      0x8ed out/BSP_Common/xz/xz_dec_lzma2.o
-                                       0x40ea (size before relaxing)
- .debug_str     0x000000000008cd1f      0x375 out/BSP_Common/xz/xz_dec_stream.o
-                                       0x3c08 (size before relaxing)
- .debug_str     0x000000000008d094       0x33 out/BSP_Common/xz/xz_port.o
-                                       0x35a5 (size before relaxing)
- .debug_str     0x000000000008d0c7      0x159 out/startup/system_bl602.o
-                                      0x66864 (size before relaxing)
- .debug_str     0x000000000008d220      0x180 out/startup/GCC/start_load.o
-                                       0x8def (size before relaxing)
- .debug_str     0x000000000008d3a0       0xdc out/startup/interrupt.o
-                                       0x35b2 (size before relaxing)
- .debug_str     0x000000000008d47c       0x58 out/startup/GCC/entry.o
-                                         0x7b (size before relaxing)
- .debug_str     0x000000000008d4d4       0xb2 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_common.o
-                                       0xafa8 (size before relaxing)
- .debug_str     0x000000000008d586      0x3c5 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_uart.o
-                                      0x6c698 (size before relaxing)
- .debug_str     0x000000000008d94b      0xd40 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_glb.o
-                                      0x67c6e (size before relaxing)
- .debug_str     0x000000000008e68b     0x63c1 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_ef_ctrl.o
-                                      0x175ac (size before relaxing)
- .debug_str     0x0000000000094a4c      0xb48 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_hbn.o
-                                      0x67953 (size before relaxing)
- .debug_str     0x0000000000095594     0x1338 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sec_eng.o
-                                      0x23540 (size before relaxing)
- .debug_str     0x00000000000968cc       0x98 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sdu.o
-                                       0x9dad (size before relaxing)
- .debug_str     0x0000000000096964      0x247 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_mfg_efuse.o
-                                      0x66897 (size before relaxing)
- .debug_str     0x0000000000096bab     0x768d out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_romapi.o
-                                      0x88013 (size before relaxing)
- .debug_str     0x000000000009e238      0x1b7 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sflash_ext.o
-                                      0x1de49 (size before relaxing)
- .debug_str     0x000000000009e3ef       0xe5 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sf_cfg_ext.o
-                                      0x84a62 (size before relaxing)
- .debug_str     0x000000000009e4d4      0x445 out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_device.o
-                                      0x85494 (size before relaxing)
- .debug_str     0x000000000009e919       0x3c out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_gpio.o
-                                      0x6bde2 (size before relaxing)
- .debug_str     0x000000000009e955      0x2c4 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_udivdi3.o)
+.debug_str      0x0000000000000000    0x9ecbb
+ .debug_str     0x0000000000000000    0x858e0 out/ChipTest/Eflash_Loader/main.o
+                                      0x85a96 (size before relaxing)
+ .debug_str     0x00000000000858e0     0x16e7 out/ChipTest/Eflash_Loader/bflb_eflash_loader_cmds.o
+                                      0x86bb6 (size before relaxing)
+ .debug_str     0x0000000000086fc7     0x121e out/ChipTest/Eflash_Loader/bflb_eflash_loader_gpio.o
+                                      0x85c12 (size before relaxing)
+ .debug_str     0x00000000000881e5      0xdb9 out/ChipTest/Eflash_Loader/bflb_eflash_loader_interface.o
+                                      0x86a22 (size before relaxing)
+ .debug_str     0x0000000000088f9e      0x170 out/ChipTest/Eflash_Loader/bflb_eflash_loader_jlink.o
+                                      0x854c2 (size before relaxing)
+ .debug_str     0x000000000008910e      0xcbc out/ChipTest/Eflash_Loader/bflb_eflash_loader_uart.o
+                                      0x86095 (size before relaxing)
+ .debug_str     0x0000000000089dca      0x139 out/ChipTest/Eflash_Loader/bflb_eflash_loader_sdio.o
+                                      0x85f75 (size before relaxing)
+ .debug_str     0x0000000000089f03      0x58d out/ChipTest/Eflash_Loader/bflb_eflash_loader_boot.o
+                                      0x86750 (size before relaxing)
+ .debug_str     0x000000000008a490      0x3b2 out/ChipTest/Eflash_Loader/bflb_spi_flash.o
+                                      0x861b7 (size before relaxing)
+ .debug_str     0x000000000008a842      0x2bf out/ChipTest/Eflash_Loader/bflb_efuse.o
+                                      0x84d8a (size before relaxing)
+ .debug_str     0x000000000008ab01       0x30 out/ChipTest/Eflash_Loader/bflb_eflash_loader_cfg.o
+                                      0x847c4 (size before relaxing)
+ .debug_str     0x000000000008ab31       0xd6 out/ChipTest/Eflash_Loader/bflb_set_clock.o
+                                      0x849a6 (size before relaxing)
+ .debug_str     0x000000000008ac07      0x371 out/ChipTest/Eflash_Loader/sdu.o
+                                      0x85db0 (size before relaxing)
+ .debug_str     0x000000000008af78       0x49 out/BSP_Common/libc/memcpy.o
+                                       0x3162 (size before relaxing)
+ .debug_str     0x000000000008afc1       0x1d out/BSP_Common/libc/memset.o
+                                       0x3162 (size before relaxing)
+ .debug_str     0x000000000008afde       0x1d out/BSP_Common/libc/memcmp.o
+                                       0x315d (size before relaxing)
+ .debug_str     0x000000000008affb     0x106a out/BSP_Common/libc/vsnprintf.o
+                                       0x435d (size before relaxing)
+ .debug_str     0x000000000008c065       0x1d out/BSP_Common/libc/strlen.o
+                                       0x3162 (size before relaxing)
+ .debug_str     0x000000000008c082       0xee out/BSP_Common/soft_crc/softcrc.o
+                                      0x7ef1b (size before relaxing)
+ .debug_str     0x000000000008c170      0x2cd out/BSP_Common/xz/xz_crc32.o
+                                       0x36a9 (size before relaxing)
+ .debug_str     0x000000000008c43d      0x8ed out/BSP_Common/xz/xz_dec_lzma2.o
+                                       0x40f5 (size before relaxing)
+ .debug_str     0x000000000008cd2a      0x375 out/BSP_Common/xz/xz_dec_stream.o
+                                       0x3c13 (size before relaxing)
+ .debug_str     0x000000000008d09f       0x33 out/BSP_Common/xz/xz_port.o
+                                       0x35b0 (size before relaxing)
+ .debug_str     0x000000000008d0d2      0x159 out/startup/system_bl602.o
+                                      0x6686f (size before relaxing)
+ .debug_str     0x000000000008d22b      0x180 out/startup/GCC/start_load.o
+                                       0x8dfa (size before relaxing)
+ .debug_str     0x000000000008d3ab       0xdc out/startup/interrupt.o
+                                       0x35bd (size before relaxing)
+ .debug_str     0x000000000008d487       0x58 out/startup/GCC/entry.o
+                                         0x86 (size before relaxing)
+ .debug_str     0x000000000008d4df       0xb2 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_common.o
+                                       0xafb3 (size before relaxing)
+ .debug_str     0x000000000008d591      0x3c5 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_uart.o
+                                      0x6c6a3 (size before relaxing)
+ .debug_str     0x000000000008d956      0xd40 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_glb.o
+                                      0x67c79 (size before relaxing)
+ .debug_str     0x000000000008e696     0x63c1 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_ef_ctrl.o
+                                      0x175b7 (size before relaxing)
+ .debug_str     0x0000000000094a57      0xb48 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_hbn.o
+                                      0x6795e (size before relaxing)
+ .debug_str     0x000000000009559f     0x1338 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sec_eng.o
+                                      0x2354b (size before relaxing)
+ .debug_str     0x00000000000968d7       0x98 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sdu.o
+                                       0x9db8 (size before relaxing)
+ .debug_str     0x000000000009696f      0x247 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_mfg_efuse.o
+                                      0x668a2 (size before relaxing)
+ .debug_str     0x0000000000096bb6     0x768d out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_romapi.o
+                                      0x8801e (size before relaxing)
+ .debug_str     0x000000000009e243      0x1b7 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sflash_ext.o
+                                      0x1de54 (size before relaxing)
+ .debug_str     0x000000000009e3fa       0xe5 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sf_cfg_ext.o
+                                      0x84a6d (size before relaxing)
+ .debug_str     0x000000000009e4df      0x445 out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_device.o
+                                      0x8549f (size before relaxing)
+ .debug_str     0x000000000009e924       0x3c out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_gpio.o
+                                      0x6bded (size before relaxing)
+ .debug_str     0x000000000009e960      0x2c4 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_udivdi3.o)
                                         0x38c (size before relaxing)
- .debug_str     0x000000000009ec19      0x38c /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_umoddi3.o)
- .debug_str     0x000000000009ec19       0x97 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clz.o)
+ .debug_str     0x000000000009ec24      0x38c /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_umoddi3.o)
+ .debug_str     0x000000000009ec24       0x97 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clz.o)
                                         0x2d3 (size before relaxing)
 
 .comment        0x0000000000000000       0x57
@@ -9187,11 +9468,11 @@ OUTPUT(out/ChipTest/Eflash_Loader/eflash_loader.elf elf32-littleriscv)
  .comment       0x0000000000000045       0x46 out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sf_cfg_ext.o
  .comment       0x0000000000000045       0x46 out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_device.o
  .comment       0x0000000000000045       0x46 out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_gpio.o
- .comment       0x0000000000000045       0x12 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/../../../../riscv64-unknown-elf/lib/rv32imafc/ilp32f/libc.a(lib_a-memmove-stub.o)
+ .comment       0x0000000000000045       0x12 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/../../../../riscv64-unknown-elf/lib/rv32imafc/ilp32f/libc.a(lib_a-memmove-stub.o)
                                          0x13 (size before relaxing)
- .comment       0x0000000000000057       0x46 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_udivdi3.o)
- .comment       0x0000000000000057       0x46 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_umoddi3.o)
- .comment       0x0000000000000057       0x46 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clz.o)
+ .comment       0x0000000000000057       0x46 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_udivdi3.o)
+ .comment       0x0000000000000057       0x46 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_umoddi3.o)
+ .comment       0x0000000000000057       0x46 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clz.o)
 
 .riscv.attributes
                 0x0000000000000000       0x34
@@ -9276,13 +9557,13 @@ OUTPUT(out/ChipTest/Eflash_Loader/eflash_loader.elf elf32-littleriscv)
  .riscv.attributes
                 0x000000000000075e       0x30 out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_gpio.o
  .riscv.attributes
-                0x000000000000078e       0x30 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/../../../../riscv64-unknown-elf/lib/rv32imafc/ilp32f/libc.a(lib_a-memmove-stub.o)
+                0x000000000000078e       0x30 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/../../../../riscv64-unknown-elf/lib/rv32imafc/ilp32f/libc.a(lib_a-memmove-stub.o)
  .riscv.attributes
-                0x00000000000007be       0x30 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_udivdi3.o)
+                0x00000000000007be       0x30 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_udivdi3.o)
  .riscv.attributes
-                0x00000000000007ee       0x30 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_umoddi3.o)
+                0x00000000000007ee       0x30 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_umoddi3.o)
  .riscv.attributes
-                0x000000000000081e       0x30 /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clz.o)
+                0x000000000000081e       0x30 /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clz.o)
 
 .debug_frame    0x0000000000000000     0x44ac
  .debug_frame   0x0000000000000000       0x40 out/ChipTest/Eflash_Loader/main.o
@@ -9386,11 +9667,13 @@ BFLB_Soft_CRC32                                   out/BSP_Driver/BL602_BSP_Drive
                                                   out/ChipTest/Eflash_Loader/bflb_eflash_loader_cmds.o
 BFLB_Soft_CRC32_Table                             out/BSP_Common/soft_crc/softcrc.o
 BL602_Delay_MS                                    out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_romapi.o
+                                                  out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
                                                   out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_l1c.o
                                                   out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_hbn.o
                                                   out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_glb.o
                                                   out/ChipTest/Eflash_Loader/bflb_eflash_loader_cmds.o
 BL602_Delay_US                                    out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_romapi.o
+                                                  out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
                                                   out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sflash_ext.o
                                                   out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_adc.o
                                                   out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_hbn.o
@@ -9776,6 +10059,7 @@ HBN_Trim_RC32K                                    out/BSP_Driver/BL602_BSP_Drive
 I2C_ClockSet                                      out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
 I2C_Disable                                       out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
 I2C_Enable                                        out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
+I2C_GetTimingPhase                                out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
 I2C_IRQHandler                                    out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
 I2C_IRQHandler_Wrapper                            out/startup/interrupt.o
 I2C_Init                                          out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
@@ -9789,6 +10073,7 @@ I2C_Reset                                         out/BSP_Driver/BL602_BSP_Drive
 I2C_SendWord                                      out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
 I2C_SetPrd                                        out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
 I2C_SetSclSync                                    out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
+I2C_SetTimingPhase                                out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
 I2C_TransferEndStatus                             out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_i2c.o
 IRRX_IRQHandler                                   out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_ir.o
 IRRX_IRQHandler_Wrapper                           out/startup/interrupt.o
@@ -10398,21 +10683,22 @@ __StackTop                                        out/startup/GCC/entry.o
 __Vectors                                         out/startup/interrupt.o
                                                   out/startup/GCC/entry.o
                                                   out/ChipTest/Eflash_Loader/main.o
-__adddf3                                          /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(adddf3.o)
+__adddf3                                          /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(adddf3.o)
+                                                  out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
                                                   out/BSP_Common/libc/atof.o
 __assert_func                                     out/BSP_Common/libc/common.o
 __bss_end__                                       out/startup/GCC/start_load.o
 __bss_start__                                     out/startup/GCC/start_load.o
-__clz_tab                                         /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clz.o)
-                                                  /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_umoddi3.o)
-                                                  /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_udivdi3.o)
-                                                  /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clzsi2.o)
-__clzsi2                                          /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clzsi2.o)
-                                                  /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatunsidf.o)
-                                                  /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatsidf.o)
-                                                  /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(muldf3.o)
-                                                  /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(divdf3.o)
-                                                  /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(adddf3.o)
+__clz_tab                                         /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clz.o)
+                                                  /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_umoddi3.o)
+                                                  /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_udivdi3.o)
+                                                  /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clzsi2.o)
+__clzsi2                                          /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_clzsi2.o)
+                                                  /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatunsidf.o)
+                                                  /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatsidf.o)
+                                                  /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(muldf3.o)
+                                                  /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(divdf3.o)
+                                                  /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(adddf3.o)
                                                   out/3rdParty/FreeRTOS/Source/tasks.o
 __ctypes                                          out/BSP_Common/libc/ctypes.o
                                                   out/BSP_Common/libc/ctype_isxdigit.o
@@ -10427,22 +10713,27 @@ __ctypes                                          out/BSP_Common/libc/ctypes.o
                                                   out/BSP_Common/libc/ctype_iscntrl.o
                                                   out/BSP_Common/libc/ctype_isalpha.o
                                                   out/BSP_Common/libc/ctype_isalnum.o
-__divdf3                                          /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(divdf3.o)
+__divdf3                                          /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(divdf3.o)
                                                   out/BSP_Common/libc/atof.o
                                                   out/ChipTest/Eflash_Loader/bflb_eflash_loader_uart.o
 __dtcm_load_addr                                  out/startup/GCC/start_load.o
-__fixunsdfsi                                      /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(fixunsdfsi.o)
+__fixdfsi                                         /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(fixdfsi.o)
+                                                  out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+__fixunsdfsi                                      /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(fixunsdfsi.o)
+                                                  out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
                                                   out/ChipTest/Eflash_Loader/bflb_eflash_loader_uart.o
-__floatsidf                                       /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatsidf.o)
+__floatsidf                                       /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatsidf.o)
                                                   out/BSP_Common/libc/atof.o
-__floatunsidf                                     /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatunsidf.o)
+__floatunsidf                                     /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(floatunsidf.o)
+                                                  out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
                                                   out/ChipTest/Eflash_Loader/bflb_eflash_loader_uart.o
 __freertos_irq_stack_top                          out/BSP_Common/FreeRTOS/port.o
 __global_pointer$                                 out/startup/GCC/entry.o
 __itcm_load_addr                                  out/startup/GCC/start_load.o
 __metal_after_main                                out/startup/GCC/entry.o
 __metal_chicken_bit                               out/startup/GCC/entry.o
-__muldf3                                          /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(muldf3.o)
+__muldf3                                          /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(muldf3.o)
+                                                  out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
                                                   out/BSP_Common/libc/atof.o
                                                   out/ChipTest/Eflash_Loader/bflb_eflash_loader_uart.o
 __ram_data_end__                                  out/startup/GCC/start_load.o
@@ -10464,10 +10755,10 @@ __tcm_code_end__                                  out/startup/GCC/start_load.o
 __tcm_code_start__                                out/startup/GCC/start_load.o
 __tcm_data_end__                                  out/startup/GCC/start_load.o
 __tcm_data_start__                                out/startup/GCC/start_load.o
-__udivdi3                                         /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_udivdi3.o)
+__udivdi3                                         /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_udivdi3.o)
                                                   out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_device.o
                                                   out/BSP_Common/libc/vsnprintf.o
-__umoddi3                                         /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_umoddi3.o)
+__umoddi3                                         /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/rv32imafc/ilp32f/libgcc.a(_umoddi3.o)
                                                   out/BSP_Common/libc/vsnprintf.o
 _enter                                            out/startup/GCC/entry.o
 atof                                              out/BSP_Common/libc/atof.o
@@ -10641,6 +10932,7 @@ bflb_platform_init_uart_debug_gpio                out/BSP_Driver/BL602_BSP_Drive
 bflb_platform_print_set                           out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_device.o
 bflb_platform_printc                              out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_device.o
 bflb_platform_printf                              out/BSP_Driver/BL602_BSP_Driver/platform_print/platform_device.o
+                                                  out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
                                                   out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_mfg_efuse.o
                                                   out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_l1c.o
                                                   out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_glb.o
@@ -10814,12 +11106,13 @@ memcpy                                            out/BSP_Common/libc/memcpy.o
                                                   out/ChipTest/Eflash_Loader/bflb_eflash_loader_cmds.o
 memmem                                            out/BSP_Common/libc/memmem.o
                                                   out/BSP_Common/libc/strstr.o
-memmove                                           /root/toolchain/Xuantie-900-gcc-elf-newlib-x86_64/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/../../../../riscv64-unknown-elf/lib/rv32imafc/ilp32f/libc.a(lib_a-memmove-stub.o)
+memmove                                           /home/pfchen/workspace/gcc_toolchain/t-head/linux/bin/../lib/gcc/riscv64-unknown-elf/10.2.0/../../../../riscv64-unknown-elf/lib/rv32imafc/ilp32f/libc.a(lib_a-memmove-stub.o)
                                                   out/BSP_Common/xz/xz_dec_lzma2.o
 memrchr                                           out/BSP_Common/libc/memrchr.o
 memset                                            out/BSP_Common/libc/memset.o
                                                   out/3rdParty/FreeRTOS/Source/stream_buffer.o
                                                   out/3rdParty/FreeRTOS/Source/tasks.o
+                                                  out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_calib_data.o
                                                   out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_sec_eng.o
                                                   out/startup/GCC/start_load.o
                                                   out/startup/system_bl602.o
@@ -10850,7 +11143,9 @@ mfg_efuse_write_pre                               out/BSP_Driver/BL602_BSP_Drive
 mfg_efuse_write_xtal_capcode                      out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_mfg_efuse.o
 mfg_efuse_write_xtal_capcode_pre                  out/BSP_Driver/BL602_BSP_Driver/StdDriver/bl602_mfg_efuse.o
 mrand48                                           out/BSP_Common/libc/mrand48.o
+notch_p                                           out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
 nrand48                                           out/BSP_Common/libc/nrand48.o
+opti_regs                                         out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
 otp_cfg                                           out/ChipTest/Eflash_Loader/main.o
                                                   out/ChipTest/Eflash_Loader/bflb_efuse.o
                                                   out/ChipTest/Eflash_Loader/bflb_eflash_loader_boot.o
@@ -10880,6 +11175,30 @@ qsort                                             out/BSP_Common/libc/qsort.o
 rand                                              out/BSP_Common/libc/lrand48.o
 random                                            out/BSP_Common/libc/lrand48.o
 realloc                                           out/BSP_Common/libc/stdlib.o
+rf_calib_data                                     out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_calib_data.o
+                                                  out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+rf_pri_chipv                                      out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+rf_pri_config_bandwidth                           out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+rf_pri_fcal                                       out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+rf_pri_full_cal                                   out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+rf_pri_get_txgain_index                           out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+rf_pri_get_txgain_max                             out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+rf_pri_get_txgain_min                             out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+rf_pri_get_vco_freq_cw                            out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+rf_pri_get_vco_idac_cw                            out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+rf_pri_init                                       out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+rf_pri_init_calib_mem                             out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_calib_data.o
+rf_pri_init_fast                                  out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+rf_pri_lo_acal                                    out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+rf_pri_notch_param                                out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+rf_pri_query_txgain_table                         out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+rf_pri_rccal                                      out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+rf_pri_restore_cal_reg                            out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+rf_pri_roscal                                     out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+rf_pri_txcal                                      out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+rf_pri_update_param                               out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+rf_pri_update_txgain_tempos                       out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
+rf_pri_xtalfreq                                   out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
 rx_buf_index                                      out/ChipTest/Eflash_Loader/main.o
                                                   out/ChipTest/Eflash_Loader/sdu.o
                                                   out/ChipTest/Eflash_Loader/bflb_eflash_loader_uart.o
@@ -10998,6 +11317,7 @@ tolower                                           out/BSP_Common/libc/ctype_tolo
 toupper                                           out/BSP_Common/libc/ctype_toupper.o
                                                   out/BSP_Common/libc/strncasecmp.o
                                                   out/BSP_Common/libc/strcasecmp.o
+tp_index                                          out/BSP_Driver/BL602_BSP_Driver/RFDriver/bl602_rf_private.o
 ucQueueGetQueueType                               out/3rdParty/FreeRTOS/Source/queue.o
 ucStreamBufferGetStreamBufferType                 out/3rdParty/FreeRTOS/Source/stream_buffer.o
 ulTaskNotifyTake                                  out/3rdParty/FreeRTOS/Source/tasks.o

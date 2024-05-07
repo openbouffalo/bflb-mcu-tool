@@ -6,46 +6,46 @@ import sys
 try:
     from version import VERSION
 except ImportError:
-    VERSION = "1.8.7"
-    
+    VERSION = "1.8.9"
+
 try:
     from midea import ENABLE_MIDEA
 except ImportError:
-    ENABLE_MIDEA = False    
+    ENABLE_MIDEA = False
 if ENABLE_MIDEA:
     VERSION = VERSION + " for Midea"
 
 try:
     from aithinker import ENABLE_AITHINKER
 except ImportError:
-    ENABLE_AITHINKER = False   
+    ENABLE_AITHINKER = False
 if ENABLE_AITHINKER:
     VERSION = VERSION + " for AiThinker"
-    
+
 try:
     from haier import ENABLE_HAIER
 except ImportError:
-    ENABLE_HAIER = False   
+    ENABLE_HAIER = False
 if ENABLE_HAIER:
     VERSION = VERSION + " for Haier"
-    
+
 try:
     from aqara import ENABLE_AQARA
 except ImportError:
-    ENABLE_AQARA = False   
+    ENABLE_AQARA = False
 if ENABLE_AQARA:
     VERSION = VERSION + " for Aqara"
 
 try:
     from logo import logo1
 except ImportError:
-    logo1 = None   
+    logo1 = None
 
 try:
     from debug import *
 except ImportError:
     NUM_ERROR_LOG = 5
-    
+
 chip_name = "tg7100c"
 obj_cklink = None
 
@@ -57,6 +57,7 @@ else:
 
 try:
     import changeconf as cgc
+
     conf_sign = True
 except ImportError:
     cgc = None
@@ -65,8 +66,8 @@ except ImportError:
 if not conf_sign:
     back_color = "#B3DCFB"
     list_chip = ["BL602/604", "BL702/704/706", "BL702L/704L", "BL808", "BL606P", "BL616/618"]
-    #list_chip = ["BL602/604", "BL702/704/706", "BL702L/704L", "BL808", "BL606P", "BL616/618", "BL628"]
-    #list_chip = ["WB03"]
+    # list_chip = ["BL602/604", "BL702/704/706", "BL702L/704L", "BL808", "BL606P", "BL616/618", "BL628"]
+    # list_chip = ["WB03"]
     if ENABLE_MIDEA:
         list_chip = ["BL602/604"]
     if ENABLE_AQARA:
@@ -111,7 +112,7 @@ if not conf_sign:
         "bl628": "bl628",
         "wb03": "wb03",
     }
-    bl_factory_params_file_prefix = 'bl_factory_params_'
+    bl_factory_params_file_prefix = "bl_factory_params_"
 else:
     dict_chip = cgc.dict_chip
     dict_chip_cmd = cgc.dict_chip_cmd
@@ -123,9 +124,9 @@ else:
 
 def read_version_file(file_path):
     version_dict = {}
-    with open(file_path, 'r', encoding='utf-8') as fp:
+    with open(file_path, "r", encoding="utf-8") as fp:
         for line in fp.readlines():
-            line_list = line.strip().split('=')
+            line_list = line.strip().split("=")
             version_dict[line_list[0].strip()] = line_list[1].strip()
     return version_dict
 
@@ -145,141 +146,181 @@ boot_src = {}
 cpu_type = {}
 
 # BL60X
-xtal_type['bl60x'] = ["None", "32M", "38.4M", "40M", "26M", "52M"]
-xtal_type_['bl60x'] = ["XTAL_" + item for item in xtal_type['bl60x']]
-pll_clk['bl60x'] = ["160M", "Manual"]
-encrypt_type['bl60x'] = ["None", "AES128", "AES256", "AES192"]
-key_sel['bl60x'] = ["0", "1", "2", "3"]
-sign_type['bl60x'] = ["None", "ECC"]
-cache_way_disable['bl60x'] = ["None", "OneWay", "TwoWay", "ThreeWay", "FourWay"]
-flash_clk_type['bl60x'] = ["XTAL", "Manual"]
-crc_ignore['bl60x'] = ["False", "True"]
-hash_ignore['bl60x'] = ["False", "True"]
-img_type['bl60x'] = ["CPU0", "CPU1", "SingleCPU", "BLSP_Boot2", "RAW"]
-boot_src['bl60x'] = ["Flash", "UART/SDIO"]
-cpu_type['bl60x'] = ["CPU0", "CPU1"]
+xtal_type["bl60x"] = ["None", "32M", "38.4M", "40M", "26M", "52M"]
+xtal_type_["bl60x"] = ["XTAL_" + item for item in xtal_type["bl60x"]]
+pll_clk["bl60x"] = ["160M", "Manual"]
+encrypt_type["bl60x"] = ["None", "AES128", "AES256", "AES192"]
+key_sel["bl60x"] = ["0", "1", "2", "3"]
+sign_type["bl60x"] = ["None", "ECC"]
+cache_way_disable["bl60x"] = ["None", "OneWay", "TwoWay", "ThreeWay", "FourWay"]
+flash_clk_type["bl60x"] = ["XTAL", "Manual"]
+crc_ignore["bl60x"] = ["False", "True"]
+hash_ignore["bl60x"] = ["False", "True"]
+img_type["bl60x"] = ["CPU0", "CPU1", "SingleCPU", "BLSP_Boot2", "RAW"]
+boot_src["bl60x"] = ["Flash", "UART/SDIO"]
+cpu_type["bl60x"] = ["CPU0", "CPU1"]
 
 # BL602
-xtal_type['bl602'] = ["None", "24M", "32M", "38.4M", "40M", "26M", "RC32M"]
-xtal_type_['bl602'] = ["XTAL_" + item for item in xtal_type['bl602']]
-pll_clk['bl602'] = ["160M", "Manual"]
-encrypt_type['bl602'] = ["None", "AES128", "AES256", "AES192"]
-#key_sel['bl602'] = ["0", "1", "2", "3"]
-key_sel['bl602'] = ["0"]
-sign_type['bl602'] = ["None", "ECC"]
-cache_way_disable['bl602'] = ["None", "OneWay", "TwoWay", "ThreeWay", "FourWay"]
-flash_clk_type['bl602'] = ["XTAL", "Manual"]
-crc_ignore['bl602'] = ["False", "True"]
-hash_ignore['bl602'] = ["False", "True"]
-img_type['bl602'] = ["SingleCPU", "RAW"]
-boot_src['bl602'] = ["Flash", "UART/SDIO"]
+xtal_type["bl602"] = ["None", "24M", "32M", "38.4M", "40M", "26M", "RC32M"]
+xtal_type_["bl602"] = ["XTAL_" + item for item in xtal_type["bl602"]]
+pll_clk["bl602"] = ["160M", "Manual"]
+encrypt_type["bl602"] = ["None", "AES128", "AES256", "AES192"]
+# key_sel['bl602'] = ["0", "1", "2", "3"]
+key_sel["bl602"] = ["0"]
+sign_type["bl602"] = ["None", "ECC"]
+cache_way_disable["bl602"] = ["None", "OneWay", "TwoWay", "ThreeWay", "FourWay"]
+flash_clk_type["bl602"] = ["XTAL", "Manual"]
+crc_ignore["bl602"] = ["False", "True"]
+hash_ignore["bl602"] = ["False", "True"]
+img_type["bl602"] = ["SingleCPU", "RAW"]
+boot_src["bl602"] = ["Flash", "UART/SDIO"]
 
 # BL702
-xtal_type['bl702'] = ["None", "32M", "RC32M"]
-xtal_type_['bl702'] = ["XTAL_" + item for item in xtal_type['bl702']]
-pll_clk['bl702'] = ["144M", "Manual"]
-encrypt_type['bl702'] = ["None", "AES128", "AES256", "AES192"]
-#key_sel['bl702'] = ["0", "1", "2", "3"]
-key_sel['bl702'] = ["1"]
-sign_type['bl702'] = ["None", "ECC"]
-cache_way_disable['bl702'] = ["None", "OneWay", "TwoWay", "ThreeWay", "FourWay"]
-flash_clk_type['bl702'] = ["XCLK", "Manual"]
-crc_ignore['bl702'] = ["False", "True"]
-hash_ignore['bl702'] = ["False", "True"]
-img_type['bl702'] = ["SingleCPU", "RAW"]
-boot_src['bl702'] = ["Flash", "UART/USB"]
+xtal_type["bl702"] = ["None", "32M", "RC32M"]
+xtal_type_["bl702"] = ["XTAL_" + item for item in xtal_type["bl702"]]
+pll_clk["bl702"] = ["144M", "Manual"]
+encrypt_type["bl702"] = ["None", "AES128", "AES256", "AES192"]
+# key_sel['bl702'] = ["0", "1", "2", "3"]
+key_sel["bl702"] = ["1"]
+sign_type["bl702"] = ["None", "ECC"]
+cache_way_disable["bl702"] = ["None", "OneWay", "TwoWay", "ThreeWay", "FourWay"]
+flash_clk_type["bl702"] = ["XCLK", "Manual"]
+crc_ignore["bl702"] = ["False", "True"]
+hash_ignore["bl702"] = ["False", "True"]
+img_type["bl702"] = ["SingleCPU", "RAW"]
+boot_src["bl702"] = ["Flash", "UART/USB"]
 
 # BL702L
-xtal_type['bl702l'] = ["None", "32M", "RC32M"]
-xtal_type_['bl702l'] = ["XTAL_" + item for item in xtal_type['bl702l']]
-pll_clk['bl702l'] = ["128M", "Manual"]
-encrypt_type['bl702l'] = ["None", "AES128", "AES256", "AES192"]
-#key_sel['bl702l'] = ["0", "1", "2", "3"]
-key_sel['bl702l'] = ["1"]
-sign_type['bl702l'] = ["None", "ECC"]
-cache_way_disable['bl702l'] = ["None", "OneWay", "TwoWay", "ThreeWay", "FourWay"]
-flash_clk_type['bl702l'] = ["XCLK", "Manual"]
-crc_ignore['bl702l'] = ["False", "True"]
-hash_ignore['bl702l'] = ["False", "True"]
-img_type['bl702l'] = ["SingleCPU", "RAW"]
-boot_src['bl702l'] = ["Flash", "UART/USB"]
+xtal_type["bl702l"] = ["None", "32M", "RC32M"]
+xtal_type_["bl702l"] = ["XTAL_" + item for item in xtal_type["bl702l"]]
+pll_clk["bl702l"] = ["128M", "Manual"]
+encrypt_type["bl702l"] = ["None", "AES128", "AES256", "AES192"]
+# key_sel['bl702l'] = ["0", "1", "2", "3"]
+key_sel["bl702l"] = ["1"]
+sign_type["bl702l"] = ["None", "ECC"]
+cache_way_disable["bl702l"] = ["None", "OneWay", "TwoWay", "ThreeWay", "FourWay"]
+flash_clk_type["bl702l"] = ["XCLK", "Manual"]
+crc_ignore["bl702l"] = ["False", "True"]
+hash_ignore["bl702l"] = ["False", "True"]
+img_type["bl702l"] = ["SingleCPU", "RAW"]
+boot_src["bl702l"] = ["Flash", "UART/USB"]
 
 # BL808
-xtal_type['bl808'] = ["None", "24M", "32M", "38.4M", "40M", "26M", "RC32M", "Auto"]
-xtal_type_['bl808'] = ["XTAL_" + item for item in xtal_type['bl808']]
-pll_clk['bl808'] = ["WIFIPLL 320M", "Manual"]
-encrypt_type['bl808'] = ["None", "AES CTR128", "AES CTR256", "AES CTR192", "AES XTS128", "AES XTS256", "AES XTS192"]
-key_sel['bl808'] = ["0", "1", "2", "3"]
-sign_type['bl808'] = ["None", "ECC"]
-cache_way_disable['bl808'] = ["None", "OneWay", "TwoWay", "ThreeWay", "FourWay"]
-flash_clk_type['bl808'] = ["XTAL", "Manual"]
-crc_ignore['bl808'] = ["False", "True"]
-hash_ignore['bl808'] = ["False", "True"]
-img_type['bl808'] = ["SingleCPU", "RAW"]
-boot_src['bl808'] = ["Flash", "UART/USB"]
-cpu_type['bl808'] = ["Group0", "Group1"]
+xtal_type["bl808"] = ["None", "24M", "32M", "38.4M", "40M", "26M", "RC32M", "Auto"]
+xtal_type_["bl808"] = ["XTAL_" + item for item in xtal_type["bl808"]]
+pll_clk["bl808"] = ["WIFIPLL 320M", "Manual"]
+encrypt_type["bl808"] = [
+    "None",
+    "AES CTR128",
+    "AES CTR256",
+    "AES CTR192",
+    "AES XTS128",
+    "AES XTS256",
+    "AES XTS192",
+]
+key_sel["bl808"] = ["0", "1", "2", "3"]
+sign_type["bl808"] = ["None", "ECC"]
+cache_way_disable["bl808"] = ["None", "OneWay", "TwoWay", "ThreeWay", "FourWay"]
+flash_clk_type["bl808"] = ["XTAL", "Manual"]
+crc_ignore["bl808"] = ["False", "True"]
+hash_ignore["bl808"] = ["False", "True"]
+img_type["bl808"] = ["SingleCPU", "RAW"]
+boot_src["bl808"] = ["Flash", "UART/USB"]
+cpu_type["bl808"] = ["Group0", "Group1"]
 
 # BL606P
-xtal_type['bl606p'] = ["None", "24M", "32M", "38.4M", "40M", "26M", "RC32M", "Auto"]
-xtal_type_['bl606p'] = ["XTAL_" + item for item in xtal_type['bl808']]
-pll_clk['bl606p'] = ["WIFIPLL 320M", "Manual"]
-encrypt_type['bl606p'] = ["None", "AES CTR128", "AES CTR256", "AES CTR192", "AES XTS128", "AES XTS256", "AES XTS192"]
-key_sel['bl606p'] = ["0", "1", "2", "3"]
-sign_type['bl606p'] = ["None", "ECC"]
-cache_way_disable['bl606p'] = ["None", "OneWay", "TwoWay", "ThreeWay", "FourWay"]
-flash_clk_type['bl606p'] = ["XTAL", "Manual"]
-crc_ignore['bl606p'] = ["False", "True"]
-hash_ignore['bl606p'] = ["False", "True"]
-img_type['bl606p'] = ["SingleCPU", "RAW"]
-boot_src['bl606p'] = ["Flash", "UART/USB"]
-cpu_type['bl606p'] = ["Group0", "Group1"]
+xtal_type["bl606p"] = ["None", "24M", "32M", "38.4M", "40M", "26M", "RC32M", "Auto"]
+xtal_type_["bl606p"] = ["XTAL_" + item for item in xtal_type["bl808"]]
+pll_clk["bl606p"] = ["WIFIPLL 320M", "Manual"]
+encrypt_type["bl606p"] = [
+    "None",
+    "AES CTR128",
+    "AES CTR256",
+    "AES CTR192",
+    "AES XTS128",
+    "AES XTS256",
+    "AES XTS192",
+]
+key_sel["bl606p"] = ["0", "1", "2", "3"]
+sign_type["bl606p"] = ["None", "ECC"]
+cache_way_disable["bl606p"] = ["None", "OneWay", "TwoWay", "ThreeWay", "FourWay"]
+flash_clk_type["bl606p"] = ["XTAL", "Manual"]
+crc_ignore["bl606p"] = ["False", "True"]
+hash_ignore["bl606p"] = ["False", "True"]
+img_type["bl606p"] = ["SingleCPU", "RAW"]
+boot_src["bl606p"] = ["Flash", "UART/USB"]
+cpu_type["bl606p"] = ["Group0", "Group1"]
 
 # BL616
-xtal_type['bl616'] = ["None", "24M", "32M", "38.4M", "40M", "26M", "RC32M", "Auto"]
-xtal_type_['bl616'] = ["XTAL_" + item for item in xtal_type['bl616']]
-pll_clk['bl616'] = ["WIFIPLL 320M", "Manual"]
-encrypt_type['bl616'] = ["None", "AES CTR128", "AES CTR256", "AES CTR192", "AES XTS128", "AES XTS256", "AES XTS192"]
-key_sel['bl616'] = ["0", "1", "2", "3"]
-sign_type['bl616'] = ["None", "ECC"]
-cache_way_disable['bl616'] = ["None", "OneWay", "TwoWay", "ThreeWay", "FourWay"]
-flash_clk_type['bl616'] = ["XTAL", "Manual"]
-crc_ignore['bl616'] = ["False", "True"]
-hash_ignore['bl616'] = ["False", "True"]
-img_type['bl616'] = ["SingleCPU", "RAW"]
-boot_src['bl616'] = ["Flash", "UART/USB"]
+xtal_type["bl616"] = ["None", "24M", "32M", "38.4M", "40M", "26M", "RC32M", "Auto"]
+xtal_type_["bl616"] = ["XTAL_" + item for item in xtal_type["bl616"]]
+pll_clk["bl616"] = ["WIFIPLL 320M", "Manual"]
+encrypt_type["bl616"] = [
+    "None",
+    "AES CTR128",
+    "AES CTR256",
+    "AES CTR192",
+    "AES XTS128",
+    "AES XTS256",
+    "AES XTS192",
+]
+key_sel["bl616"] = ["0", "1", "2", "3"]
+sign_type["bl616"] = ["None", "ECC"]
+cache_way_disable["bl616"] = ["None", "OneWay", "TwoWay", "ThreeWay", "FourWay"]
+flash_clk_type["bl616"] = ["XTAL", "Manual"]
+crc_ignore["bl616"] = ["False", "True"]
+hash_ignore["bl616"] = ["False", "True"]
+img_type["bl616"] = ["SingleCPU", "RAW"]
+boot_src["bl616"] = ["Flash", "UART/USB"]
 
 # BL628
-xtal_type['bl628'] = ["None", "24M", "32M", "38.4M", "40M", "26M", "RC32M", "Auto"]
-xtal_type_['bl628'] = ["XTAL_" + item for item in xtal_type['bl628']]
-pll_clk['bl628'] = ["WIFIPLL 320M", "Manual"]
-encrypt_type['bl628'] = ["None", "AES CTR128", "AES CTR256", "AES CTR192", "AES XTS128", "AES XTS256", "AES XTS192"]
-key_sel['bl628'] = ["0", "1", "2", "3"]
-sign_type['bl628'] = ["None", "ECC"]
-cache_way_disable['bl628'] = ["None", "OneWay", "TwoWay", "ThreeWay", "FourWay"]
-flash_clk_type['bl628'] = ["XTAL", "Manual"]
-crc_ignore['bl628'] = ["False", "True"]
-hash_ignore['bl628'] = ["False", "True"]
-img_type['bl628'] = ["SingleCPU", "RAW"]
-boot_src['bl628'] = ["Flash", "UART/USB"]
-cpu_type['bl628'] = ["Group0", "Group1"]
+xtal_type["bl628"] = ["None", "24M", "32M", "38.4M", "40M", "26M", "RC32M", "Auto"]
+xtal_type_["bl628"] = ["XTAL_" + item for item in xtal_type["bl628"]]
+pll_clk["bl628"] = ["WIFIPLL 320M", "Manual"]
+encrypt_type["bl628"] = [
+    "None",
+    "AES CTR128",
+    "AES CTR256",
+    "AES CTR192",
+    "AES XTS128",
+    "AES XTS256",
+    "AES XTS192",
+]
+key_sel["bl628"] = ["0", "1", "2", "3"]
+sign_type["bl628"] = ["None", "ECC"]
+cache_way_disable["bl628"] = ["None", "OneWay", "TwoWay", "ThreeWay", "FourWay"]
+flash_clk_type["bl628"] = ["XTAL", "Manual"]
+crc_ignore["bl628"] = ["False", "True"]
+hash_ignore["bl628"] = ["False", "True"]
+img_type["bl628"] = ["SingleCPU", "RAW"]
+boot_src["bl628"] = ["Flash", "UART/USB"]
+cpu_type["bl628"] = ["Group0", "Group1"]
 
 # WB03
-xtal_type['wb03'] = ["None", "24M", "32M", "38.4M", "40M", "26M", "RC32M", "Auto"]
-xtal_type_['wb03'] = ["XTAL_" + item for item in xtal_type['wb03']]
-pll_clk['wb03'] = ["WIFIPLL 320M", "Manual"]
-encrypt_type['wb03'] = ["None", "AES CTR128", "AES CTR256", "AES CTR192", "AES XTS128", "AES XTS256", "AES XTS192"]
-key_sel['wb03'] = ["0", "1", "2", "3"]
-sign_type['wb03'] = ["None", "ECC"]
-cache_way_disable['wb03'] = ["None", "OneWay", "TwoWay", "ThreeWay", "FourWay"]
-flash_clk_type['wb03'] = ["XTAL", "Manual"]
-crc_ignore['wb03'] = ["False", "True"]
-hash_ignore['wb03'] = ["False", "True"]
-img_type['wb03'] = ["SingleCPU", "RAW"]
-boot_src['wb03'] = ["Flash", "UART/USB"]
+xtal_type["wb03"] = ["None", "24M", "32M", "38.4M", "40M", "26M", "RC32M", "Auto"]
+xtal_type_["wb03"] = ["XTAL_" + item for item in xtal_type["wb03"]]
+pll_clk["wb03"] = ["WIFIPLL 320M", "Manual"]
+encrypt_type["wb03"] = [
+    "None",
+    "AES CTR128",
+    "AES CTR256",
+    "AES CTR192",
+    "AES XTS128",
+    "AES XTS256",
+    "AES XTS192",
+]
+key_sel["wb03"] = ["0", "1", "2", "3"]
+sign_type["wb03"] = ["None", "ECC"]
+cache_way_disable["wb03"] = ["None", "OneWay", "TwoWay", "ThreeWay", "FourWay"]
+flash_clk_type["wb03"] = ["XTAL", "Manual"]
+crc_ignore["wb03"] = ["False", "True"]
+hash_ignore["wb03"] = ["False", "True"]
+img_type["wb03"] = ["SingleCPU", "RAW"]
+boot_src["wb03"] = ["Flash", "UART/USB"]
 
 try:
     if not logo1:
-        logo1 = '''iVBORw0KGgoAAAANSUhEUgAAANoAAADaCAYAAADAHVzbAAAACXBIWXMAAAsTAAALEwEAmpwYAAABNmlD
+        logo1 = """iVBORw0KGgoAAAANSUhEUgAAANoAAADaCAYAAADAHVzbAAAACXBIWXMAAAsTAAALEwEAmpwYAAABNmlD
                 Q1BQaG90b3Nob3AgSUNDIHByb2ZpbGUAAHjarY6xSsNQFEDPi6LiUCsEcXB4kygotupgxqQtRRCs1SHJ
                 1qShSmkSXl7VfoSjWwcXd7/AyVFwUPwC/0Bx6uAQIYODCJ7p3MPlcsGo2HWnYZRhEGvVbjrS9Xw5+8QM
                 UwDQCbPUbrUOAOIkjvjB5ysC4HnTrjsN/sZ8mCoNTIDtbpSFICpA/0KnGsQYMIN+qkHcAaY6addAPACl
@@ -437,8 +478,8 @@ try:
                 wWAwohkMRjSDwYhmMBiMaAaDEc1gMBjRDAYjmsFgRDMYDEY0g8GIZjAY0QwGgxHNYDCiGQwGI5rBYEQz
                 GIxoBoPBiGYwGNEMBoMRzWAwohkMRjSDwWBEMxiMaAaDEc1gMBjRDAYjmsFgMKIZDEY0g8GIZjAYjGgG
                 gxHNYDAY0QwGI5rBYEQzGAxGNIPBiGYwGNEMBoMRzWAwohkMBiOawWBEMxiMaAaDwYhmMBjRDAbDKfz/
-                AQADByJ1+Dnq3AAAAABJRU5ErkJggg=='''
-    logo2 = '''AAABAAEAICAAAAEAGADYAQAAFgAAAIlQTkcNChoKAAAADUlIRFIAAAAgAAAAIAgGAAAAc3p69AAAA
+                AQADByJ1+Dnq3AAAAABJRU5ErkJggg=="""
+    logo2 = """AAABAAEAICAAAAEAGADYAQAAFgAAAIlQTkcNChoKAAAADUlIRFIAAAAgAAAAIAgGAAAAc3p69AAAA
             AFzUkdCAK7OHOkAAAAEZ0FNQQAAsY8L/GEFAAAACXBIWXMAAA7DAAAOwwHHb6hkAAABbUlEQVRYR2NgG
             AWjITAaAqMhMBoCJIaATusecaOWff+xYcOmvVdDV61iJtFIBgawYU17o/BpNGg94IrLYqyOaTxgic88n
             Ya9tUYte/+C1Ri07s0EGaLftK8cXZNR814nUixGV2tYv98Ew8yWvStA6nTbdyvB5Qxb9s2ixCKS9Tbvi
@@ -446,20 +487,27 @@ try:
             u//z0KWZdg0IVto2LL3OUgNkH4EEjds3teGrGf+kQcHYJimDsBmePeO6996dt38D8N0dwDVLMTMOojCB
             xYF1Wsv/8eHq9ZehuRzagBsaSBtwemnaQvPvMeHQ1ddYaOG/ZDSEophIUAVg4k1hBQHBE099h+GAycfe
             UCsHXjVoTngKzDr9ROD9Vv2SFPdAaSUlFSxHGQIKZbC1FLNcrADmveeJwE7UdXyUcNGQ4CWIQAAiakrc
-            tfuVAEAAAAASUVORK5CYII='''
+            tfuVAEAAAAASUVORK5CYII="""
 except Exception:
     logo1 = ""
     logo2 = ""
 
 if conf_sign:
-    about_tool = '''
+    about_tool = (
+        '''
             <html><body>
-            <table bgcolor="''' + back_color + '''" width="100%" cellspacing="2" cellpadding="1" border="0">
+            <table bgcolor="'''
+        + back_color
+        + """" width="100%" cellspacing="2" cellpadding="1" border="0">
             <tr>
             <td align="center"><font face="微软雅黑" color=\"grey\"><h2>{}</h2></font></td>
             </tr>
             <tr>
-            <td align="center"><font face="微软雅黑" color=\"grey\" size=2>version: '''.format(cgc.title) + VERSION + '''</font></td>
+            <td align="center"><font face="微软雅黑" color=\"grey\" size=2>version: """.format(
+            cgc.title
+        )
+        + VERSION
+        + """</font></td>
             </tr>
             </table>
             <br><br><br>
@@ -476,17 +524,23 @@ if conf_sign:
             </ul>
             </font>
             </body></html>
-    '''
+    """
+    )
 else:
-    about_tool = '''\
+    about_tool = (
+        '''\
                 <html><body>
-                <table bgcolor="''' + back_color + '''" width="100%" cellspacing="2"
+                <table bgcolor="'''
+        + back_color
+        + """" width="100%" cellspacing="2"
                 cellpadding="1" border="0">
                 <tr>
                 <td align="center"><font face="微软雅黑" color=\"grey\"><h2>Bouffalo Lab Dev Cube</h2></font></td>
                 </tr>
                 <tr>
-                <td align="center"><font face="微软雅黑" color=\"grey\" size=2>version: ''' + VERSION + '''</font></td>
+                <td align="center"><font face="微软雅黑" color=\"grey\" size=2>version: """
+        + VERSION
+        + """</font></td>
                 </tr>
                 <tr>
                 <td align="center"><font face="微软雅黑" color=\"grey\" size=2>jxtan@bouffalolab.com</font></td>
@@ -505,7 +559,8 @@ else:
                 </ul>
                 </font>   
                 </body></html>
-    '''
+    """
+    )
 
 DEFAULT_STYLE = """
 QProgressBar{
@@ -562,4 +617,3 @@ QProgressBar::chunk {
     margin: 0.1px;
 }
 """
-

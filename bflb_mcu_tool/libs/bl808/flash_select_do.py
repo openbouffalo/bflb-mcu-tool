@@ -15,13 +15,13 @@ def get_suitable_file_name(cfg_dir, flash_id):
     conf_files = []
     for home, dirs, files in os.walk(cfg_dir):
         for filename in files:
-            if filename.split('_')[-1] == flash_id + '.conf':
+            if filename.split("_")[-1] == flash_id + ".conf":
                 conf_files.append(filename)
 
     if len(conf_files) > 1:
         bflb_utils.printf("Flash id duplicate and alternative is:")
         for i in range(len(conf_files)):
-            tmp = conf_files[i].split('.')[0]
+            tmp = conf_files[i].split(".")[0]
             bflb_utils.printf("%d:%s" % (i + 1, tmp))
         return conf_files[i]
     elif len(conf_files) == 1:
@@ -32,14 +32,14 @@ def get_suitable_file_name(cfg_dir, flash_id):
 
 def update_flash_cfg_do(chipname, chiptype, flash_id, file=None, create=False, section=None):
     if conf_sign:
-        cfg_dir = app_path + "/utils/flash/" + chipname + '/'
+        cfg_dir = app_path + "/utils/flash/" + chipname + "/"
     else:
-        cfg_dir = app_path + "/utils/flash/" + gol.flash_dict[chipname] + '/'
+        cfg_dir = app_path + "/utils/flash/" + gol.flash_dict[chipname] + "/"
     conf_name = get_suitable_file_name(cfg_dir, flash_id)
     value_key = []
     if os.path.isfile(cfg_dir + conf_name) is False:
         return False
-    fp = open(cfg_dir + conf_name, 'r')
+    fp = open(cfg_dir + conf_name, "r")
     for line in fp.readlines():
         value = line.split("=")[0].strip()
         if value == "[FLASH_CFG]":
@@ -62,7 +62,7 @@ def update_flash_cfg_do(chipname, chiptype, flash_id, file=None, create=False, s
 
 def get_supported_flash_do():
     flash_type = []
-    #for itr in flashList:
+    # for itr in flashList:
     #    flash_type.append(itr["name"])
     return flash_type
 
@@ -70,7 +70,7 @@ def get_supported_flash_do():
 def get_int_mask(pos, length):
     ones = "1" * 32
     zeros = "0" * 32
-    mask = ones[0:32 - pos - length] + zeros[0:length] + ones[0:pos]
+    mask = ones[0 : 32 - pos - length] + zeros[0:length] + ones[0:pos]
     return int(mask, 2)
 
 
@@ -96,10 +96,12 @@ def create_flashcfg_data_from_cfg(cfg_len, cfgfile):
         pos = int(flash_cfg_keys.get(key)["pos"], 10)
         bitlen = int(flash_cfg_keys.get(key)["bitlen"], 10)
 
-        oldval = bflb_utils.bytearray_to_int(bflb_utils.bytearray_reverse(data[offset:offset + 4]))
+        oldval = bflb_utils.bytearray_to_int(
+            bflb_utils.bytearray_reverse(data[offset : offset + 4])
+        )
         newval = (oldval & get_int_mask(pos, bitlen)) + (val << pos)
         # bflb_utils.printf(newval,binascii.hexlify(bflb_utils.int_to_4bytearray_l(newval)))
-        data[offset:offset + 4] = bflb_utils.int_to_4bytearray_l(newval)
+        data[offset : offset + 4] = bflb_utils.int_to_4bytearray_l(newval)
     crcarray = bflb_utils.get_crc32_bytearray(data)
     data = bflb_utils.int_to_4bytearray_l(0x47464346) + data + crcarray
     return data
@@ -120,10 +122,10 @@ def create_flashcfg_table(start_addr):
         cnt = 0
         for row in reader:
             row_dict = {}
-            row_dict['jid'] = row.get("flashJedecID", "")
-            row_dict['cfgfile'] = row.get("configFile", "")
-            if row_dict['cfgfile'] not in cfgfile_list:
-                cfgfile_list.append(row_dict['cfgfile'])
+            row_dict["jid"] = row.get("flashJedecID", "")
+            row_dict["cfgfile"] = row.get("configFile", "")
+            if row_dict["cfgfile"] not in cfgfile_list:
+                cfgfile_list.append(row_dict["cfgfile"])
             table_list.append(row_dict)
             cnt += 1
         table_list_len = 4 + cnt * 8 + 4
@@ -135,11 +137,11 @@ def create_flashcfg_table(start_addr):
             data = create_flashcfg_data_from_cfg(single_flashcfg_len - 8, cfgfile)
             flash_table_data += data
         for dict in table_list:
-            flash_table_list += bflb_utils.int_to_4bytearray_b(int(dict['jid'] + '00', 16))
+            flash_table_list += bflb_utils.int_to_4bytearray_b(int(dict["jid"] + "00", 16))
             i = 0
             offset = 0
             for cfgfile in cfgfile_list:
-                if cfgfile == dict['cfgfile']:
+                if cfgfile == dict["cfgfile"]:
                     offset = start_addr + table_list_len + single_flashcfg_len * i
                     break
                 i += 1
