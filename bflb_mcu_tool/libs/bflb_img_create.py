@@ -52,6 +52,9 @@ def check_pt_file(file, addr):
     if len(file) > 0:
         i = 0
         L = []
+        if len(file) > len(addr):
+            bflb_utils.printf("error: tool path contains spaces!")
+            return False
         while i < len(file):
             L.append([convert_path(file[i]), int(addr[i], 16)])
             i += 1
@@ -156,28 +159,29 @@ def compress_dir_iot(chipname, outdir, efuse_load=False):
         i = 0
         try:
             while i < len(flash_file):
-                filedir = convert_path(flash_file[i])
-                filename = os.path.basename(filedir)
-                suffix = filedir.split(".")[-1]
-                if suffix == "bin" and filename not in [
-                    "partition.bin",
-                    "efusedata.bin",
-                    "efusedata_mask.bin",
-                ]:
-                    dir = os.path.join(outdir, chipname, "img_create_iot", filename)
-                else:
-                    relpath = os.path.relpath(
-                        os.path.join(app_path, convert_path(flash_file[i])), chip_path
-                    )
-                    dir = os.path.join(outdir, relpath)
-                if os.path.isdir(os.path.dirname(dir)) is False:
-                    os.makedirs(os.path.dirname(dir))
-                shutil.copyfile(os.path.join(app_path, convert_path(flash_file[i])), dir)
-                if filename in ["efusedata.bin", "efusedata_mask.bin"]:
-                    shutil.copyfile(
-                        os.path.join(app_path, convert_path(flash_file[i])),
-                        os.path.join(outdir, filename),
-                    )
+                if os.path.exists(flash_file[i]):
+                    filedir = convert_path(flash_file[i])
+                    filename = os.path.basename(filedir)
+                    suffix = filedir.split(".")[-1]
+                    if suffix == "bin" and filename not in [
+                        "partition.bin",
+                        "efusedata.bin",
+                        "efusedata_mask.bin",
+                    ]:
+                        dir = os.path.join(outdir, chipname, "img_create_iot", filename)
+                    else:
+                        relpath = os.path.relpath(
+                            os.path.join(app_path, convert_path(flash_file[i])), chip_path
+                        )
+                        dir = os.path.join(outdir, relpath)
+                    if os.path.isdir(os.path.dirname(dir)) is False:
+                        os.makedirs(os.path.dirname(dir))
+                    shutil.copyfile(os.path.join(app_path, convert_path(flash_file[i])), dir)
+                    if filename in ["efusedata.bin", "efusedata_mask.bin"]:
+                        shutil.copyfile(
+                            os.path.join(app_path, convert_path(flash_file[i])),
+                            os.path.join(outdir, filename),
+                        )
                 i += 1
             verfile = os.path.join(dir_path, "version.txt")
             with open(verfile, mode="w") as f:

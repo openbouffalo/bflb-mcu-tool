@@ -127,6 +127,12 @@ def eflash_loader_server(socket_server, port, echo, aes_key):
                         bflb_utils.printf(e)
 
             if recv_data.decode("utf-8", "ignore").startswith("stop"):
+                socket_server.sendto(
+                    bytearray.fromhex(binascii.hexlify(b"Stop success.").decode("utf-8")),
+                    recv_addr,
+                )
+                bflb_utils.printf("Stop server success.")
+                socket_server.close()
                 break
             eflash_loader_monitor_thread = threading.Thread(
                 target=eflash_loader_monitor, args=(recv_addr, recv_data)

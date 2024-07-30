@@ -36,6 +36,8 @@ from importlib import reload
 import portalocker
 import ecdsa
 from Crypto.Cipher import AES
+from Crypto.PublicKey import RSA
+from Crypto.Cipher import PKCS1_v1_5
 
 try:
     import bflb_path
@@ -91,6 +93,34 @@ except ImportError:
 
 FLASH_LOAD_SHAKE_HAND = "Flash load shake hand"
 FLASH_ERASE_SHAKE_HAND = "Flash erase shake hand"
+PRIVATE_KEY_RSA_HEX = """
+2d2d2d2d2d424547494e205253412050524956415445204b45592d2d2d2d2d0a4d49
+49435851494241414b426751436b62486e492f62337849384a4951665276434f6378
+5146346e6c3541395470326b396a6a6154622b7947412b572b6857790a6c6f516b35
+6f33543852574f796e4e30513562656f536a354e665430706e33574964643074792f
+7159652f42495a724966576e724c736251584974325a4c55680a6a354a38486b5955
+7247584c54497150774e6b4a65454863593235567a5336787764593036742f49376c
+44654b70676e46466469326b6d694b774944415141420a416f47414e744874397476
+57364e2b31786e617241787779544f4c376f584b7768696841656b41587133315270
+52544e6d645a4f78716a5662534972646c63430a6934576e59634f704f5266396537
+32494b73755a312f75586845734e7471384f43472b30562b4f4e63624a3967567854
+52673636343465343932577470676e470a7a484d656c486e35796e69686541667151
+574139463534747266364c53706b64344a6e584d5937335851767664723043515144
+434f474b352b5a3943662b62470a426e587877524a454d4d6d74334b764479794548
+555445494c3378676f554743535a644d75637375724a47736752492b735847776349
+6c434b3646596174696e0a574935474c5a4366416b4541324c6d344c3766444c4b42
+5a5776554f4c48576a5248795a67763943716f70673743745873656a33374f796e77
+506b2f624662530a732b4f317378486133377a4467623853366147576f35572b5a37
+78694543574739514a42414a2b7976587375526b586e35566e75396778544e544863
+362f694a0a2b724b4431435377486945633671694a37394f78727a626e6a7170534f
+3359637132506868426f5162737836453745674b6756775334786f36774543514466
+310a72474e563161562b4f64524d6c6a35516d626d6a5770674368526f33354e4c57
+566978763953524e37767261344d392b6b36557a564d564b4250506b623637650a77
+576c6c2b646c2f58737932546250526e4d6b435151434c517a704d4d7a485477376d
+626c376e497857786c6a39744c393433446158645731415956445542790a72313366
+777256646341546542343156617463396d4274584c543366376842484f7338773372
+4152513857590a2d2d2d2d2d454e44205253412050524956415445204b45592d2d2d
+2d2d"""
 
 try:
     from config import NUM_ERR
@@ -206,9 +236,9 @@ class BflbEflashLoader(object):
         self._macaddr_check = bytearray(0)
         self._macaddr_check_status = False
 
-    def set_config_file(self, bootheaderFile, imgCreateFile):
-        self._efuse_bootheader_file = bootheaderFile
-        self._img_create_file = imgCreateFile
+    def set_config_file(self, bootheader_file, img_create_file):
+        self._efuse_bootheader_file = bootheader_file
+        self._img_create_file = img_create_file
 
     def set_mass_opt_flag(self, flag):
         self._mass_opt = flag
@@ -769,9 +799,9 @@ class BflbEflashLoader(object):
 
     def efuse_read_mac_addr_process(self, shakehand=1, callback=None):
         readdata = bytearray(0)
-        macLen = 6
+        mac_length = 6
         if self._chip_type == "bl702" or self._chip_type == "bl702l":
-            macLen = 8
+            mac_length = 8
         # shake hand
         if shakehand != 0:
             bflb_utils.printf(FLASH_LOAD_SHAKE_HAND)
@@ -785,13 +815,13 @@ class BflbEflashLoader(object):
             return False, None
         # bflb_utils.printf(binascii.hexlify(data_read))
         readdata += data_read
-        crcarray = bflb_utils.get_crc32_bytearray(readdata[:macLen])
-        if crcarray != readdata[macLen : macLen + 4]:
+        crcarray = bflb_utils.get_crc32_bytearray(readdata[:mac_length])
+        if crcarray != readdata[mac_length : mac_length + 4]:
             bflb_utils.printf(binascii.hexlify(crcarray))
-            bflb_utils.printf(binascii.hexlify(readdata[macLen : macLen + 4]))
+            bflb_utils.printf(binascii.hexlify(readdata[mac_length : mac_length + 4]))
             self.error_code_print("0025")
             return False, None
-        return True, readdata[:macLen]
+        return True, readdata[:mac_length]
 
     def efuse_write_mac_addr_process(self, macaddr, shakehand=1, callback=None):
         # shake hand
@@ -855,7 +885,15 @@ class BflbEflashLoader(object):
                 bflb_utils.printf("Decrypt efuse data")
                 efuse_save_crc = efuse_data[0:4]
                 efuse_data = efuse_data[4096:]
-                security_key, security_iv = bflb_utils.get_security_key()
+                cfg_key = os.path.join(app_path, "cfg.bin")
+                #bflb_utils.printf(cfg_key)
+                if os.path.exists(cfg_key):
+                    res, security_key, security_iv = bflb_utils.get_aes_encrypted_security_key(cfg_key)
+                    if res is False:
+                        bflb_utils.printf("Get encrypted aes key and iv failed")
+                        return False
+                else:
+                    security_key, security_iv = bflb_utils.get_security_key()
                 efuse_data = bflb_utils.aes_decrypt_data(efuse_data, security_key, security_iv, 0)
                 efuse_crc = bflb_utils.get_crc32_bytearray(efuse_data)
                 if efuse_crc != efuse_save_crc:
@@ -876,78 +914,19 @@ class BflbEflashLoader(object):
             mask_data = self._efuse_mask_data
         if security_write and (self.get_ecdh_shared_key() is not True):
             return False
-        bflb_utils.printf("Load efuse 0")
-        # load normal data
         if security_write:
             cmd_name = "efuse_security_write"
         else:
             cmd_name = "efuse_write"
         cmd_id = bflb_utils.hexstr_to_bytearray(self._com_cmds.get(cmd_name)["cmd_id"])
-        data_send = efuse_data[0:124] + bytearray(4)
-        if security_write:
-            data_send = self.ecdh_encrypt_data(data_send)
-        data_send = bflb_utils.int_to_4bytearray_l(0) + data_send
-        ret, dmy = self.com_process_one_cmd(cmd_name, cmd_id, data_send)
-        if ret.startswith("OK") is False:
-            bflb_utils.printf("Write Fail")
-            self.error_code_print("0021")
-            return False
-        # verify
-        if verify >= 1:
-            ret, read_data = self.efuse_read_main_process(
-                0, 128, shakehand=0, file=None, security_read=security_write
-            )
-            if ret is True and self.efuse_compare(
-                read_data, mask_data[0:124] + bytearray(4), efuse_data[0:124] + bytearray(4)
-            ):
-                bflb_utils.printf("Verify success")
-            else:
-                bflb_utils.printf("Read: ")
-                bflb_utils.printf(binascii.hexlify(read_data[0:124]).decode("utf-8"))
-                bflb_utils.printf("Expected: ")
-                bflb_utils.printf(binascii.hexlify(efuse_data[0:124]).decode("utf-8"))
-                bflb_utils.printf("Verify fail")
-                self.error_code_print("0022")
-                return False
-        # load read write protect data
-        data_send = bytearray(12) + efuse_data[124:128]
-        if security_write:
-            data_send = self.ecdh_encrypt_data(data_send)
-        data_send = bflb_utils.int_to_4bytearray_l(124 - 12) + data_send
-        ret, dmy = self.com_process_one_cmd(cmd_name, cmd_id, data_send)
-        if ret.startswith("OK") is False:
-            bflb_utils.printf("Write Fail")
-            self.error_code_print("0021")
-            return False
-        # verify
-        if verify >= 1:
-            ret, read_data = self.efuse_read_main_process(
-                124 - 12, 16, shakehand=0, file=None, security_read=security_write
-            )
-            if ret is True and self.efuse_compare(
-                read_data, bytearray(12) + mask_data[124:128], bytearray(12) + efuse_data[124:128]
-            ):
-                bflb_utils.printf("Verify success")
-            else:
-                bflb_utils.printf("Read: ")
-                bflb_utils.printf(binascii.hexlify(read_data[12:16]))
-                bflb_utils.printf("Expected: ")
-                bflb_utils.printf(binascii.hexlify(efuse_data[124:128]))
-                bflb_utils.printf("Verify fail")
-                self.error_code_print("0022")
-                return False
-        if len(efuse_data) > 128:
-            bflb_utils.printf("Load efuse 1")
+
+        # parameter end_idx: end - 4
+        def write_and_verify_except_protect_data(start_idx, end_idx):
             # load normal data
-            if security_write:
-                cmd_name = "efuse_security_write"
-            else:
-                cmd_name = "efuse_write"
-            cmd_id = bflb_utils.hexstr_to_bytearray(self._com_cmds.get(cmd_name)["cmd_id"])
-            data_send = efuse_data[128:252] + bytearray(4)
+            data_send = efuse_data[start_idx:end_idx] + bytearray(4)
             if security_write:
                 data_send = self.ecdh_encrypt_data(data_send)
-            data_send = bflb_utils.int_to_4bytearray_l(128) + data_send
+            data_send = bflb_utils.int_to_4bytearray_l(start_idx) + data_send
             ret, dmy = self.com_process_one_cmd(cmd_name, cmd_id, data_send)
             if ret.startswith("OK") is False:
                 bflb_utils.printf("Write Fail")
@@ -956,23 +935,34 @@ class BflbEflashLoader(object):
             # verify
             if verify >= 1:
                 ret, read_data = self.efuse_read_main_process(
-                    128, 128, shakehand=0, file=None, security_read=security_write
+                    start_idx,
+                    end_idx - start_idx + 4,
+                    shakehand=0,
+                    file=None,
+                    security_read=security_write,
                 )
                 if ret is True and self.efuse_compare(
                     read_data,
-                    mask_data[128:252] + bytearray(4),
-                    efuse_data[128:252] + bytearray(4),
+                    mask_data[start_idx:end_idx] + bytearray(4),
+                    efuse_data[start_idx:end_idx] + bytearray(4),
                 ):
                     bflb_utils.printf("Verify success")
                 else:
+                    # bflb_utils.printf("Read: ")
+                    # bflb_utils.printf(binascii.hexlify(read_data[0:end_idx - start_idx]).decode('utf-8'))
+                    # bflb_utils.printf("Expected: ")
+                    # bflb_utils.printf(binascii.hexlify(efuse_data[start_idx:end_idx]).decode('utf-8'))
                     bflb_utils.printf("Verify fail")
                     self.error_code_print("0022")
                     return False
+            return True
+
+        def write_and_verify_protect_data(start_idx, end_idx):
             # load read write protect data
-            data_send = bytearray(12) + efuse_data[252:256]
+            data_send = bytearray(12) + efuse_data[start_idx:end_idx]
             if security_write:
                 data_send = self.ecdh_encrypt_data(data_send)
-            data_send = bflb_utils.int_to_4bytearray_l(252 - 12) + data_send
+            data_send = bflb_utils.int_to_4bytearray_l(start_idx - 12) + data_send
             ret, dmy = self.com_process_one_cmd(cmd_name, cmd_id, data_send)
             if ret.startswith("OK") is False:
                 bflb_utils.printf("Write Fail")
@@ -981,54 +971,30 @@ class BflbEflashLoader(object):
             # verify
             if verify >= 1:
                 ret, read_data = self.efuse_read_main_process(
-                    252 - 12, 16, shakehand=0, file=None, security_read=security_write
+                    start_idx - 12, 16, shakehand=0, file=None, security_read=security_write
                 )
                 if ret is True and self.efuse_compare(
                     read_data,
-                    bytearray(12) + mask_data[252:256],
-                    bytearray(12) + efuse_data[252:256],
+                    bytearray(12) + mask_data[start_idx:end_idx],
+                    bytearray(12) + efuse_data[start_idx:end_idx],
                 ):
                     bflb_utils.printf("Verify success")
                 else:
-                    bflb_utils.printf("Verify fail")
-                    self.error_code_print("0022")
-        if len(efuse_data) > 256:
-            bflb_utils.printf("Load efuse remainder")
-            # load normal data
-            if security_write:
-                cmd_name = "efuse_security_write"
-            else:
-                cmd_name = "efuse_write"
-            cmd_id = bflb_utils.hexstr_to_bytearray(self._com_cmds.get(cmd_name)["cmd_id"])
-            data_send = efuse_data[256:508] + bytearray(4)
-            if security_write:
-                data_send = self.ecdh_encrypt_data(data_send)
-            data_send = bflb_utils.int_to_4bytearray_l(256) + data_send
-            ret, dmy = self.com_process_one_cmd(cmd_name, cmd_id, data_send)
-            if ret.startswith("OK") is False:
-                bflb_utils.printf("Write Fail")
-                self.error_code_print("0021")
-                return False
-            # verify
-            if verify >= 1:
-                ret, read_data = self.efuse_read_main_process(
-                    256, 256, shakehand=0, file=None, security_read=security_write
-                )
-                if ret is True and self.efuse_compare(
-                    read_data,
-                    mask_data[256:508] + bytearray(4),
-                    efuse_data[256:508] + bytearray(4),
-                ):
-                    bflb_utils.printf("Verify success")
-                else:
+                    # bflb_utils.printf("Read: ")
+                    # bflb_utils.printf(binascii.hexlify(read_data[12:16]))
+                    # bflb_utils.printf("Expected: ")
+                    # bflb_utils.printf(binascii.hexlify(efuse_data[start_idx:end_idx]))
                     bflb_utils.printf("Verify fail")
                     self.error_code_print("0022")
                     return False
-            # load read write protect data
-            data_send = bytearray(12) + efuse_data[508:512]
+            return True
+
+        def write_and_verify_all_data(start_idx, end_idx):
+            # load normal data
+            data_send = efuse_data[start_idx:end_idx]
             if security_write:
                 data_send = self.ecdh_encrypt_data(data_send)
-            data_send = bflb_utils.int_to_4bytearray_l(508 - 12) + data_send
+            data_send = bflb_utils.int_to_4bytearray_l(start_idx) + data_send
             ret, dmy = self.com_process_one_cmd(cmd_name, cmd_id, data_send)
             if ret.startswith("OK") is False:
                 bflb_utils.printf("Write Fail")
@@ -1037,17 +1003,59 @@ class BflbEflashLoader(object):
             # verify
             if verify >= 1:
                 ret, read_data = self.efuse_read_main_process(
-                    508 - 12, 16, shakehand=0, file=None, security_read=security_write
+                    start_idx,
+                    end_idx - start_idx,
+                    shakehand=0,
+                    file=None,
+                    security_read=security_write,
                 )
                 if ret is True and self.efuse_compare(
-                    read_data,
-                    bytearray(12) + mask_data[508:512],
-                    bytearray(12) + efuse_data[508:512],
+                    read_data, mask_data[start_idx:end_idx], efuse_data[start_idx:end_idx]
                 ):
                     bflb_utils.printf("Verify success")
                 else:
+                    # bflb_utils.printf("Read: ")
+                    # bflb_utils.printf(binascii.hexlify(read_data[0:end_idx - start_idx]).decode('utf-8'))
+                    # bflb_utils.printf("Expected: ")
+                    # bflb_utils.printf(binascii.hexlify(efuse_data[start_idx:end_idx]).decode('utf-8'))
                     bflb_utils.printf("Verify fail")
                     self.error_code_print("0022")
+                    return False
+            return True
+
+        if self._chip_type == "bl616":
+            if len(efuse_data) > 256:
+                bflb_utils.printf("Load efuse remainder")
+                if not write_and_verify_all_data(256, 512):
+                    return False
+            if len(efuse_data) > 128:
+                bflb_utils.printf("Load efuse 1")
+                if not write_and_verify_all_data(128, 256):
+                    return False
+            bflb_utils.printf("Load efuse 0")
+            if not write_and_verify_all_data(0, 128):
+                return False
+        else:
+            bflb_utils.printf("Load efuse 0")
+            if not write_and_verify_except_protect_data(0, 124):
+                return False
+            if not write_and_verify_protect_data(124, 128):
+                return False
+
+            if len(efuse_data) > 128:
+                bflb_utils.printf("Load efuse 1")
+                if not write_and_verify_except_protect_data(128, 252):
+                    return False
+                if not write_and_verify_protect_data(252, 256):
+                    return False
+
+            if len(efuse_data) > 256:
+                bflb_utils.printf("Load efuse remainder")
+                if not write_and_verify_except_protect_data(256, 508):
+                    return False
+                if not write_and_verify_protect_data(508, 512):
+                    return False
+
         bflb_utils.printf("Finished")
         return True
 
@@ -1269,29 +1277,27 @@ class BflbEflashLoader(object):
         if shakehand is not False:
             bflb_utils.printf(FLASH_LOAD_SHAKE_HAND)
             if self.img_load_shake_hand() is False:
-                return False, None
+                return False
 
         if security_write and (self.get_ecdh_shared_key() is not True):
             return False
 
-        bflb_utils.printf("Load efuse data")
-        try:
-            # load normal data
-            if security_write:
-                cmd_name = "efuse_security_write"
-            else:
-                cmd_name = "efuse_write"
-            cmd_id = bflb_utils.hexstr_to_bytearray(self._com_cmds.get(cmd_name)["cmd_id"])
-            start_addr = int(addr) - int(addr) % 16
-            efuse_data = (
-                bytearray(int(addr) % 16)
-                + bytearray.fromhex(data)
-                + bytearray(16 - (int(addr) + int(len(data) / 2)) % 16)
-            )
-            bflb_utils.printf("efuse_data: ", start_addr)
-            bflb_utils.printf(binascii.hexlify(efuse_data))
-            mask_data = bytearray(len(efuse_data))
+        if int(addr) > 512 or (int(addr) + len(data) // 2) > 512:
+            bflb_utils.printf("efuse data over range")
+            return False
 
+        start_addr = 0x0
+        efuse_data = bytearray(int(addr)) + bytearray.fromhex(data)
+        if (int(addr) + len(data) // 2) % 16 != 0:
+            efuse_data += bytearray(16 - (int(addr) + len(data) // 2) % 16)
+        efuse_maskdata = bytearray(len(efuse_data))
+        for num in range(0, len(efuse_data)):
+            if efuse_data[num] != 0:
+                efuse_maskdata[num] |= 0xFF
+
+        bflb_utils.printf("Load efuse data")
+
+        try:
             if func > 0:
                 bflb_utils.printf("Read and check efuse data")
                 ret, read_data = self.efuse_read_main_process(
@@ -1310,37 +1316,14 @@ class BflbEflashLoader(object):
                         bflb_utils.printf(read_data[i])
                         bflb_utils.printf(efuse_data[i])
                         return False
-
-            if security_write:
-                efuse_data = self.ecdh_encrypt_data(efuse_data)
-            data_send = bflb_utils.int_to_4bytearray_l(start_addr) + efuse_data
-            ret, dmy = self.com_process_one_cmd(cmd_name, cmd_id, data_send)
-            if ret.startswith("OK") is False:
-                bflb_utils.printf("Write Fail")
-                self.error_code_print("0021")
-                return False
-            # verify
-            for num in range(0, len(efuse_data)):
-                if efuse_data[num] != 0:
-                    mask_data[num] |= 0xFF
         except Exception as e:
             bflb_utils.printf(e)
             return False
-        if verify >= 1:
-            ret, read_data = self.efuse_read_main_process(
-                start_addr, len(efuse_data), 0, file=None, security_read=security_write
-            )
-            if ret is True and self.efuse_compare(read_data, mask_data, efuse_data):
-                bflb_utils.printf("Verify success")
-            else:
-                bflb_utils.printf("Read: ")
-                bflb_utils.printf(binascii.hexlify(read_data))
-                bflb_utils.printf("Expected: ")
-                bflb_utils.printf(binascii.hexlify(efuse_data))
-                bflb_utils.printf("Verify fail")
-                bflb_utils.printf(binascii.hexlify(mask_data))
-                self.error_code_print("0022")
-                return False
+
+        ret = self.efuse_load_specified(
+            None, None, efuse_data, efuse_maskdata, verify, 0, security_write
+        )
+        return ret
 
     def efuse_create_encrypt_sign_data(
         self,
@@ -2106,7 +2089,7 @@ class BflbEflashLoader(object):
                     return sf_swap_cfg + 5
         return 0x80
 
-    def setOpenFile_zip(self, packet_file):
+    def unpack_file_zip(self, packet_file):
         bflb_utils.printf("Unpack file")
         filename = packet_file
         try:
@@ -2529,8 +2512,11 @@ class BflbEflashLoader(object):
         dir = os.path.abspath(romfs_path)
         dst = os.path.abspath(dst_img_name)
         # bflb_utils.printf('Generating romfs image %s using directory %s ... ' % (dst, dir))
-        CREATE_NO_WINDOW = 0x08000000
-        subprocess.call([exe, "-d", dir, "-f", dst], creationflags=CREATE_NO_WINDOW)
+        if os.name == "nt":
+            CREATE_NO_WINDOW = 0x08000000
+            subprocess.call([exe, "-d", dir, "-f", dst], creationflags=CREATE_NO_WINDOW)
+        else:
+            subprocess.call([exe, "-d", dir, "-f", dst])
         bflb_utils.printf("========= programming romfs ", dst_img_name, " to ", hex(addr))
         ret = self.flash_load_specified(dst_img_name, addr, 1, verify, 0, callback)
         return ret
@@ -2837,10 +2823,10 @@ class BflbEflashLoader(object):
             conf_name = sub_module.flash_select_do.get_suitable_file_name(cfg_dir, jedec_id)
             (
                 offset,
-                flashCfgLen,
+                flash_cfg_length,
                 flash_para,
-                flashCrcOffset,
-                crcOffset,
+                flash_crc_offset,
+                crc_offset,
             ) = bflb_flash_select.update_flash_para_from_cfg(
                 sub_module.bootheader_cfg_keys.bootheader_cfg_keys, cfg_dir + conf_name
             )
@@ -3021,6 +3007,7 @@ class BflbEflashLoader(object):
             address = ""
             load_str = ""
             load_data = ""
+            load_data_encrypted = ""
             interface = ""
             port = ""
             load_speed = ""
@@ -3075,6 +3062,8 @@ class BflbEflashLoader(object):
                 efuse_load_func = 0
             if args.data:
                 load_data = args.data
+            if args.data_encrypted:
+                load_data_encrypted = args.data_encrypted
             if args.addr:
                 address = args.addr
             if args.skip:
@@ -3139,7 +3128,7 @@ class BflbEflashLoader(object):
             return False, 0
 
         if packet_file != "":
-            if self.setOpenFile_zip(packet_file) is True:
+            if self.unpack_file_zip(packet_file) is True:
                 return True, 0
             else:
                 return False, 0
@@ -3158,10 +3147,6 @@ class BflbEflashLoader(object):
                 config_file = "eflash_loader_cfg.ini"
         if args.usage:
             self.usage()
-        if args.version:
-            if not conf_sign:
-                bflb_utils.printf("Version: ", bflb_version.eflash_loader_version_text)
-            return True, 0
         load_str = load_str.replace("*", "\n").replace("%", " ")
         # get interface
         if config_file is None and load_str is None and eflash_loader_cfg is None:
@@ -3826,6 +3811,9 @@ class BflbEflashLoader(object):
                     else:
                         flash_file = re.compile("\s+").split(cfg.get("FLASH_CFG", "file"))
                         address = re.compile("\s+").split(cfg.get("FLASH_CFG", "address"))
+                        if len(flash_file) > len(address):
+                            bflb_utils.printf("error: tool path contains spaces!")
+                            return False, 0
                     if csvfile and csvaddr:
                         bflb_utils.printf("factory info burn")
                         csvbin = os.path.join(
@@ -4064,8 +4052,11 @@ class BflbEflashLoader(object):
                     bflb_utils.printf("write efuse macaddr ", macaddr)
                     if gol.ENABLE_AQARA:
                         security_write = True
+                    elif self._chip_type == "bl602" or self._chip_type == "bl702":
+                        security_write = False
                     else:
-                        security_write = cfg.get("EFUSE_CFG", "security_write") == "true"
+                        security_write = True
+                        # security_write = (cfg.get("EFUSE_CFG", "security_write") == "true")
                     if self._chip_type == "bl702" or self._chip_type == "bl702l":
                         ret = self.efuse_load_702_macaddr(
                             macaddr,
@@ -4096,8 +4087,11 @@ class BflbEflashLoader(object):
                     )
                     if gol.ENABLE_AQARA:
                         security_write = True
+                    elif self._chip_type == "bl602" or self._chip_type == "bl702":
+                        security_write = False
                     else:
-                        security_write = cfg.get("EFUSE_CFG", "security_write") == "true"
+                        security_write = True
+                        # security_write = (cfg.get("EFUSE_CFG", "security_write") == "true")
                     ret = self.efuse_load_specified(
                         None,
                         None,
@@ -4132,8 +4126,11 @@ class BflbEflashLoader(object):
                     )
                     if gol.ENABLE_AQARA:
                         security_write = True
+                    elif self._chip_type == "bl602" or self._chip_type == "bl702":
+                        security_write = False
                     else:
-                        security_write = cfg.get("EFUSE_CFG", "security_write") == "true"
+                        security_write = True
+                        # security_write = (cfg.get("EFUSE_CFG", "security_write") == "true")
                     ret = self.efuse_load_specified(
                         None,
                         None,
@@ -4154,11 +4151,14 @@ class BflbEflashLoader(object):
                         write_addr = int(address, 16)
                     else:
                         write_addr = int(address, 10)
-                    bflb_utils.printf("write efuse data ", load_data, " to ", address)
+                    bflb_utils.printf("write efuse data to ", address)
                     if gol.ENABLE_AQARA:
                         security_write = True
+                    elif self._chip_type == "bl602" or self._chip_type == "bl702":
+                        security_write = False
                     else:
-                        security_write = cfg.get("EFUSE_CFG", "security_write") == "true"
+                        security_write = True
+                        # security_write = (cfg.get("EFUSE_CFG", "security_write") == "true")
                     ret = self.efuse_load_data_process(
                         load_data,
                         write_addr,
@@ -4170,6 +4170,46 @@ class BflbEflashLoader(object):
                     if ret is False:
                         bflb_utils.printf("write efuse data fail")
                         return False, flash_burn_retry
+
+                if load_data_encrypted and address:
+                    loadflag = False
+                    write_addr = 0
+                    if address[0:2] == "0x":
+                        write_addr = int(address, 16)
+                    else:
+                        write_addr = int(address, 10)
+                    bflb_utils.printf(
+                        "write encrypted efuse data ", load_data_encrypted, " to ", address
+                    )
+                    if gol.ENABLE_AQARA:
+                        security_write = True
+                    elif self._chip_type == "bl602" or self._chip_type == "bl702":
+                        security_write = False
+                    else:
+                        security_write = True
+                        # security_write = (cfg.get("EFUSE_CFG", "security_write") == "true")
+                    sk = bytearray.fromhex(PRIVATE_KEY_RSA_HEX)
+                    privatekey = RSA.importKey(sk)
+                    cipher = PKCS1_v1_5.new(privatekey)
+                    data = []
+                    load_data_encrypted = bytearray.fromhex(load_data_encrypted)
+                    for i in range(0, len(load_data_encrypted), 128):
+                        cont = load_data_encrypted[i : i + 128]
+                        data.append(cipher.decrypt(cont, 1))
+                    data_decrypted = b"".join(data)
+                    load_data = binascii.hexlify(data_decrypted).decode("utf-8")
+                    ret = self.efuse_load_data_process(
+                        load_data,
+                        write_addr,
+                        efuse_load_func,
+                        verify,
+                        self._need_shake_hand,
+                        security_write,
+                    )
+                    if ret is False:
+                        bflb_utils.printf("write encrypted efuse data fail")
+                        return False, flash_burn_retry
+
                 if efuse_para:
                     loadflag = False
                     bflb_utils.printf("write efuse para")
@@ -4190,8 +4230,11 @@ class BflbEflashLoader(object):
                     )
                     if gol.ENABLE_AQARA:
                         security_write = True
+                    elif self._chip_type == "bl602" or self._chip_type == "bl702":
+                        security_write = False
                     else:
-                        security_write = cfg.get("EFUSE_CFG", "security_write") == "true"
+                        security_write = True
+                        # security_write = (cfg.get("EFUSE_CFG", "security_write") == "true")
                     if efuse_load:
                         ret = self.efuse_load_specified(
                             None,
@@ -4219,8 +4262,11 @@ class BflbEflashLoader(object):
                         efuse_file = "task" + str(task_num) + "/" + efuse_file
                     if gol.ENABLE_AQARA:
                         security_write = True
+                    elif self._chip_type == "bl602" or self._chip_type == "bl702":
+                        security_write = False
                     else:
-                        security_write = cfg.get("EFUSE_CFG", "security_write") == "true"
+                        security_write = True                    
+                        #security_write = cfg.get("EFUSE_CFG", "security_write") == "true"
                     if efuse_load and self._isp_en is False:
                         ret = self.efuse_load_specified(
                             efuse_file,
@@ -4252,7 +4298,11 @@ class BflbEflashLoader(object):
                 return False, flash_burn_retry
             bflb_utils.printf("Program dac file Finished")
             bflb_utils.printf("write efuse data")
-            security_write = cfg.get("EFUSE_CFG", "security_write") == "true"
+            if self._chip_type == "bl602" or self._chip_type == "bl702":
+                security_write = False
+            else:
+                security_write = True
+                # security_write = (cfg.get("EFUSE_CFG", "security_write") == "true")
             ret = self.efuse_load_specified(
                 None, None, efuse_data, mask_data, 0, self._need_shake_hand, security_write
             )
@@ -4289,10 +4339,14 @@ class BflbEflashLoader(object):
                         return False, flash_burn_retry
             if args.efuse:
                 if macaddr:
+                    if self._chip_type == "bl602" or self._chip_type == "bl702":
+                        security_write = False
+                    else:
+                        security_write = True
                     if self._chip_type == "bl702" or self._chip_type == "bl702l":
                         if (
                             self.efuse_get_702_macaddr(
-                                verify=1, shakehand=self._need_shake_hand, security_write=False
+                                verify=1, shakehand=self._need_shake_hand, security_write=security_write
                             )
                             is False
                         ):
@@ -4300,7 +4354,7 @@ class BflbEflashLoader(object):
                     else:
                         if (
                             self.efuse_get_macaddr(
-                                verify=1, shakehand=self._need_shake_hand, security_write=False
+                                verify=1, shakehand=self._need_shake_hand, security_write=security_write
                             )
                             is False
                         ):
@@ -4308,12 +4362,10 @@ class BflbEflashLoader(object):
                 else:
                     start_addr = int(start, 16)
                     end_addr = int(end, 16)
-                    if (
-                        self.efuse_read_main_process(
+                    ret, efusedata = self.efuse_read_main_process(
                             start_addr, end_addr - start_addr + 1, self._need_shake_hand, file
                         )
-                        is False
-                    ):
+                    if ret is False:
                         return False, flash_burn_retry
 
         if self._isp_en is True and (self._chip_type == "bl702" or self._chip_type == "bl702l"):
@@ -4340,7 +4392,13 @@ def run():
 
     parser = eflash_loader_parser_init()
     args = parser.parse_args()
+    if args.version:
+        if not conf_sign:
+            bflb_utils.printf("Version: ", bflb_version.eflash_loader_version_text)
     # args = parser.parse_args(["--chipname=bl602", "--write", "--flash", "--baudrate=2000000", "--config=eflash_loader_cfg.ini"])
+    if not args.chipname:
+        bflb_utils.printf("Error: chipname is none!")
+        return
     bflb_utils.printf("Chipname: %s" % args.chipname)
     eflash_loader_obj = BflbEflashLoader(args.chipname, gol.dict_chip_cmd[args.chipname])
     gol.chip_name = args.chipname

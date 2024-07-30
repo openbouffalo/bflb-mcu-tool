@@ -216,8 +216,12 @@ class BflbCKLinkPort(object):
         try:
             ret = ack + err_code_str + "(" + bflb_utils.get_bflb_error_code(err_code_str) + ")"
         except Exception:
-            ret = ack + err_code_str + " unknown"
-        bflb_utils.printf(ret)
+            ret = ""
+        if err_code_str == "0a0a":
+            bflb_utils.printf("Error: chip is protected or closed")
+            return "FL"
+        else:
+            bflb_utils.printf(ret)
         return ret
 
     def if_deal_response(self):

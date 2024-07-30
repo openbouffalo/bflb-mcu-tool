@@ -106,8 +106,9 @@ def img_update_efuse_group0(
         efuse_data[92] |= sign << 7
         efuse_mask_data[92] |= 0xFF
     # Set ef_sboot_en
-    if flash_encryp_type > 0:
-        efuse_data[0] |= 0x30
+    # disable ef_sboot_en for bl616 a1 dbg and encrypt
+    # if flash_encryp_type > 0:
+    #     efuse_data[0] |= 0x30
     efuse_mask_data[0] |= 0xFF
     rw_lock0 = 0
     rw_lock1 = 0
@@ -272,7 +273,16 @@ def img_update_efuse_group0(
         if security is True:
             bflb_utils.printf("Encrypt efuse data")
             efuse_crc = bflb_utils.get_crc32_bytearray(efuse_data)
-            security_key, security_iv = bflb_utils.get_security_key()
+            # security_key, security_iv = bflb_utils.get_security_key()
+            cfg_key = os.path.join(bflb_utils.app_path, "cfg.bin")
+            #bflb_utils.printf(cfg_key)
+            if os.path.exists(cfg_key):
+                res, security_key, security_iv = bflb_utils.get_aes_encrypted_security_key(cfg_key)
+                if res is False:
+                    bflb_utils.printf("Get encrypted aes key and iv failed")
+                    return False
+            else:
+                security_key, security_iv = bflb_utils.get_security_key()
             efuse_data_encrypt = img_create_encrypt_data(efuse_data, security_key, security_iv, 0)
             efuse_data_encrypt = bytearray(4096) + efuse_data_encrypt
             efuse_data_encrypt[0:4] = efuse_crc
@@ -781,36 +791,38 @@ def img_creat_process(group_type, flash_img, cfg, security=False, **kwargs):
             i += 1
         seg_cnt = cnt
     else:
-        seg_data = img_get_one_group_img(boot_entry, segdata_file)
-        padding_size = 0
-        if len(seg_data) % encrypt_blk_size != 0:
-            padding_size = encrypt_blk_size - len(seg_data) % encrypt_blk_size
-            seg_data += padding[0:padding_size]
+        if segdata_file:
+            seg_data = img_get_one_group_img(boot_entry, segdata_file)
+            if seg_data:
+                padding_size = 0
+                if len(seg_data) % encrypt_blk_size != 0:
+                    padding_size = encrypt_blk_size - len(seg_data) % encrypt_blk_size
+                    seg_data += padding[0:padding_size]
 
-        magic_code = 0x504E4642
-        if seg_data[0:4] == bflb_utils.int_to_4bytearray_l(magic_code):
-            bflb_utils.printf("img already have bootheader")
-            encrypt_flag = (seg_data[bootcfg_start] >> 2) & 0x3
-            img_offset = img_create_get_img_offset(seg_data)
-            if encrypt_flag == 0 and encrypt > 0:
-                # segdata not encrypted and need encrypt, create bootheader and encrypt
-                seg_data = seg_data[img_offset:]
-            elif encrypt_flag > 0 and encrypt == 0:
-                bflb_utils.printf("Write flash img direct")
-                bootinfo_file_name = cfg.get(cfg_section, "bootinfo_file")
-                fp = open(bootinfo_file_name, "wb+")
-                fp.write(seg_data[:img_offset])
-                fp.close()
-                fw_file_name = cfg.get(cfg_section, "img_file")
-                fp = open(fw_file_name, "wb+")
-                fp.write(seg_data[img_offset:])
-                fp.close()
-                return "OK", data_tohash
-            else:
-                seg_data = seg_data[img_offset:]
-                data_encrypted = 1
-        data_toencrypt += seg_data
-        seg_cnt = len(data_toencrypt)
+                magic_code = 0x504E4642
+                if seg_data[0:4] == bflb_utils.int_to_4bytearray_l(magic_code):
+                    bflb_utils.printf("img already have bootheader")
+                    encrypt_flag = (seg_data[bootcfg_start] >> 2) & 0x3
+                    img_offset = img_create_get_img_offset(seg_data)
+                    if encrypt_flag == 0 and encrypt > 0:
+                        # segdata not encrypted and need encrypt, create bootheader and encrypt
+                        seg_data = seg_data[img_offset:]
+                    elif encrypt_flag > 0 and encrypt == 0:
+                        bflb_utils.printf("Write flash img direct")
+                        bootinfo_file_name = cfg.get(cfg_section, "bootinfo_file")
+                        fp = open(bootinfo_file_name, "wb+")
+                        fp.write(seg_data[:img_offset])
+                        fp.close()
+                        fw_file_name = cfg.get(cfg_section, "img_file")
+                        fp = open(fw_file_name, "wb+")
+                        fp.write(seg_data[img_offset:])
+                        fp.close()
+                        return "OK", data_tohash
+                    else:
+                        seg_data = seg_data[img_offset:]
+                        data_encrypted = 1
+                data_toencrypt += seg_data
+                seg_cnt = len(data_toencrypt)
 
     # do encrypt
     if encrypt:

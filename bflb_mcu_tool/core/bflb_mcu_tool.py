@@ -3303,7 +3303,7 @@ def run(argv):
                 shutil.copyfile(f_org, f)
         else:
             act = "download"
-        obj_mcu.program_img_thread(config, act=act)
+            obj_mcu.program_img_thread(config, act=act)
     except Exception as e:
         error = str(e)
         bflb_utils.printf(error)

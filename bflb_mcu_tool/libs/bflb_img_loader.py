@@ -787,6 +787,7 @@ class BflbImgLoader(object):
                     bflb_utils.printf("shake hand fail")
                     self.bflb_boot_if.if_close()
                     res = False
+                    return
             time.sleep(0.01)
             if file1 is not None and file1 != "":
                 res, bootinfo = self.img_load_main_process(
@@ -795,11 +796,13 @@ class BflbImgLoader(object):
                 if res.startswith("OK") is False:
                     if res.startswith("repeat_burn") is True:
                         res = False
+                        return
                     else:
                         bflb_utils.printf("Error: Image load fail")
                         if res.startswith("error_shakehand") is True:
                             bflb_utils.printf("shakehand with eflash loader found")
                         res = False
+                        return
             if file2 is not None and file2 != "":
                 res, bootinfo = self.img_load_main_process(
                     file2, 1, self._create_cfg, callback, record_bootinfo, **kwargs
@@ -807,11 +810,13 @@ class BflbImgLoader(object):
                 if res.startswith("OK") is False:
                     if res.startswith("repeat_burn") is True:
                         res = False
+                        return
                     else:
                         bflb_utils.printf("Error: Image load fail")
                         if res.startswith("error_shakehand") is True:
                             bflb_utils.printf("shakehand with eflash loader found")
                         res = False
+                        return
             bflb_utils.printf("Run img")
             res, dmy = self.boot_process_one_section("run_image", 0)
             if res.startswith("OK") is False:

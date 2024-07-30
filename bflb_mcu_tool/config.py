@@ -6,7 +6,7 @@ import sys
 try:
     from version import VERSION
 except ImportError:
-    VERSION = "1.8.9"
+    VERSION = "1.9.0"
 
 try:
     from midea import ENABLE_MIDEA
@@ -44,7 +44,7 @@ except ImportError:
 try:
     from debug import *
 except ImportError:
-    NUM_ERROR_LOG = 5
+    NUM_ERROR_LOG = 10
 
 chip_name = "tg7100c"
 obj_cklink = None

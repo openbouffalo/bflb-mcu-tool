@@ -30,11 +30,12 @@ from ecdsa import ECDH, NIST256p
 
 try:
     # import Crypto.Util.Counter
-    from Cryptodome.Util import Counter
-    from Cryptodome.Cipher import AES
-    from Cryptodome.Hash import SHA256
+    from Crypto.Util import Counter
+    from Crypto.Cipher import AES
+    from Crypto.Hash import SHA256
     import ecdsa
-except:
+except Exception as e:
+    print(e)
     print("Import Crypto and ecdsa package error!!")
 
 ecdh_enable = False
@@ -102,7 +103,10 @@ def udp_socket_send_client(udp_socket_client, send_address, key=None):
     if send_data == "quit":
         udp_socket_client.close()
         print("Quit successfully")
-        os.kill(os.getpid(), signal.SIGKILL)
+        if sys.platform.startswith('win'):
+            os.system("taskkill /F /PID %d" % os.getpid())
+        else:
+            os.kill(os.getpid(), signal.SIGKILL)
     else:
         if ecdh_enable:
             tmp_ecdh = BLECDH()
@@ -142,6 +146,9 @@ def udp_socket_send_client(udp_socket_client, send_address, key=None):
             elif log.decode("utf-8", "ignore").find("Finished with fail") != -1:
                 print("Program fail")
                 return False
+            elif log.decode("utf-8", "ignore").find("Stop success") != -1:
+                print("Server stop")
+                return True
             else:
                 if time.time() - start_time > 150:
                     print("timeout, exit!")

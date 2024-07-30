@@ -519,7 +519,6 @@ class BflbUartPort(object):
                     success, ack = self.if_read(1000)
                     bflb_utils.printf("ack is ", binascii.hexlify(ack).decode("utf-8"))
                     if ack.find(b"\x4F") != -1 or ack.find(b"\x4B") != -1:
-                        self._ser.timeout = timeout
                         if self._602a0_dln_fix:
                             self._ser.write(bytearray(2))
                         if self._password != None and len(self._password) != 0:
@@ -531,6 +530,7 @@ class BflbUartPort(object):
                             bflb_utils.printf(
                                 "set pswd ack is ", binascii.hexlify(ack).decode("utf-8")
                             )
+                        self._ser.timeout = timeout
                         time.sleep(0.03)
                         return "OK"
                     if len(ack) != 0:
@@ -797,8 +797,13 @@ class BflbUartPort(object):
             try:
                 ret = ack + err_code_str + "(" + bflb_utils.get_bflb_error_code(err_code_str) + ")"
             except Exception:
-                ret = ack + err_code_str + " unknown"
-            bflb_utils.printf(ret)
+                ret = ""
+                # ret = ack + err_code_str + " unknown"
+            if err_code_str == "0a0a":
+                bflb_utils.printf("Error: chip is protected or closed")
+                return "FL"
+            else:
+                bflb_utils.printf(ret)
             return ret
         except Exception as e:
             bflb_utils.printf("Error: %s" % e)

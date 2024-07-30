@@ -727,13 +727,6 @@ def errorcode_msg(task=None):
         "ErrorCode: " + error_code_num + ", ErrorMsg: " + eflash_loader_error_code[error_code_num]
     )
 
-
-def get_security_key():
-    return hexstr_to_bytearray("424F554646414C4F4C41424B45594956"), hexstr_to_bytearray(
-        "424F554646414C4F4C41424B00000000"
-    )
-
-
 # 12345678->0x12,0x34,0x56,0x78
 def hexstr_to_bytearray_b(hexstring):
     return bytearray.fromhex(hexstring)
@@ -943,6 +936,32 @@ def aes_decrypt_data(data, key_bytearray, iv_bytearray, flash_img):
         cryptor = AES.new(key_bytearray, AES.MODE_CTR, counter=iv)
         plaintext = cryptor.decrypt(data)
     return plaintext
+
+
+def get_security_key():
+    # b'BOUFFALOLABKEYIV'
+    key_hex = "424F554646414C4F4C41424B45594956"
+    # b'BOUFFALOLABK\x00\x00\x00\x00'
+    iv_hex = "424F554646414C4F4C41424B00000000"
+    return hexstr_to_bytearray(key_hex), hexstr_to_bytearray(iv_hex)
+
+
+def get_aes_encrypted_security_key(cfg):
+    # b"BOUFFALOLABKEY\x00\x00"
+    key_hex = "424f554646414c4f4c41424b45590000"
+    # b"BOUFFALOLABIV\x00\x00\x00"
+    iv_hex = "424f554646414c4f4c41424956000000"
+    try:
+        cryptor = AES.new(hexstr_to_bytearray(key_hex), AES.MODE_CBC, hexstr_to_bytearray(iv_hex))
+        with open(cfg, mode="rb") as fp:
+            data = fp.read()
+        plaintext = cryptor.decrypt(data)
+        if len(plaintext) == 32:
+            return True, plaintext[0:16], plaintext[16:32]
+        else:
+            return False, None, None
+    except Exception as e:
+        return False, None, None
 
 
 def open_file(file, mode="rb"):
@@ -1217,6 +1236,7 @@ def eflash_loader_parser_init():
     parser.add_argument("--packet", dest="packet", help=" import packet to replace burn file")
     parser.add_argument("--efusefile", dest="efusefile", help="efuse file to write efuse")
     parser.add_argument("--data", dest="data", help="data to write")
+    parser.add_argument("--data_encrypted", dest="data_encrypted", help="encrypted data to write")
     parser.add_argument("--mass", dest="mass", help="load mass bin")
     parser.add_argument("--loadstr", dest="loadstr", help="")
     parser.add_argument("--loadfile", dest="loadfile", help="")
