@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-#  Copyright (C) 2021- BOUFFALO LAB (NANJING) CO., LTD.
+# -*- coding:utf-8 -*-
+#  Copyright (C) 2016- BOUFFALO LAB (NANJING) CO., LTD.
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -33,9 +33,9 @@ def little_endian(data):
 
 def bl_dts2dtb(src_addr="", dest_addr=""):
     if "" == src_addr or "" == dest_addr:
-        bflb_utils.printf("bl_dts2dtb please check arg.")
+        bflb_utils.printf("bl_dts2dtb please check arg")
         return
-    bflb_utils.printf("=========", src_addr, " ——> ", dest_addr, "=========")
+    bflb_utils.printf("========= ", os.path.normpath(src_addr), " ——> ", os.path.normpath(dest_addr))
     with open(src_addr, "r", encoding="utf-8") as f:
         tmp1_dts = f.read()
     tmp2_dtb = fdt.parse_dts(tmp1_dts)
@@ -615,7 +615,10 @@ def bl_dts2hex(dts):
         pwr_offset_bz_hex = ""
 
     if country_code:
-        country_code_hex = "50000200" + little_endian("%04x" % country_code[0])
+        if isinstance(country_code[0], int):
+            country_code_hex = "50000200" + little_endian("%04x" % country_code[0])
+        else:
+            country_code_hex = "50000200" + string_to_bytearray(country_code[0]).hex()
     else:
         country_code_hex = ""
 

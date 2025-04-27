@@ -4,7 +4,8 @@ import os
 import binascii
 import hashlib
 
-import ecdsa
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.backends import default_backend
 
 from libs import bflb_utils
 from libs import bflb_efuse_boothd_create
@@ -36,8 +37,15 @@ def create_key_data_do(values, chip_name, chip_type, cfg_file, efuse_data):
         if os.path.exists(values["cpu0_pk_simple"]) is False:
             bflb_utils.printf("Error: public key file not found")
             return "Error: public key file not found"
-        vk = ecdsa.VerifyingKey.from_pem(open(values["cpu0_pk_simple"]).read())
-        pk_data = vk.to_string()
+        with open(values["cpu0_pk_simple"], "rb") as f:
+            pk = f.read()
+            public_key = serialization.load_pem_public_key(pk, backend=default_backend())
+            public_numbers = public_key.public_numbers()
+            x = public_numbers.x
+            y = public_numbers.y
+            x_bytes = x.to_bytes(32, "big")
+            y_bytes = y.to_bytes(32, "big")
+            pk_data = x_bytes + y_bytes
         bflb_utils.printf("Public key: ", binascii.hexlify(pk_data))
         pk_hash = img_create_sha256_data(pk_data)
         bflb_utils.printf("Public key hash=", binascii.hexlify(pk_hash))
@@ -61,35 +69,12 @@ def create_key_data_do(values, chip_name, chip_type, cfg_file, efuse_data):
 
     # AES key
     if aes_mode != 0:
-        if (
-            len(values["cpu0_aes_key_simple"]) >= 32
-            and verify_hex_num(values["cpu0_aes_key_simple"]) is True
-        ):
-            fp.write(
-                "ef_sf_aes_mode = "
-                + str(ef_sf_aes_mode_list.index(values["ef_sf_aes_mode"]))
-                + "\n"
-            )
-            fp.write(
-                "ef_key_slot_2_w0 = 0x"
-                + str_endian_switch(values["cpu0_aes_key_simple"][0:8])
-                + "\n"
-            )
-            fp.write(
-                "ef_key_slot_2_w1 = 0x"
-                + str_endian_switch(values["cpu0_aes_key_simple"][8:16])
-                + "\n"
-            )
-            fp.write(
-                "ef_key_slot_2_w2 = 0x"
-                + str_endian_switch(values["cpu0_aes_key_simple"][16:24])
-                + "\n"
-            )
-            fp.write(
-                "ef_key_slot_2_w3 = 0x"
-                + str_endian_switch(values["cpu0_aes_key_simple"][24:32])
-                + "\n"
-            )
+        if len(values["cpu0_aes_key_simple"]) >= 32 and verify_hex_num(values["cpu0_aes_key_simple"]) is True:
+            fp.write("ef_sf_aes_mode = " + str(ef_sf_aes_mode_list.index(values["ef_sf_aes_mode"])) + "\n")
+            fp.write("ef_key_slot_2_w0 = 0x" + str_endian_switch(values["cpu0_aes_key_simple"][0:8]) + "\n")
+            fp.write("ef_key_slot_2_w1 = 0x" + str_endian_switch(values["cpu0_aes_key_simple"][8:16]) + "\n")
+            fp.write("ef_key_slot_2_w2 = 0x" + str_endian_switch(values["cpu0_aes_key_simple"][16:24]) + "\n")
+            fp.write("ef_key_slot_2_w3 = 0x" + str_endian_switch(values["cpu0_aes_key_simple"][24:32]) + "\n")
             if values["cpu0_aes_key_wp_enable"] is True:
                 fp.write("wr_lock_key_slot_2 = 1\n")
             else:
@@ -112,16 +97,8 @@ def create_key_data_do(values, chip_name, chip_type, cfg_file, efuse_data):
             return "Error: Please check AES key len"
     elif aes_mode == 2:
         if len(values["cpu0_aes_key_simple"]) == 48:
-            fp.write(
-                "ef_key_slot_3_w0 = 0x"
-                + str_endian_switch(values["cpu0_aes_key_simple"][32:40])
-                + "\n"
-            )
-            fp.write(
-                "ef_key_slot_3_w1 = 0x"
-                + str_endian_switch(values["cpu0_aes_key_simple"][40:48])
-                + "\n"
-            )
+            fp.write("ef_key_slot_3_w0 = 0x" + str_endian_switch(values["cpu0_aes_key_simple"][32:40]) + "\n")
+            fp.write("ef_key_slot_3_w1 = 0x" + str_endian_switch(values["cpu0_aes_key_simple"][40:48]) + "\n")
             if values["cpu0_aes_key_wp_enable"] is True:
                 fp.write("wr_lock_key_slot_3 = 1\n")
             else:
@@ -135,26 +112,10 @@ def create_key_data_do(values, chip_name, chip_type, cfg_file, efuse_data):
             return "Error: Please check AES key len"
     elif aes_mode == 3:
         if len(values["cpu0_aes_key_simple"]) == 64:
-            fp.write(
-                "ef_key_slot_3_w0 = 0x"
-                + str_endian_switch(values["cpu0_aes_key_simple"][32:40])
-                + "\n"
-            )
-            fp.write(
-                "ef_key_slot_3_w1 = 0x"
-                + str_endian_switch(values["cpu0_aes_key_simple"][40:48])
-                + "\n"
-            )
-            fp.write(
-                "ef_key_slot_3_w2 = 0x"
-                + str_endian_switch(values["cpu0_aes_key_simple"][48:56])
-                + "\n"
-            )
-            fp.write(
-                "ef_key_slot_3_w3 = 0x"
-                + str_endian_switch(values["cpu0_aes_key_simple"][56:64])
-                + "\n"
-            )
+            fp.write("ef_key_slot_3_w0 = 0x" + str_endian_switch(values["cpu0_aes_key_simple"][32:40]) + "\n")
+            fp.write("ef_key_slot_3_w1 = 0x" + str_endian_switch(values["cpu0_aes_key_simple"][40:48]) + "\n")
+            fp.write("ef_key_slot_3_w2 = 0x" + str_endian_switch(values["cpu0_aes_key_simple"][48:56]) + "\n")
+            fp.write("ef_key_slot_3_w3 = 0x" + str_endian_switch(values["cpu0_aes_key_simple"][56:64]) + "\n")
             if values["cpu0_aes_key_wp_enable"] is True:
                 fp.write("wr_lock_key_slot_3 = 1\n")
             else:

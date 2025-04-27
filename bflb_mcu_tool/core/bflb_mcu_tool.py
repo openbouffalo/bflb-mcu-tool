@@ -82,9 +82,7 @@ def record_log():
     logger = logging.getLogger()
     logger.setLevel(logging.DEBUG)
     # create a handler, write the log info into it
-    now_log_file = os.path.join(
-        log_file, "{0}_{1}.log".format("flashcube", time.strftime("%Y%m%d", time.localtime()))
-    )
+    now_log_file = os.path.join(log_file, "{0}_{1}.log".format("flashcube", time.strftime("%Y%m%d", time.localtime())))
     # 用于写入日志文件
     fh = TimedRotatingFileHandler(
         now_log_file, when="D", interval=1, backupCount=0, encoding="utf-8", delay=False, utc=False
@@ -125,33 +123,19 @@ class BflbMcuTool(object):
         self.config = {}
         self.efuse_load_en = False
         self._password = None
-        self.eflash_loader_cfg = os.path.join(
-            chip_path, chipname, "eflash_loader/eflash_loader_cfg.conf"
-        )
-        self.eflash_loader_cfg_tmp = os.path.join(
-            chip_path, chipname, "eflash_loader/eflash_loader_cfg.ini"
-        )
-        self.eflash_loader_bin = os.path.join(
-            chip_path, chipname, "eflash_loader/eflash_loader_40m.bin"
-        )
+        self.eflash_loader_cfg = os.path.join(chip_path, chipname, "eflash_loader/eflash_loader_cfg.conf")
+        self.eflash_loader_cfg_tmp = os.path.join(chip_path, chipname, "eflash_loader/eflash_loader_cfg.ini")
+        self.eflash_loader_bin = os.path.join(chip_path, chipname, "eflash_loader/eflash_loader_40m.bin")
         self.img_create_path = os.path.join(chip_path, chipname, "img_create_mcu")
         # self.img_create_path = os.path.join("chips", chipname, "img_create_mcu")
         self.efuse_bh_path = os.path.join(chip_path, chipname, "efuse_bootheader")
-        self.efuse_bh_default_cfg = (
-            os.path.join(chip_path, chipname, "efuse_bootheader") + "/efuse_bootheader_cfg.conf"
-        )
+        self.efuse_bh_default_cfg = os.path.join(chip_path, chipname, "efuse_bootheader") + "/efuse_bootheader_cfg.conf"
         self.efuse_bh_default_cfg_dp = (
             os.path.join(chip_path, chipname, "efuse_bootheader") + "/efuse_bootheader_cfg_dp.conf"
         )
-        self.img_create_cfg_org = (
-            os.path.join(chip_path, chipname, "img_create_mcu") + "/img_create_cfg.conf"
-        )
-        self.img_create_cfg_dp_org = (
-            os.path.join(chip_path, chipname, "img_create_mcu") + "/img_create_cfg_dp.conf"
-        )
-        self.img_create_cfg = (
-            os.path.join(chip_path, chipname, "img_create_mcu") + "/img_create_cfg.ini"
-        )
+        self.img_create_cfg_org = os.path.join(chip_path, chipname, "img_create_mcu") + "/img_create_cfg.conf"
+        self.img_create_cfg_dp_org = os.path.join(chip_path, chipname, "img_create_mcu") + "/img_create_cfg_dp.conf"
+        self.img_create_cfg = os.path.join(chip_path, chipname, "img_create_mcu") + "/img_create_cfg.ini"
         if not os.path.exists(self.img_create_path):
             os.makedirs(self.img_create_path)
         if os.path.isfile(self.eflash_loader_cfg_tmp) is False:
@@ -253,30 +237,24 @@ class BflbMcuTool(object):
             addr = "0x" + addr
         return addr
 
-    def eflash_loader_thread(
-        self, args, eflash_loader_bin=None, callback=None, create_img_callback=None, **kwargs
-    ):
+    def eflash_loader_thread(self, args, eflash_loader_bin=None, callback=None, create_img_callback=None, **kwargs):
         ret = None
         try:
             bflb_utils.set_error_code("FFFF")
             ret = self.eflash_loader_t.efuse_flash_loader(
                 args, None, eflash_loader_bin, callback, None, create_img_callback, **kwargs
             )
-            self.eflash_loader_t.object_status_clear()
+            self.eflash_loader_t.clear_object_status()
         except Exception as e:
             traceback.print_exc(limit=5, file=sys.stdout)
             ret = str(e)
         finally:
             return ret
 
-    def img_loader_thread(
-        self, comnum, sh_baudrate, wk_baudrate, file1, file2, callback=None, **kwargs
-    ):
+    def img_loader_thread(self, comnum, sh_baudrate, wk_baudrate, file1, file2, callback=None, **kwargs):
         ret = None
         try:
-            img_load_t = bflb_img_loader.BflbImgLoader(
-                self.chiptype, self.chipname, createcfg=self.img_create_cfg
-            )
+            img_load_t = bflb_img_loader.BflbImgLoader(self.chiptype, self.chipname, createcfg=self.img_create_cfg)
             if self._password != None and len(self._password) != 0:
                 img_load_t.bflb_boot_if.set_password(self._password)
             ret, bootinfo, res = img_load_t.img_load_process(
@@ -538,19 +516,11 @@ class BflbMcuTool(object):
                 group1_img_output_file = self.img_create_path + "/img_group1.bin"
                 whole_img_output_file = self.img_create_path + "/whole_img.bin"
                 read_data = self.bl_get_file_data([group0_bootinfo_file])[0]
-                group0_img_offset = bflb_utils.bytearray_to_int(
-                    bflb_utils.bytearray_reverse(read_data[132:136])
-                )
-                group0_img_len = bflb_utils.bytearray_to_int(
-                    bflb_utils.bytearray_reverse(read_data[140:144])
-                )
+                group0_img_offset = bflb_utils.bytearray_to_int(bflb_utils.bytearray_reverse(read_data[132:136]))
+                group0_img_len = bflb_utils.bytearray_to_int(bflb_utils.bytearray_reverse(read_data[140:144]))
                 read_data = self.bl_get_file_data([group1_bootinfo_file])[0]
-                group1_img_offset = bflb_utils.bytearray_to_int(
-                    bflb_utils.bytearray_reverse(read_data[132:136])
-                )
-                group1_img_len = bflb_utils.bytearray_to_int(
-                    bflb_utils.bytearray_reverse(read_data[140:144])
-                )
+                group1_img_offset = bflb_utils.bytearray_to_int(bflb_utils.bytearray_reverse(read_data[132:136]))
+                group1_img_len = bflb_utils.bytearray_to_int(bflb_utils.bytearray_reverse(read_data[140:144]))
                 whole_img_len = 0
                 if group0_img_offset + group0_img_len > group1_img_offset + group1_img_len:
                     whole_img_len = group0_img_offset + group0_img_len
@@ -564,26 +534,18 @@ class BflbMcuTool(object):
                 whole_img_data[0x1000 : len(group1_bootinfo_filedata)] = group1_bootinfo_filedata
                 filedata = self.bl_get_file_data([group0_img_output_file])[0]
                 if group0_img_len != len(filedata):
-                    bflb_utils.printf(
-                        "group0 img len error, get %d except %d" % (group0_img_len, len(filedata))
-                    )
+                    bflb_utils.printf("group0 img len error, get %d except %d" % (group0_img_len, len(filedata)))
                 if group0_bootinfo_filedata[0:4] == filedata[0:4]:
                     whole_img_data = filedata
                 else:
-                    whole_img_data[
-                        group0_img_offset : group0_img_offset + len(filedata)
-                    ] = filedata
+                    whole_img_data[group0_img_offset : group0_img_offset + len(filedata)] = filedata
                 filedata = self.bl_get_file_data([group1_img_output_file])[0]
                 if group1_img_len != len(filedata):
-                    bflb_utils.printf(
-                        "group1 img len error, get %d except %d" % (group1_img_len, len(filedata))
-                    )
+                    bflb_utils.printf("group1 img len error, get %d except %d" % (group1_img_len, len(filedata)))
                 if group1_bootinfo_filedata[0:4] == filedata[0:4]:
                     whole_img_data = filedata
                 else:
-                    whole_img_data[
-                        group1_img_offset : group1_img_offset + len(filedata)
-                    ] = filedata
+                    whole_img_data[group1_img_offset : group1_img_offset + len(filedata)] = filedata
                 fp = open(whole_img_output_file, "wb+")
                 fp.write(whole_img_data)
                 fp.close()
@@ -607,7 +569,7 @@ class BflbMcuTool(object):
                 tlv_bin = self.img_create_path + "/tlv.bin"
                 with open(tlv_bin, "wb") as fp:
                     fp.write(dts_bytearray)
-                bflb_utils.printf("tlv bin created success")
+                bflb_utils.printf("tlv bin created successfully")
         if values["img_file"]:
             img_org = values["img_file"]
             if parse_rfpa(img_org) == b"BLRFPARA" and dts_bytearray:
@@ -621,7 +583,7 @@ class BflbMcuTool(object):
                 with open(img_new, "wb") as fp:
                     fp.write(bin_bytearray)
                 values["img_file"] = img_new
-                bflb_utils.printf("tlv bin inserted success")
+                bflb_utils.printf("tlv bin inserted successfully")
             if file_check_len(img_org, 4096):
                 fw_new = file_add_len(img_org, 16)
                 values["img_file"] = fw_new
@@ -634,49 +596,41 @@ class BflbMcuTool(object):
                 error = "Please select image file"
                 bflb_utils.printf(error)
                 bflb_utils.set_error_code("0061")
-                return bflb_utils.errorcode_msg()
+                return bflb_utils.get_error_code_msg()
         if values["img_addr"] == "" or values["img_addr"] == "0x":
             error = "Please set image address"
             bflb_utils.printf(error)
             bflb_utils.set_error_code("0062")
-            return bflb_utils.errorcode_msg()
+            return bflb_utils.get_error_code_msg()
         if values["bootinfo_addr"] == "" or values["bootinfo_addr"] == "0x":
             error = "Please set boot info address"
             bflb_utils.printf(error)
             bflb_utils.set_error_code("0063")
-            return bflb_utils.errorcode_msg()
+            return bflb_utils.get_error_code_msg()
         if "encrypt_type" in values.keys():
             if "encrypt_key" in values.keys():
                 if values["encrypt_type"] != "None" and values["encrypt_key"] == "":
                     error = "Please set AES key"
                     bflb_utils.printf(error)
                     bflb_utils.set_error_code("0064")
-                    return bflb_utils.errorcode_msg()
+                    return bflb_utils.get_error_code_msg()
             if "aes_iv" in values.keys():
                 if values["encrypt_type"] != "None" and values["aes_iv"] == "":
                     error = "Please set AES IV"
                     bflb_utils.printf(error)
                     bflb_utils.set_error_code("0065")
-                    return bflb_utils.errorcode_msg()
+                    return bflb_utils.get_error_code_msg()
             if values["encrypt_type"] != "None":
                 self.encrypt = True
             else:
                 self.encrypt = False
         if "sign_type" in values.keys():
-            """
-            if "public_key_cfg" in values.keys():
-                if values["sign_type"] != "None" and values["public_key_cfg"] == "":
-                    error = "Please set public key"
-                    bflb_utils.printf(error)
-                    bflb_utils.set_error_code("0066")
-                    return bflb_utils.errorcode_msg()
-            """
             if "private_key_cfg" in values.keys():
-                if values["sign_type"] != "None" and values["private_key_cfg"] == "":
+                if values["sign_type"] != "None" and values["private_key_cfg"] == "" and values["privatekey"] == "":
                     error = "Please set private key"
                     bflb_utils.printf(error)
                     bflb_utils.set_error_code("0067")
-                    return bflb_utils.errorcode_msg()
+                    return bflb_utils.get_error_code_msg()
             if values["sign_type"] != "None":
                 self.sign = True
             else:
@@ -729,16 +683,16 @@ class BflbMcuTool(object):
             bflb_utils.set_error_code("0068")
             return True
         if os.path.isfile(bh_cfg_file) is False:
-            bflb_utils.copyfile(self.efuse_bh_default_cfg, bh_cfg_file)
+            bflb_utils.copy_file(self.efuse_bh_default_cfg, bh_cfg_file)
         if values["img_type"] == "CPU0" or values["img_type"] == "CPU1":
-            bflb_utils.copyfile(self.img_create_cfg_dp_org, self.img_create_cfg)
+            bflb_utils.copy_file(self.img_create_cfg_dp_org, self.img_create_cfg)
         elif values["img_type"] == "BLSP_Boot2":
             if chiptype == "bl60x":
-                bflb_utils.copyfile(self.img_create_cfg_dp_org, self.img_create_cfg)
+                bflb_utils.copy_file(self.img_create_cfg_dp_org, self.img_create_cfg)
             else:
-                bflb_utils.copyfile(self.img_create_cfg_org, self.img_create_cfg)
+                bflb_utils.copy_file(self.img_create_cfg_org, self.img_create_cfg)
         else:
-            bflb_utils.copyfile(self.img_create_cfg_org, self.img_create_cfg)
+            bflb_utils.copy_file(self.img_create_cfg_org, self.img_create_cfg)
         # add flash cfg
         if os.path.exists(self.eflash_loader_cfg_tmp):
             cfg1 = BFConfigParser()
@@ -747,26 +701,24 @@ class BflbMcuTool(object):
                 flash_id = cfg1.get("FLASH_CFG", "flash_id")
                 self.eflash_loader_t.set_config_file(bh_cfg_file, self.img_create_cfg)
                 if (
-                    bflb_flash_select.update_flash_cfg(
-                        chipname, chiptype, flash_id, bh_cfg_file, False, section
-                    )
+                    bflb_flash_select.update_flash_cfg(chipname, chiptype, flash_id, bh_cfg_file, False, section)
                     is False
                 ):
                     error = "flash_id:" + flash_id + " do not support"
                     bflb_utils.printf(error)
                     bflb_utils.set_error_code("0069")
-                    return bflb_utils.errorcode_msg()
+                    return bflb_utils.get_error_code_msg()
             else:
                 error = "Do not find flash_id in eflash_loader_cfg.ini"
                 bflb_utils.printf(error)
                 bflb_utils.set_error_code("0070")
-                return bflb_utils.errorcode_msg()
+                return bflb_utils.get_error_code_msg()
             if cfg1.has_option("EFUSE_CFG", "security_save"):
                 security_save_efuse = cfg1.get("EFUSE_CFG", "security_save") == "true"
         else:
             bflb_utils.printf("Config file not found")
             bflb_utils.set_error_code("000B")
-            return bflb_utils.errorcode_msg()
+            return bflb_utils.get_error_code_msg()
         # update config
         cfg = BFConfigParser()
         cfg.read(bh_cfg_file)
@@ -782,20 +734,13 @@ class BflbMcuTool(object):
 
         chip_erase_time = cfg.get(section, "chip_erase_time")
         if int(chip_erase_time) > 65535:
-            bflb_utils.printf("Warning: chip erase time is overflow")
+            bflb_utils.printf("Warning: chip erase time exceeds limit")
 
         if chiptype == "bl702" or chiptype == "bl702l":
             bflb_utils.update_cfg(cfg, section, "boot2_enable", "0")
         if "xtal_type" in values.keys():
-            if (
-                chiptype == "bl60x"
-                or chiptype == "bl602"
-                or chiptype == "bl702"
-                or chiptype == "bl702l"
-            ):
-                bflb_utils.update_cfg(
-                    cfg, section, "xtal_type", self.xtal_type_.index(values["xtal_type"])
-                )
+            if chiptype == "bl60x" or chiptype == "bl602" or chiptype == "bl702" or chiptype == "bl702l":
+                bflb_utils.update_cfg(cfg, section, "xtal_type", self.xtal_type_.index(values["xtal_type"]))
         if "pll_clk" in values.keys():
             if chiptype == "bl602":
                 if values["pll_clk"] == "160M":
@@ -847,28 +792,28 @@ class BflbMcuTool(object):
                 error = "Key length error"
                 bflb_utils.printf(error)
                 bflb_utils.set_error_code("0071")
-                return bflb_utils.errorcode_msg()
+                return bflb_utils.get_error_code_msg()
             if tmp == 2 and len(values["encrypt_key"]) != 64:
                 error = "Key length error"
                 bflb_utils.printf(error)
                 bflb_utils.set_error_code("0071")
-                return bflb_utils.errorcode_msg()
+                return bflb_utils.get_error_code_msg()
             if tmp == 3 and len(values["encrypt_key"]) != 48:
                 error = "Key length error"
                 bflb_utils.printf(error)
                 bflb_utils.set_error_code("0071")
-                return bflb_utils.errorcode_msg()
+                return bflb_utils.get_error_code_msg()
             if tmp != 0:
                 if len(values["aes_iv"]) != 32:
                     error = "AES IV length error"
                     bflb_utils.printf(error)
                     bflb_utils.set_error_code("0072")
-                    return bflb_utils.errorcode_msg()
+                    return bflb_utils.get_error_code_msg()
                 if values["aes_iv"].endswith("00000000") is False:
                     error = "AES IV should endswith 4 bytes zero"
                     bflb_utils.printf(error)
                     bflb_utils.set_error_code("0073")
-                    return bflb_utils.errorcode_msg()
+                    return bflb_utils.get_error_code_msg()
         if "key_sel" in values.keys():
             bflb_utils.update_cfg(cfg, section, "key_sel", self.key_sel.index(values["key_sel"]))
             if self.chiptype == "bl602":
@@ -883,13 +828,9 @@ class BflbMcuTool(object):
                 (1 << self.cache_way_disable.index(values["cache_way_disable"])) - 1,
             )
         if "crc_ignore" in values.keys():
-            bflb_utils.update_cfg(
-                cfg, section, "crc_ignore", self.crc_ignore.index(values["crc_ignore"])
-            )
+            bflb_utils.update_cfg(cfg, section, "crc_ignore", self.crc_ignore.index(values["crc_ignore"]))
         if "hash_ignore" in values.keys():
-            bflb_utils.update_cfg(
-                cfg, section, "hash_ignore", self.hash_ignore.index(values["hash_ignore"])
-            )
+            bflb_utils.update_cfg(cfg, section, "hash_ignore", self.hash_ignore.index(values["hash_ignore"]))
         if values["img_type"] == "CPU0":
             bflb_utils.update_cfg(cfg, section, "halt_cpu1", "0")
         elif chiptype != "bl602":
@@ -906,9 +847,7 @@ class BflbMcuTool(object):
                 self.img_create_path + "/bootheader_dummy.bin",
                 bh_file,
             )
-            bflb_efuse_boothd_create.efuse_create_process(
-                chipname, chiptype, bh_cfg_file, efuse_file
-            )
+            bflb_efuse_boothd_create.efuse_create_process(chipname, chiptype, bh_cfg_file, efuse_file)
         elif values["boot_src"].upper() == "UART/SDIO" or values["boot_src"].upper() == "UART/USB":
             bflb_efuse_boothd_create.bootheader_create_process(
                 chipname,
@@ -918,9 +857,7 @@ class BflbMcuTool(object):
                 self.img_create_path + "/bootheader_dummy.bin",
                 True,
             )
-            bflb_efuse_boothd_create.efuse_create_process(
-                chipname, chiptype, bh_cfg_file, efuse_file
-            )
+            bflb_efuse_boothd_create.efuse_create_process(chipname, chiptype, bh_cfg_file, efuse_file)
         else:
             bflb_efuse_boothd_create.bootheader_create_process(
                 chipname,
@@ -929,9 +866,7 @@ class BflbMcuTool(object):
                 bh_file,
                 self.img_create_path + "/bootheader_dummy.bin",
             )
-            bflb_efuse_boothd_create.efuse_create_process(
-                chipname, chiptype, bh_cfg_file, efuse_file
-            )
+            bflb_efuse_boothd_create.efuse_create_process(chipname, chiptype, bh_cfg_file, efuse_file)
         # create img_create_cfg.ini
         cfg = BFConfigParser()
         cfg.read(self.img_create_cfg)
@@ -940,52 +875,45 @@ class BflbMcuTool(object):
         bflb_utils.update_cfg(cfg, img_create_section, "efuse_mask_file", efuse_mask_file)
         # create segheader
         segheader = bytearray(12)
-        segheader[0:4] = bflb_utils.int_to_4bytearray_l(
-            int(values["img_addr"].replace("0x", ""), 16)
-        )
+        segheader[0:4] = bflb_utils.int_to_4bytearray_l(int(values["img_addr"].replace("0x", ""), 16))
         segfp = open(self.img_create_path + "/segheader_tmp.bin", "wb+")
         segfp.write(segheader)
         segfp.close()
-        bflb_utils.update_cfg(
-            cfg, img_create_section, "segheader_file", self.img_create_path + "/segheader_tmp.bin"
-        )
+        bflb_utils.update_cfg(cfg, img_create_section, "segheader_file", self.img_create_path + "/segheader_tmp.bin")
         bflb_utils.update_cfg(cfg, img_create_section, "segdata_file", values["img_file"])
 
-        encryptEn = False
-        signEn = False
+        encrypt_enable = False
+        sign_enable = False
 
         if values["encrypt_type"] != "None":
             if "encrypt_key" in values.keys() and "aes_iv" in values.keys():
                 if values["encrypt_key"] != "" and values["aes_iv"]:
-                    encryptEn = True
+                    encrypt_enable = True
         if values["sign_type"] != "None":
             if "public_key_cfg" in values.keys() and "private_key_cfg" in values.keys():
                 if values["private_key_cfg"]:
-                    signEn = True
+                    sign_enable = True
+            if "privatekey" in values.keys():
+                if values["privatekey"]:
+                    sign_enable = True
         if "encrypt_key" in values.keys():
             bflb_utils.update_cfg(cfg, img_create_section, "aes_key_org", values["encrypt_key"])
         if "aes_iv" in values.keys():
             bflb_utils.update_cfg(cfg, img_create_section, "aes_iv", values["aes_iv"])
         if "public_key_cfg" in values.keys():
-            bflb_utils.update_cfg(
-                cfg, img_create_section, "publickey_file", values["public_key_cfg"]
-            )
+            bflb_utils.update_cfg(cfg, img_create_section, "publickey_file", values["public_key_cfg"])
         if "private_key_cfg" in values.keys():
-            bflb_utils.update_cfg(
-                cfg, img_create_section, "privatekey_file_uecc", values["private_key_cfg"]
-            )
+            bflb_utils.update_cfg(cfg, img_create_section, "privatekey_file_uecc", values["private_key_cfg"])
 
         bflb_utils.update_cfg(cfg, img_create_section, "bootinfo_file", bootinfo_file)
         bflb_utils.update_cfg(cfg, img_create_section, "img_file", img_output_file)
-        bflb_utils.update_cfg(
-            cfg, img_create_section, "whole_img_file", img_output_file.replace(".bin", "_if.bin")
-        )
+        bflb_utils.update_cfg(cfg, img_create_section, "whole_img_file", img_output_file.replace(".bin", "_if.bin"))
         cfg.write(self.img_create_cfg, "w+")
 
         cfg = BFConfigParser()
         cfg.read(self.eflash_loader_cfg_tmp)
         # udate efuse data
-        if encryptEn or signEn:
+        if encrypt_enable or sign_enable:
             img_cfg = BFConfigParser()
             img_cfg.read(self.img_create_cfg)
             if chiptype == "bl60x":
@@ -995,9 +923,7 @@ class BflbMcuTool(object):
                 efusefile = img_cfg.get("Img_Cfg", "efuse_file")
                 efusemaskfile = img_cfg.get("Img_Cfg", "efuse_mask_file")
             cfg.set("EFUSE_CFG", "file", convert_path(os.path.relpath(efusefile, app_path)))
-            cfg.set(
-                "EFUSE_CFG", "maskfile", convert_path(os.path.relpath(efusemaskfile, app_path))
-            )
+            cfg.set("EFUSE_CFG", "maskfile", convert_path(os.path.relpath(efusemaskfile, app_path)))
             cfg.set("EFUSE_CFG", "burn_en", "true")
             cfg.write(self.eflash_loader_cfg_tmp, "w")
             self.efuse_load_en = True
@@ -1014,11 +940,17 @@ class BflbMcuTool(object):
                     options.extend(["--security=efuse"])
                 args = parser_image.parse_args(options)
                 res = bflb_img_create.img_create(
-                    args, chipname, chiptype, self.img_create_path, self.img_create_cfg
+                    args,
+                    chipname,
+                    chiptype,
+                    self.img_create_path,
+                    self.img_create_cfg,
+                    privatekey_str=values["privatekey"],
+                    publickey_str=values["publickey"],
                 )
                 if res is not True:
                     bflb_utils.set_error_code("0060")
-                    return bflb_utils.errorcode_msg()
+                    return bflb_utils.get_error_code_msg()
             elif values["img_type"] == "BLSP_Boot2":
                 if chiptype == "bl60x":
                     options = ["--image=media", "--cpu=cpu0", "--signer=none"]
@@ -1026,44 +958,68 @@ class BflbMcuTool(object):
                         options.extend(["--security=efuse"])
                     args = parser_image.parse_args(options)
                     res = bflb_img_create.img_create(
-                        args, chipname, chiptype, self.img_create_path, self.img_create_cfg
+                        args,
+                        chipname,
+                        chiptype,
+                        self.img_create_path,
+                        self.img_create_cfg,
+                        privatekey_str=values["privatekey"],
+                        publickey_str=values["publickey"],
                     )
                     if res is not True:
                         bflb_utils.set_error_code("0060")
-                        return bflb_utils.errorcode_msg()
+                        return bflb_utils.get_error_code_msg()
                 else:
                     options = ["--image=media", "--signer=none"]
                     if security_save_efuse is True:
                         options.extend(["--security=efuse"])
                     args = parser_image.parse_args(options)
                     res = bflb_img_create.img_create(
-                        args, chipname, chiptype, self.img_create_path, self.img_create_cfg
+                        args,
+                        chipname,
+                        chiptype,
+                        self.img_create_path,
+                        self.img_create_cfg,
+                        privatekey_str=values["privatekey"],
+                        publickey_str=values["publickey"],
                     )
                     if res is not True:
                         bflb_utils.set_error_code("0060")
-                        return bflb_utils.errorcode_msg()
+                        return bflb_utils.get_error_code_msg()
             elif values["img_type"] == "CPU0":
                 options = ["--image=media", "--cpu=cpu0", "--signer=none"]
                 if security_save_efuse is True:
                     options.extend(["--security=efuse"])
                 args = parser_image.parse_args(options)
                 res = bflb_img_create.img_create(
-                    args, chipname, chiptype, self.img_create_path, self.img_create_cfg
+                    args,
+                    chipname,
+                    chiptype,
+                    self.img_create_path,
+                    self.img_create_cfg,
+                    privatekey_str=values["privatekey"],
+                    publickey_str=values["publickey"],
                 )
                 if res is not True:
                     bflb_utils.set_error_code("0060")
-                    return bflb_utils.errorcode_msg()
+                    return bflb_utils.get_error_code_msg()
             elif values["img_type"] == "CPU1":
                 options = ["--image=media", "--cpu=cpu1", "--signer=none"]
                 if security_save_efuse is True:
                     options.extend(["--security=efuse"])
                 args = parser_image.parse_args(options)
                 res = bflb_img_create.img_create(
-                    args, chipname, chiptype, self.img_create_path, self.img_create_cfg
+                    args,
+                    chipname,
+                    chiptype,
+                    self.img_create_path,
+                    self.img_create_cfg,
+                    privatekey_str=values["privatekey"],
+                    publickey_str=values["publickey"],
                 )
                 if res is not True:
                     bflb_utils.set_error_code("0060")
-                    return bflb_utils.errorcode_msg()
+                    return bflb_utils.get_error_code_msg()
         else:
             if values["img_type"] == "SingleCPU":
                 options = ["--image=if", "--signer=none"]
@@ -1071,33 +1027,51 @@ class BflbMcuTool(object):
                     options.extend(["--security=efuse"])
                 args = parser_image.parse_args(options)
                 res = bflb_img_create.img_create(
-                    args, chipname, chiptype, self.img_create_path, self.img_create_cfg
+                    args,
+                    chipname,
+                    chiptype,
+                    self.img_create_path,
+                    self.img_create_cfg,
+                    privatekey_str=values["privatekey"],
+                    publickey_str=values["publickey"],
                 )
                 if res is not True:
                     bflb_utils.set_error_code("0060")
-                    return bflb_utils.errorcode_msg()
+                    return bflb_utils.get_error_code_msg()
             elif values["img_type"] == "CPU0":
                 options = ["--image=if", "--cpu=cpu0", "--signer=none"]
                 if security_save_efuse is True:
                     options.extend(["--security=efuse"])
                 args = parser_image.parse_args(options)
                 res = bflb_img_create.img_create(
-                    args, chipname, chiptype, self.img_create_path, self.img_create_cfg
+                    args,
+                    chipname,
+                    chiptype,
+                    self.img_create_path,
+                    self.img_create_cfg,
+                    privatekey_str=values["privatekey"],
+                    publickey_str=values["publickey"],
                 )
                 if res is not True:
                     bflb_utils.set_error_code("0060")
-                    return bflb_utils.errorcode_msg()
+                    return bflb_utils.get_error_code_msg()
             elif values["img_type"] == "CPU1":
                 options = ["--image=if", "--cpu=cpu1", "--signer=none"]
                 if security_save_efuse is True:
                     options.extend(["--security=efuse"])
                 args = parser_image.parse_args(options)
                 res = bflb_img_create.img_create(
-                    args, chipname, chiptype, self.img_create_path, self.img_create_cfg
+                    args,
+                    chipname,
+                    chiptype,
+                    self.img_create_path,
+                    self.img_create_cfg,
+                    privatekey_str=values["privatekey"],
+                    publickey_str=values["publickey"],
                 )
                 if res is not True:
                     bflb_utils.set_error_code("0060")
-                    return bflb_utils.errorcode_msg()
+                    return bflb_utils.get_error_code_msg()
         os.remove(self.img_create_path + "/segheader_tmp.bin")
         if os.path.exists(self.img_create_path + "/bootheader_dummy.bin"):
             os.remove(self.img_create_path + "/bootheader_dummy.bin")
@@ -1147,7 +1121,7 @@ class BflbMcuTool(object):
                 tlv_bin = self.img_create_path + "/tlv.bin"
                 with open(tlv_bin, "wb") as fp:
                     fp.write(dts_bytearray)
-                bflb_utils.printf("tlv bin created success")
+                bflb_utils.printf("tlv bin created successfully")
         if values["img1_file"] and values["img1_group"] != "unused":
             img_org = values["img1_file"]
             if parse_rfpa(img_org) == b"BLRFPARA" and dts_bytearray:
@@ -1161,11 +1135,11 @@ class BflbMcuTool(object):
                 with open(img_new, "wb") as fp:
                     fp.write(bin_bytearray)
                 values["img1_file"] = img_new
-                bflb_utils.printf("tlv bin inserted success")
+                bflb_utils.printf("tlv bin inserted successfully")
             if file_check_len(img_org, 4096):
                 fw_new = file_add_len(img_org, 16)
                 values["img1_file"] = fw_new
-                bflb_utils.printf("16 bytes add to tail success")
+                bflb_utils.printf("16 bytes added to tail successfully")
         for index in range(cpu_num):
             num = str(index + 1)
             if values["img%s_group" % num] != "unused":
@@ -1173,12 +1147,12 @@ class BflbMcuTool(object):
                     error = "Please select image%s file" % num
                     bflb_utils.printf(error)
                     bflb_utils.set_error_code("0061")
-                    return bflb_utils.errorcode_msg()
+                    return bflb_utils.get_error_code_msg()
                 if values["img%s_addr" % num] == "" or values["img%s_addr" % num] == "0x":
                     error = "Please set image%s address" % num
                     bflb_utils.printf(error)
                     bflb_utils.set_error_code("0062")
-                    return bflb_utils.errorcode_msg()
+                    return bflb_utils.get_error_code_msg()
                 img_start = int(values["img%s_addr" % num].replace("0x", ""), 16)
                 if values["img%s_group" % num] == "group0":
                     group0_enable = True
@@ -1211,56 +1185,44 @@ class BflbMcuTool(object):
                     error = "Please set group0 AES key"
                     bflb_utils.printf(error)
                     bflb_utils.set_error_code("0064")
-                    return bflb_utils.errorcode_msg()
+                    return bflb_utils.get_error_code_msg()
             if "aes_iv-group0" in values.keys():
                 if values["encrypt_type-group0"] != "None" and values["aes_iv-group0"] == "":
                     error = "Please set group0 AES IV"
                     bflb_utils.printf(error)
                     bflb_utils.set_error_code("0065")
-                    return bflb_utils.errorcode_msg()
+                    return bflb_utils.get_error_code_msg()
         if "encrypt_type-group1" in values.keys():
             if "encrypt_key-group1" in values.keys():
                 if values["encrypt_type-group1"] != "None" and values["encrypt_key-group1"] == "":
                     error = "Please set group1 AES key"
                     bflb_utils.printf(error)
                     bflb_utils.set_error_code("0064")
-                    return bflb_utils.errorcode_msg()
+                    return bflb_utils.get_error_code_msg()
             if "aes_iv-group1" in values.keys():
                 if values["encrypt_type-group1"] != "None" and values["aes_iv-group1"] == "":
                     error = "Please set group1 AES IV"
                     bflb_utils.printf(error)
                     bflb_utils.set_error_code("0065")
-                    return bflb_utils.errorcode_msg()
-        if "sign_type-group0" in values.keys():
-            """
-            if "public_key_cfg-group0" in values.keys():
-                if values["sign_type-group0"] != "None" and values["public_key_cfg-group0"] == "":
-                    error = "Please set group0 public key"
-                    bflb_utils.printf(error)
-                    bflb_utils.set_error_code("0066")
-                    return bflb_utils.errorcode_msg()
-            """
+                    return bflb_utils.get_error_code_msg()
+        if "sign_type" in values.keys():
             if "private_key_cfg-group0" in values.keys():
-                if values["sign_type-group0"] != "None" and values["private_key_cfg-group0"] == "":
+                if (
+                    values["sign_type"] != "None"
+                    and values["private_key_cfg-group0"] == ""
+                    and values["privatekey"] == ""
+                ):
                     error = "Please set group0 private key"
                     bflb_utils.printf(error)
                     bflb_utils.set_error_code("0067")
-                    return bflb_utils.errorcode_msg()
+                    return bflb_utils.get_error_code_msg()
         if "sign_type-group1" in values.keys():
-            """
-            if "public_key_cfg-group1" in values.keys():
-                if values["sign_type-group1"] != "None" and values["public_key_cfg-group1"] == "":
-                    error = "Please set group1 public key"
-                    bflb_utils.printf(error)
-                    bflb_utils.set_error_code("0066")
-                    return bflb_utils.errorcode_msg()
-            """
             if "private_key_cfg-group1" in values.keys():
                 if values["sign_type-group1"] != "None" and values["private_key_cfg-group1"] == "":
                     error = "Please set group1 private key"
                     bflb_utils.printf(error)
                     bflb_utils.set_error_code("0067")
-                    return bflb_utils.errorcode_msg()
+                    return bflb_utils.get_error_code_msg()
         group0_section = "BOOTHEADER_GROUP0_CFG"
         group1_section = "BOOTHEADER_GROUP1_CFG"
         bh_cfg_file = self.img_create_path + "/efuse_bootheader_cfg.ini"
@@ -1275,7 +1237,7 @@ class BflbMcuTool(object):
         group0_img_create_section = "Img_Group0_Cfg"
         group1_img_create_section = "Img_Group1_Cfg"
         if os.path.isfile(bh_cfg_file) is False:
-            bflb_utils.copyfile(self.efuse_bh_default_cfg, bh_cfg_file)
+            bflb_utils.copy_file(self.efuse_bh_default_cfg, bh_cfg_file)
         shutil.copyfile(self.img_create_cfg_org, self.img_create_cfg)
         # add flash cfg
         if os.path.exists(self.eflash_loader_cfg_tmp):
@@ -1284,26 +1246,24 @@ class BflbMcuTool(object):
             if cfg1.has_option("FLASH_CFG", "flash_id"):
                 flash_id = cfg1.get("FLASH_CFG", "flash_id")
                 if (
-                    bflb_flash_select.update_flash_cfg(
-                        chipname, chiptype, flash_id, bh_cfg_file, False, group0_section
-                    )
+                    bflb_flash_select.update_flash_cfg(chipname, chiptype, flash_id, bh_cfg_file, False, group0_section)
                     is False
                 ):
                     error = "flash_id:" + flash_id + " do not support"
                     bflb_utils.printf(error)
                     bflb_utils.set_error_code("0069")
-                    return bflb_utils.errorcode_msg()
+                    return bflb_utils.get_error_code_msg()
             else:
                 error = "Do not find flash_id in eflash_loader_cfg.ini"
                 bflb_utils.printf(error)
                 bflb_utils.set_error_code("0070")
-                return bflb_utils.errorcode_msg()
+                return bflb_utils.get_error_code_msg()
             if cfg1.has_option("EFUSE_CFG", "security_save"):
                 security_save_efuse = cfg1.get("EFUSE_CFG", "security_save") == "true"
         else:
             bflb_utils.printf("Config file not found")
             bflb_utils.set_error_code("000B")
-            return bflb_utils.errorcode_msg()
+            return bflb_utils.get_error_code_msg()
         # update config
         cfg = BFConfigParser()
         cfg.read(bh_cfg_file)
@@ -1317,15 +1277,13 @@ class BflbMcuTool(object):
 
         chip_erase_time = cfg.get(group0_section, "chip_erase_time")
         if int(chip_erase_time) > 65535:
-            bflb_utils.printf("Warning: chip erase time is overflow")
+            bflb_utils.printf("Warning: chip erase time exceeds limit")
 
         bflb_utils.update_cfg(cfg, group0_section, "boot2_enable", "0")
         bflb_utils.update_cfg(cfg, group1_section, "boot2_enable", "0")
 
         if "sign_type-group0" in values.keys():
-            bflb_utils.update_cfg(
-                cfg, group0_section, "sign", self.sign_type.index(values["sign_type-group0"])
-            )
+            bflb_utils.update_cfg(cfg, group0_section, "sign", self.sign_type.index(values["sign_type-group0"]))
         if "encrypt_type-group0" in values.keys():
             tmp = self.encrypt_type.index(values["encrypt_type-group0"])
             if tmp == 4 or tmp == 5 or tmp == 6:
@@ -1339,33 +1297,31 @@ class BflbMcuTool(object):
                 error = "group0 key length error"
                 bflb_utils.printf(error)
                 bflb_utils.set_error_code("0071")
-                return bflb_utils.errorcode_msg()
+                return bflb_utils.get_error_code_msg()
             if tmp == 3 and len(values["encrypt_key-group0"]) != 48:
                 error = "group0 key length error"
                 bflb_utils.printf(error)
                 bflb_utils.set_error_code("0071")
-                return bflb_utils.errorcode_msg()
+                return bflb_utils.get_error_code_msg()
             if tmp == 2 or tmp == 4 or tmp == 5 or tmp == 6:
                 if len(values["encrypt_key-group0"]) != 64:
                     error = "group0 key length error"
                     bflb_utils.printf(error)
                     bflb_utils.set_error_code("0071")
-                    return bflb_utils.errorcode_msg()
+                    return bflb_utils.get_error_code_msg()
             if tmp != 0:
                 if len(values["aes_iv-group0"]) != 32:
                     error = "group0 AES IV length error"
                     bflb_utils.printf(error)
                     bflb_utils.set_error_code("0072")
-                    return bflb_utils.errorcode_msg()
+                    return bflb_utils.get_error_code_msg()
                 if values["aes_iv-group0"].endswith("00000000") is False:
                     error = "group0 AES IV should endswith 4 bytes zero"
                     bflb_utils.printf(error)
                     bflb_utils.set_error_code("0073")
-                    return bflb_utils.errorcode_msg()
+                    return bflb_utils.get_error_code_msg()
         if "key_sel-group0" in values.keys():
-            bflb_utils.update_cfg(
-                cfg, group0_section, "key_sel", self.key_sel.index(values["key_sel-group0"])
-            )
+            bflb_utils.update_cfg(cfg, group0_section, "key_sel", self.key_sel.index(values["key_sel-group0"]))
         if "crc_ignore-group0" in values.keys():
             bflb_utils.update_cfg(
                 cfg,
@@ -1381,9 +1337,7 @@ class BflbMcuTool(object):
                 self.hash_ignore.index(values["hash_ignore-group0"]),
             )
         if "sign_type-group1" in values.keys():
-            bflb_utils.update_cfg(
-                cfg, group1_section, "sign", self.sign_type.index(values["sign_type-group1"])
-            )
+            bflb_utils.update_cfg(cfg, group1_section, "sign", self.sign_type.index(values["sign_type-group1"]))
         if "encrypt_type-group1" in values.keys():
             tmp = self.encrypt_type.index(values["encrypt_type-group1"])
             if tmp == 4 or tmp == 5 or tmp == 6:
@@ -1397,33 +1351,31 @@ class BflbMcuTool(object):
                 error = "group1 key length error"
                 bflb_utils.printf(error)
                 bflb_utils.set_error_code("0071")
-                return bflb_utils.errorcode_msg()
+                return bflb_utils.get_error_code_msg()
             if tmp == 3 and len(values["encrypt_key-group1"]) != 48:
                 error = "group1 key length error"
                 bflb_utils.printf(error)
                 bflb_utils.set_error_code("0071")
-                return bflb_utils.errorcode_msg()
+                return bflb_utils.get_error_code_msg()
             if tmp == 2 or tmp == 4 or tmp == 5 or tmp == 6:
                 if len(values["encrypt_key-group1"]) != 64:
                     error = "group1 key length error"
                     bflb_utils.printf(error)
                     bflb_utils.set_error_code("0071")
-                    return bflb_utils.errorcode_msg()
+                    return bflb_utils.get_error_code_msg()
             if tmp != 0:
                 if len(values["aes_iv-group1"]) != 32:
                     error = "group1 AES IV length error"
                     bflb_utils.printf(error)
                     bflb_utils.set_error_code("0072")
-                    return bflb_utils.errorcode_msg()
+                    return bflb_utils.get_error_code_msg()
                 if values["aes_iv-group1"].endswith("00000000") is False:
                     error = "group1 AES IV should endswith 4 bytes zero"
                     bflb_utils.printf(error)
                     bflb_utils.set_error_code("0073")
-                    return bflb_utils.errorcode_msg()
+                    return bflb_utils.get_error_code_msg()
         if "key_sel-group1" in values.keys():
-            bflb_utils.update_cfg(
-                cfg, group1_section, "key_sel", self.key_sel.index(values["key_sel-group1"])
-            )
+            bflb_utils.update_cfg(cfg, group1_section, "key_sel", self.key_sel.index(values["key_sel-group1"]))
         if "crc_ignore-group1" in values.keys():
             bflb_utils.update_cfg(
                 cfg,
@@ -1441,40 +1393,26 @@ class BflbMcuTool(object):
         for index in range(cpu_num):
             num = str(index + 1)
             if values["img%s_group" % num] == "unused":
-                bflb_utils.update_cfg(
-                    cfg, group0_section, "%s_config_enable" % cpu_list[index], "0"
-                )
+                bflb_utils.update_cfg(cfg, group0_section, "%s_config_enable" % cpu_list[index], "0")
                 # bflb_utils.update_cfg(cfg, group0_section, "%s_halt_cpu" % cpu_list[index], "1")
-                bflb_utils.update_cfg(
-                    cfg, group1_section, "%s_config_enable" % cpu_list[index], "0"
-                )
+                bflb_utils.update_cfg(cfg, group1_section, "%s_config_enable" % cpu_list[index], "0")
                 # bflb_utils.update_cfg(cfg, group1_section, "%s_halt_cpu" % cpu_list[index], "1")
             elif values["img%s_group" % num] == "group0":
-                bflb_utils.update_cfg(
-                    cfg, group0_section, "%s_config_enable" % cpu_list[index], "1"
-                )
+                bflb_utils.update_cfg(cfg, group0_section, "%s_config_enable" % cpu_list[index], "1")
                 # bflb_utils.update_cfg(cfg, group0_section, "%s_halt_cpu" % cpu_list[index], "0")
-                bflb_utils.update_cfg(
-                    cfg, group1_section, "%s_config_enable" % cpu_list[index], "0"
-                )
+                bflb_utils.update_cfg(cfg, group1_section, "%s_config_enable" % cpu_list[index], "0")
                 # bflb_utils.update_cfg(cfg, group1_section, "%s_halt_cpu" % cpu_list[index], "0")
             elif values["img%s_group" % num] == "group1":
-                bflb_utils.update_cfg(
-                    cfg, group0_section, "%s_config_enable" % cpu_list[index], "0"
-                )
+                bflb_utils.update_cfg(cfg, group0_section, "%s_config_enable" % cpu_list[index], "0")
                 # bflb_utils.update_cfg(cfg, group0_section, "%s_halt_cpu" % cpu_list[index], "0")
-                bflb_utils.update_cfg(
-                    cfg, group1_section, "%s_config_enable" % cpu_list[index], "1"
-                )
+                bflb_utils.update_cfg(cfg, group1_section, "%s_config_enable" % cpu_list[index], "1")
                 # bflb_utils.update_cfg(cfg, group1_section, "%s_halt_cpu" % cpu_list[index], "0")
 
         bflb_utils.update_cfg(cfg, group0_section, "img_len_cnt", "0x100")
         bflb_utils.update_cfg(cfg, group1_section, "img_len_cnt", "0x100")
         for index in range(cpu_num):
             if int(img_addr_offset[index].replace("0x", ""), 16) > 0:
-                offset = int(img_addr_offset[index].replace("0x", ""), 16) - int(
-                    group0_img_start.replace("0x", ""), 16
-                )
+                offset = int(img_addr_offset[index].replace("0x", ""), 16) - int(group0_img_start.replace("0x", ""), 16)
                 bflb_utils.update_cfg(
                     cfg,
                     group0_section,
@@ -1528,9 +1466,7 @@ class BflbMcuTool(object):
                 group1_bh_file,
                 self.img_create_path + "/bootheader_dummy.bin",
             )
-            bflb_efuse_boothd_create.efuse_create_process(
-                chipname, chiptype, bh_cfg_file, efuse_file
-            )
+            bflb_efuse_boothd_create.efuse_create_process(chipname, chiptype, bh_cfg_file, efuse_file)
             if group0_enable is not True:
                 self.bflb_set_file_ff(group0_bh_file)
             if group1_enable is not True:
@@ -1539,9 +1475,7 @@ class BflbMcuTool(object):
             bflb_efuse_boothd_create.bootheader_create_process(
                 chipname, chiptype, bh_cfg_file, group0_bh_file, group1_bh_file, True
             )
-            bflb_efuse_boothd_create.efuse_create_process(
-                chipname, chiptype, bh_cfg_file, efuse_file
-            )
+            bflb_efuse_boothd_create.efuse_create_process(chipname, chiptype, bh_cfg_file, efuse_file)
         # create img_create_cfg.ini
         cfg = BFConfigParser()
         cfg.read(self.img_create_cfg)
@@ -1577,17 +1511,11 @@ class BflbMcuTool(object):
         bflb_utils.update_cfg(cfg, group0_img_create_section, "segdata_file", group0_img)
         bflb_utils.update_cfg(cfg, group1_img_create_section, "segdata_file", group1_img)
         if "encrypt_key-group0" in values.keys():
-            bflb_utils.update_cfg(
-                cfg, group0_img_create_section, "aes_key_org", values["encrypt_key-group0"]
-            )
+            bflb_utils.update_cfg(cfg, group0_img_create_section, "aes_key_org", values["encrypt_key-group0"])
         if "aes_iv-group0" in values.keys():
-            bflb_utils.update_cfg(
-                cfg, group0_img_create_section, "aes_iv", values["aes_iv-group0"]
-            )
+            bflb_utils.update_cfg(cfg, group0_img_create_section, "aes_iv", values["aes_iv-group0"])
         if "public_key_cfg-group0" in values.keys():
-            bflb_utils.update_cfg(
-                cfg, group0_img_create_section, "publickey_file", values["public_key_cfg-group0"]
-            )
+            bflb_utils.update_cfg(cfg, group0_img_create_section, "publickey_file", values["public_key_cfg-group0"])
         if "private_key_cfg-group0" in values.keys():
             bflb_utils.update_cfg(
                 cfg,
@@ -1596,17 +1524,11 @@ class BflbMcuTool(object):
                 values["private_key_cfg-group0"],
             )
         if "encrypt_key-group1" in values.keys():
-            bflb_utils.update_cfg(
-                cfg, group1_img_create_section, "aes_key_org", values["encrypt_key-group1"]
-            )
+            bflb_utils.update_cfg(cfg, group1_img_create_section, "aes_key_org", values["encrypt_key-group1"])
         if "aes_iv-group1" in values.keys():
-            bflb_utils.update_cfg(
-                cfg, group1_img_create_section, "aes_iv", values["aes_iv-group1"]
-            )
+            bflb_utils.update_cfg(cfg, group1_img_create_section, "aes_iv", values["aes_iv-group1"])
         if "public_key_cfg-group1" in values.keys():
-            bflb_utils.update_cfg(
-                cfg, group1_img_create_section, "publickey_file", values["public_key_cfg-group1"]
-            )
+            bflb_utils.update_cfg(cfg, group1_img_create_section, "publickey_file", values["public_key_cfg-group1"])
         if "private_key_cfg-group1" in values.keys():
             bflb_utils.update_cfg(
                 cfg,
@@ -1614,12 +1536,8 @@ class BflbMcuTool(object):
                 "privatekey_file_uecc",
                 values["private_key_cfg-group1"],
             )
-        bflb_utils.update_cfg(
-            cfg, group0_img_create_section, "bootinfo_file", group0_bootinfo_file
-        )
-        bflb_utils.update_cfg(
-            cfg, group1_img_create_section, "bootinfo_file", group1_bootinfo_file
-        )
+        bflb_utils.update_cfg(cfg, group0_img_create_section, "bootinfo_file", group0_bootinfo_file)
+        bflb_utils.update_cfg(cfg, group1_img_create_section, "bootinfo_file", group1_bootinfo_file)
         bflb_utils.update_cfg(cfg, group0_img_create_section, "img_file", group0_img_output_file)
         bflb_utils.update_cfg(cfg, group1_img_create_section, "img_file", group1_img_output_file)
         bflb_utils.update_cfg(
@@ -1642,22 +1560,34 @@ class BflbMcuTool(object):
                 options.extend(["--security=efuse"])
             args = parser_image.parse_args(options)
             res = bflb_img_create.img_create(
-                args, chipname, chiptype, self.img_create_path, self.img_create_cfg
+                args,
+                chipname,
+                chiptype,
+                self.img_create_path,
+                self.img_create_cfg,
+                privatekey_str=values["privatekey"],
+                publickey_str=values["publickey"],
             )
             if res is not True:
                 bflb_utils.set_error_code("0060")
-                return bflb_utils.errorcode_msg()
+                return bflb_utils.get_error_code_msg()
         else:
             options = ["--image=if", "--group=all", "--signer=none"]
             if security_save_efuse is True:
                 options.extend(["--security=efuse"])
             args = parser_image.parse_args(options)
             res = bflb_img_create.img_create(
-                args, chipname, chiptype, self.img_create_path, self.img_create_cfg
+                args,
+                chipname,
+                chiptype,
+                self.img_create_path,
+                self.img_create_cfg,
+                privatekey_str=values["privatekey"],
+                publickey_str=values["publickey"],
             )
             if res is not True:
                 bflb_utils.set_error_code("0060")
-                return bflb_utils.errorcode_msg()
+                return bflb_utils.get_error_code_msg()
         i = 0
         while i < len(segheader_file):
             os.remove(self.img_create_path + segheader_file[i])
@@ -1702,7 +1632,7 @@ class BflbMcuTool(object):
                 tlv_bin = self.img_create_path + "/tlv.bin"
                 with open(tlv_bin, "wb") as fp:
                     fp.write(dts_bytearray)
-                bflb_utils.printf("tlv bin created success")
+                bflb_utils.printf("tlv bin created successfully")
         if values["img1_file"]:
             img_org = values["img1_file"]
             if parse_rfpa(img_org) == b"BLRFPARA" and dts_bytearray:
@@ -1716,11 +1646,11 @@ class BflbMcuTool(object):
                 with open(img_new, "wb") as fp:
                     fp.write(bin_bytearray)
                 values["img1_file"] = img_new
-                bflb_utils.printf("tlv bin inserted success")
+                bflb_utils.printf("tlv bin inserted successfully")
             if file_check_len(img_org, 4096):
                 fw_new = file_add_len(img_org, 16)
                 values["img1_file"] = fw_new
-                bflb_utils.printf("16 bytes add to tail success")
+                bflb_utils.printf("16 bytes added to tail successfully")
         else:
             if values["dl_chiperase"] == "True":
                 bflb_utils.printf("flash chiperase operation")
@@ -1729,12 +1659,12 @@ class BflbMcuTool(object):
                 error = "Please select image1 file"
                 bflb_utils.printf(error)
                 bflb_utils.set_error_code("0061")
-                return bflb_utils.errorcode_msg()
+                return bflb_utils.get_error_code_msg()
         if values["img1_addr"] == "" or values["img1_addr"] == "0x":
             error = "Please set image1 address"
             bflb_utils.printf(error)
             bflb_utils.set_error_code("0062")
-            return bflb_utils.errorcode_msg()
+            return bflb_utils.get_error_code_msg()
         img_start = int(values["img1_addr"].replace("0x", ""), 16)
         group0_img += values["img1_file"]
         img_addr_offset = values["img1_addr"]
@@ -1749,28 +1679,24 @@ class BflbMcuTool(object):
                     error = "Please set group0 AES key"
                     bflb_utils.printf(error)
                     bflb_utils.set_error_code("0064")
-                    return bflb_utils.errorcode_msg()
+                    return bflb_utils.get_error_code_msg()
             if "aes_iv-group0" in values.keys():
                 if values["encrypt_type-group0"] != "None" and values["aes_iv-group0"] == "":
                     error = "Please set group0 AES IV"
                     bflb_utils.printf(error)
                     bflb_utils.set_error_code("0065")
-                    return bflb_utils.errorcode_msg()
-        if "sign_type-group0" in values.keys():
-            """
-            if "public_key_cfg-group0" in values.keys():
-                if values["sign_type-group0"] != "None" and values["public_key_cfg-group0"] == "":
-                    error = "Please set group0 public key"
-                    bflb_utils.printf(error)
-                    bflb_utils.set_error_code("0066")
-                    return bflb_utils.errorcode_msg()
-            """
+                    return bflb_utils.get_error_code_msg()
+        if "sign_type" in values.keys():
             if "private_key_cfg-group0" in values.keys():
-                if values["sign_type-group0"] != "None" and values["private_key_cfg-group0"] == "":
+                if (
+                    values["sign_type"] != "None"
+                    and values["private_key_cfg-group0"] == ""
+                    and values["privatekey"] == ""
+                ):
                     error = "Please set group0 private key"
                     bflb_utils.printf(error)
                     bflb_utils.set_error_code("0067")
-                    return bflb_utils.errorcode_msg()
+                    return bflb_utils.get_error_code_msg()
         group0_section = "BOOTHEADER_GROUP0_CFG"
         bh_cfg_file = self.img_create_path + "/efuse_bootheader_cfg.ini"
         group0_bh_file = self.img_create_path + "/bootheader.bin"
@@ -1780,7 +1706,7 @@ class BflbMcuTool(object):
         group0_img_output_file = self.img_create_path + "/img.bin"
         group0_img_create_section = "Img_Group0_Cfg"
         if os.path.isfile(bh_cfg_file) is False:
-            bflb_utils.copyfile(self.efuse_bh_default_cfg, bh_cfg_file)
+            bflb_utils.copy_file(self.efuse_bh_default_cfg, bh_cfg_file)
         shutil.copyfile(self.img_create_cfg_org, self.img_create_cfg)
         # add flash cfg
         if os.path.exists(self.eflash_loader_cfg_tmp):
@@ -1789,26 +1715,24 @@ class BflbMcuTool(object):
             if cfg1.has_option("FLASH_CFG", "flash_id"):
                 flash_id = cfg1.get("FLASH_CFG", "flash_id")
                 if (
-                    bflb_flash_select.update_flash_cfg(
-                        chipname, chiptype, flash_id, bh_cfg_file, False, group0_section
-                    )
+                    bflb_flash_select.update_flash_cfg(chipname, chiptype, flash_id, bh_cfg_file, False, group0_section)
                     is False
                 ):
                     error = "flash_id:" + flash_id + " do not support"
                     bflb_utils.printf(error)
                     bflb_utils.set_error_code("0069")
-                    return bflb_utils.errorcode_msg()
+                    return bflb_utils.get_error_code_msg()
             else:
                 error = "Do not find flash_id in eflash_loader_cfg.ini"
                 bflb_utils.printf(error)
                 bflb_utils.set_error_code("0070")
-                return bflb_utils.errorcode_msg()
+                return bflb_utils.get_error_code_msg()
             if cfg1.has_option("EFUSE_CFG", "security_save"):
                 security_save_efuse = cfg1.get("EFUSE_CFG", "security_save") == "true"
         else:
             bflb_utils.printf("Config file not found")
             bflb_utils.set_error_code("000B")
-            return bflb_utils.errorcode_msg()
+            return bflb_utils.get_error_code_msg()
         # update config
         cfg = BFConfigParser()
         cfg.read(bh_cfg_file)
@@ -1822,7 +1746,7 @@ class BflbMcuTool(object):
 
         chip_erase_time = cfg.get(group0_section, "chip_erase_time")
         if int(chip_erase_time) > 65535:
-            bflb_utils.printf("Warning: chip erase time is overflow")
+            bflb_utils.printf("Warning: chip erase time exceeds limit")
 
         bflb_utils.update_cfg(cfg, group0_section, "boot2_enable", "0")
         #         if "xtal_type" in values.keys():
@@ -1840,9 +1764,7 @@ class BflbMcuTool(object):
                 bflb_utils.update_cfg(cfg, group0_section, "sfctrl_clk_delay", "1")
                 bflb_utils.update_cfg(cfg, group0_section, "sfctrl_clk_invert", "0x01")
         if "sign_type-group0" in values.keys():
-            bflb_utils.update_cfg(
-                cfg, group0_section, "sign", self.sign_type.index(values["sign_type-group0"])
-            )
+            bflb_utils.update_cfg(cfg, group0_section, "sign", self.sign_type.index(values["sign_type-group0"]))
             if cfg.has_option(group0_section, "custom_ecc_type"):
                 bflb_utils.update_cfg(
                     cfg,
@@ -1865,33 +1787,31 @@ class BflbMcuTool(object):
                 error = "group0 key length error"
                 bflb_utils.printf(error)
                 bflb_utils.set_error_code("0071")
-                return bflb_utils.errorcode_msg()
+                return bflb_utils.get_error_code_msg()
             if tmp == 3 and len(values["encrypt_key-group0"]) != 48:
                 error = "group0 key length error"
                 bflb_utils.printf(error)
                 bflb_utils.set_error_code("0071")
-                return bflb_utils.errorcode_msg()
+                return bflb_utils.get_error_code_msg()
             if tmp == 2 or tmp == 4 or tmp == 5 or tmp == 6:
                 if len(values["encrypt_key-group0"]) != 64:
                     error = "group0 key length error"
                     bflb_utils.printf(error)
                     bflb_utils.set_error_code("0071")
-                    return bflb_utils.errorcode_msg()
+                    return bflb_utils.get_error_code_msg()
             if tmp != 0:
                 if len(values["aes_iv-group0"]) != 32:
                     error = "group0 AES IV length error"
                     bflb_utils.printf(error)
                     bflb_utils.set_error_code("0072")
-                    return bflb_utils.errorcode_msg()
+                    return bflb_utils.get_error_code_msg()
                 if values["aes_iv-group0"].endswith("00000000") is False:
                     error = "group0 AES IV should endswith 4 bytes zero"
                     bflb_utils.printf(error)
                     bflb_utils.set_error_code("0073")
-                    return bflb_utils.errorcode_msg()
+                    return bflb_utils.get_error_code_msg()
         if "key_sel-group0" in values.keys():
-            bflb_utils.update_cfg(
-                cfg, group0_section, "key_sel", self.key_sel.index(values["key_sel-group0"])
-            )
+            bflb_utils.update_cfg(cfg, group0_section, "key_sel", self.key_sel.index(values["key_sel-group0"]))
         if "crc_ignore-group0" in values.keys():
             bflb_utils.update_cfg(
                 cfg,
@@ -1943,16 +1863,12 @@ class BflbMcuTool(object):
                 None,
                 self.img_create_path + "/bootheader_dummy.bin",
             )
-            bflb_efuse_boothd_create.efuse_create_process(
-                chipname, chiptype, bh_cfg_file, efuse_file
-            )
+            bflb_efuse_boothd_create.efuse_create_process(chipname, chiptype, bh_cfg_file, efuse_file)
         else:
             bflb_efuse_boothd_create.bootheader_create_process(
                 chipname, chiptype, bh_cfg_file, group0_bh_file, None, True
             )
-            bflb_efuse_boothd_create.efuse_create_process(
-                chipname, chiptype, bh_cfg_file, efuse_file
-            )
+            bflb_efuse_boothd_create.efuse_create_process(chipname, chiptype, bh_cfg_file, efuse_file)
         # create img_create_cfg.ini
         cfg = BFConfigParser()
         cfg.read(self.img_create_cfg)
@@ -1972,17 +1888,11 @@ class BflbMcuTool(object):
         bflb_utils.update_cfg(cfg, group0_img_create_section, "segheader_file", segheader_group0)
         bflb_utils.update_cfg(cfg, group0_img_create_section, "segdata_file", group0_img)
         if "encrypt_key-group0" in values.keys():
-            bflb_utils.update_cfg(
-                cfg, group0_img_create_section, "aes_key_org", values["encrypt_key-group0"]
-            )
+            bflb_utils.update_cfg(cfg, group0_img_create_section, "aes_key_org", values["encrypt_key-group0"])
         if "aes_iv-group0" in values.keys():
-            bflb_utils.update_cfg(
-                cfg, group0_img_create_section, "aes_iv", values["aes_iv-group0"]
-            )
+            bflb_utils.update_cfg(cfg, group0_img_create_section, "aes_iv", values["aes_iv-group0"])
         if "public_key_cfg-group0" in values.keys():
-            bflb_utils.update_cfg(
-                cfg, group0_img_create_section, "publickey_file", values["public_key_cfg-group0"]
-            )
+            bflb_utils.update_cfg(cfg, group0_img_create_section, "publickey_file", values["public_key_cfg-group0"])
         if "private_key_cfg-group0" in values.keys():
             bflb_utils.update_cfg(
                 cfg,
@@ -1990,9 +1900,7 @@ class BflbMcuTool(object):
                 "privatekey_file_uecc",
                 values["private_key_cfg-group0"],
             )
-        bflb_utils.update_cfg(
-            cfg, group0_img_create_section, "bootinfo_file", group0_bootinfo_file
-        )
+        bflb_utils.update_cfg(cfg, group0_img_create_section, "bootinfo_file", group0_bootinfo_file)
         bflb_utils.update_cfg(cfg, group0_img_create_section, "img_file", group0_img_output_file)
         bflb_utils.update_cfg(
             cfg,
@@ -2018,7 +1926,7 @@ class BflbMcuTool(object):
             )
             if res is not True:
                 bflb_utils.set_error_code("0060")
-                return bflb_utils.errorcode_msg()
+                return bflb_utils.get_error_code_msg()
         else:
             options = ["--image=if", "--group=all", "--signer=none"]
             if security_save_efuse is True:
@@ -2035,7 +1943,7 @@ class BflbMcuTool(object):
             )
             if res is not True:
                 bflb_utils.set_error_code("0060")
-                return bflb_utils.errorcode_msg()
+                return bflb_utils.get_error_code_msg()
         os.remove(self.img_create_path + segheader_file)
         if os.path.exists(self.img_create_path + "/bootheader_dummy.bin"):
             os.remove(self.img_create_path + "/bootheader_dummy.bin")
@@ -2043,9 +1951,9 @@ class BflbMcuTool(object):
         cfg = BFConfigParser()
         cfg.read(self.eflash_loader_cfg_tmp)
 
-        if (
-            "encrypt_type-group0" in values.keys() and values["encrypt_type-group0"] != "None"
-        ) or ("sign_type-group0" in values.keys() and values["sign_type-group0"] != "None"):
+        if ("encrypt_type-group0" in values.keys() and values["encrypt_type-group0"] != "None") or (
+            "sign_type-group0" in values.keys() and values["sign_type-group0"] != "None"
+        ):
             cfg.set("EFUSE_CFG", "burn_en", "true")
             self.efuse_load_en = True
         else:
@@ -2079,9 +1987,7 @@ class BflbMcuTool(object):
                 else:
                     bflb_utils.update_cfg(cfg, "LOAD_CFG", "verify", "0")
             if cfg.has_option("LOAD_CFG", "xtal_type"):
-                bflb_utils.update_cfg(
-                    cfg, "LOAD_CFG", "xtal_type", self.xtal_type_.index(values["xtal_type"])
-                )
+                bflb_utils.update_cfg(cfg, "LOAD_CFG", "xtal_type", self.xtal_type_.index(values["xtal_type"]))
             cfg.write("eflash_loader_tmp.ini", "w+")
             options = ["--erase", "--end=0", "-c", "eflash_loader_tmp.ini"]
         else:
@@ -2103,10 +2009,7 @@ class BflbMcuTool(object):
                 img_output_file = create_output_path + "/img_cpu1.bin"
                 whole_img_output_file = create_output_path + "/whole_img_cpu1.bin"
             # uart download
-            if (
-                values["boot_src"].upper() == "UART/SDIO"
-                or values["boot_src"].upper() == "UART/USB"
-            ):
+            if values["boot_src"].upper() == "UART/SDIO" or values["boot_src"].upper() == "UART/USB":
                 if values["dl_device"].lower() == "uart":
                     uart = values["dl_comport"]
                     uart_brd = values["dl_comspeed"]
@@ -2159,9 +2062,7 @@ class BflbMcuTool(object):
                     bflb_utils.printf("========= Interface is JLink =========")
                     # self.bl60x_mfg_flasher_jlink_cfg(rate=jlink_brd)
                     self._bflb_com_if = bflb_interface_jlink.BflbJLinkPort()
-                    self._bflb_com_if.if_init(
-                        values["dl_comport"], int(jlink_brd), self.chiptype, self.chipname
-                    )
+                    self._bflb_com_if.if_init(values["dl_comport"], int(jlink_brd), self.chiptype, self.chipname)
                     self._bflb_com_if.reset_cpu()
                     if values["img_type"] == "RAW":
                         img_file = values["img_file"]
@@ -2182,9 +2083,7 @@ class BflbMcuTool(object):
                     msp = bytes([msp[3], msp[2], msp[1], msp[0]])
                     # msp.reverse()
                     # print(pc, msp)
-                    self._bflb_com_if.set_pc_msp(
-                        binascii.hexlify(pc), binascii.hexlify(msp).decode("utf-8")
-                    )
+                    self._bflb_com_if.set_pc_msp(binascii.hexlify(pc), binascii.hexlify(msp).decode("utf-8"))
                     time.sleep(0.01)
                     self._bflb_com_if.if_close()
                     return True
@@ -2213,16 +2112,12 @@ class BflbMcuTool(object):
             )
 
             if cfg.has_option("LOAD_CFG", "xtal_type"):
-                bflb_utils.update_cfg(
-                    cfg, "LOAD_CFG", "xtal_type", self.xtal_type_.index(values["xtal_type"])
-                )
+                bflb_utils.update_cfg(cfg, "LOAD_CFG", "xtal_type", self.xtal_type_.index(values["xtal_type"]))
             if values["img_type"] == "RAW":
                 img_raw_tmp = os.path.join(self.img_create_path, "img_raw_tmp.bin")
                 shutil.copyfile(values["img_file"], img_raw_tmp)
                 bflb_utils.update_cfg(cfg, "FLASH_CFG", "file", img_raw_tmp)
-                bflb_utils.update_cfg(
-                    cfg, "FLASH_CFG", "address", values["img_addr"].replace("0x", "")
-                )
+                bflb_utils.update_cfg(cfg, "FLASH_CFG", "address", values["img_addr"].replace("0x", ""))
             else:
                 bind_bootinfo = True
                 fw_with_bootinfo = False
@@ -2236,9 +2131,7 @@ class BflbMcuTool(object):
                         whole_img_data = filedata
                         fw_with_bootinfo = True
                     else:
-                        whole_img_len = img_addr + os.path.getsize(
-                            os.path.join(app_path, img_output_file)
-                        )
+                        whole_img_len = img_addr + os.path.getsize(os.path.join(app_path, img_output_file))
                         whole_img_data = self.bl_create_flash_default_data(whole_img_len)
                         whole_img_data[0 : len(bootinfo_filedata)] = bootinfo_filedata
                         whole_img_data[img_addr : img_addr + len(filedata)] = filedata
@@ -2250,9 +2143,7 @@ class BflbMcuTool(object):
                     # bflb_utils.update_cfg(cfg, "FLASH_CFG", "address", values["bootinfo_addr"].replace("0x", ""))
                 if fw_with_bootinfo is True:
                     bflb_utils.update_cfg(cfg, "FLASH_CFG", "file", convert_path(img_output_file))
-                    bflb_utils.update_cfg(
-                        cfg, "FLASH_CFG", "address", values["bootinfo_addr"].replace("0x", "")
-                    )
+                    bflb_utils.update_cfg(cfg, "FLASH_CFG", "address", values["bootinfo_addr"].replace("0x", ""))
                 else:
                     bflb_utils.update_cfg(
                         cfg,
@@ -2264,9 +2155,7 @@ class BflbMcuTool(object):
                         cfg,
                         "FLASH_CFG",
                         "address",
-                        values["bootinfo_addr"].replace("0x", "")
-                        + " "
-                        + values["img_addr"].replace("0x", ""),
+                        values["bootinfo_addr"].replace("0x", "") + " " + values["img_addr"].replace("0x", ""),
                     )
             cfg.write(self.eflash_loader_cfg_tmp, "w+")
             # call eflash_loader
@@ -2292,22 +2181,18 @@ class BflbMcuTool(object):
                 or "sign_type" in values.keys()
                 or "public_key_cfg" in values.keys()
                 or "private_key_cfg" in values.keys()
+                or "privatekey" in values.keys()
             ):
                 if (
-                    values["encrypt_type"] != "None"
-                    and values["encrypt_key"] != ""
-                    and values["aes_iv"] != ""
-                ) or (
-                    values["sign_type"] != "None"
-                    and values["private_key_cfg"] != ""  # values["public_key_cfg"] != "" and\
+                    (values["encrypt_type"] != "None" and values["encrypt_key"] != "" and values["aes_iv"] != "")
+                    or (values["sign_type"] != "None" and values["private_key_cfg"] != "")
+                    or (values["sign_type"] != "None" and values["privatekey"] != "")
                 ):
                     if values["boot_src"].upper() == "FLASH":
                         options.extend(["--efuse", "--createcfg=" + self.img_create_cfg])
                         self.efuse_load_en = True
         ret = bflb_img_create.compress_dir(self.chipname, "img_create_mcu", self.efuse_load_en)
-        if (self.encrypt is True or self.sign is True) and (
-            self.chiptype == "bl602" or self.chiptype == "bl702"
-        ):
+        if (self.encrypt is True or self.sign is True) and (self.chiptype == "bl602" or self.chiptype == "bl702"):
             if self.encrypt:
                 encrypt = 1
             else:
@@ -2342,15 +2227,13 @@ class BflbMcuTool(object):
                 zip_file = os.path.join(self.img_create_path, "whole_img.pack")
                 z = zipfile.ZipFile(zip_file, "a")
                 z.write(
-                    os.path.join(
-                        chip_path, self.chipname, "eflash_loader", eflash_loader_bin_encrpyt
-                    ),
+                    os.path.join(chip_path, self.chipname, "eflash_loader", eflash_loader_bin_encrpyt),
                     os.path.join(self.chipname, "eflash_loader", eflash_loader_bin_encrpyt),
                 )
                 z.close()
 
         if ret is not True:
-            return bflb_utils.errorcode_msg()
+            return bflb_utils.get_error_code_msg()
         if not values["dl_comport"] and values["dl_device"].lower() == "uart":
             error = '{"ErrorCode":"FFFF","ErrorMsg":"BFLB INTERFACE HAS NO COM PORT"}'
             bflb_utils.printf(error)
@@ -2406,20 +2289,12 @@ class BflbMcuTool(object):
             else:
                 group1_img_start = 0
         else:
-            if (
-                values["img1_group"] == "group0"
-                or values["img2_group"] == "group0"
-                or values["img3_group"] == "group0"
-            ):
+            if values["img1_group"] == "group0" or values["img2_group"] == "group0" or values["img3_group"] == "group0":
                 group0_used = True
                 group0_img_start &= 0x3FFFFFF
             else:
                 group0_img_start = 0
-            if (
-                values["img1_group"] == "group1"
-                or values["img2_group"] == "group1"
-                or values["img3_group"] == "group1"
-            ):
+            if values["img1_group"] == "group1" or values["img2_group"] == "group1" or values["img3_group"] == "group1":
                 group1_used = True
                 group1_img_start &= 0x3FFFFFF
             else:
@@ -2508,53 +2383,30 @@ class BflbMcuTool(object):
         )
 
         if cfg.has_option("LOAD_CFG", "xtal_type"):
-            bflb_utils.update_cfg(
-                cfg, "LOAD_CFG", "xtal_type", self.xtal_type_.index(values["xtal_type"])
-            )
+            bflb_utils.update_cfg(cfg, "LOAD_CFG", "xtal_type", self.xtal_type_.index(values["xtal_type"]))
         if values["img_type"] == "RAW":
             bflb_utils.update_cfg(cfg, "FLASH_CFG", "file", values["img1_file"])
-            bflb_utils.update_cfg(
-                cfg, "FLASH_CFG", "address", values["img1_addr"].replace("0x", "")
-            )
+            bflb_utils.update_cfg(cfg, "FLASH_CFG", "address", values["img1_addr"].replace("0x", ""))
         else:
             read_data = self.bl_get_file_data([group0_bootinfo_file])[0]
             if self.chiptype == "bl628":
-                group0_img_offset = bflb_utils.bytearray_to_int(
-                    bflb_utils.bytearray_reverse(read_data[128:132])
-                )
-                group0_img_len = bflb_utils.bytearray_to_int(
-                    bflb_utils.bytearray_reverse(read_data[136:140])
-                )
+                group0_img_offset = bflb_utils.bytearray_to_int(bflb_utils.bytearray_reverse(read_data[128:132]))
+                group0_img_len = bflb_utils.bytearray_to_int(bflb_utils.bytearray_reverse(read_data[136:140]))
                 read_data = self.bl_get_file_data([group1_bootinfo_file])[0]
-                group1_img_offset = bflb_utils.bytearray_to_int(
-                    bflb_utils.bytearray_reverse(read_data[128:132])
-                )
-                group1_img_len = bflb_utils.bytearray_to_int(
-                    bflb_utils.bytearray_reverse(read_data[136:140])
-                )
+                group1_img_offset = bflb_utils.bytearray_to_int(bflb_utils.bytearray_reverse(read_data[128:132]))
+                group1_img_len = bflb_utils.bytearray_to_int(bflb_utils.bytearray_reverse(read_data[136:140]))
             else:
-                group0_img_offset = bflb_utils.bytearray_to_int(
-                    bflb_utils.bytearray_reverse(read_data[132:136])
-                )
-                group0_img_len = bflb_utils.bytearray_to_int(
-                    bflb_utils.bytearray_reverse(read_data[140:144])
-                )
+                group0_img_offset = bflb_utils.bytearray_to_int(bflb_utils.bytearray_reverse(read_data[132:136]))
+                group0_img_len = bflb_utils.bytearray_to_int(bflb_utils.bytearray_reverse(read_data[140:144]))
                 read_data = self.bl_get_file_data([group1_bootinfo_file])[0]
-                group1_img_offset = bflb_utils.bytearray_to_int(
-                    bflb_utils.bytearray_reverse(read_data[132:136])
-                )
-                group1_img_len = bflb_utils.bytearray_to_int(
-                    bflb_utils.bytearray_reverse(read_data[140:144])
-                )
+                group1_img_offset = bflb_utils.bytearray_to_int(bflb_utils.bytearray_reverse(read_data[132:136]))
+                group1_img_len = bflb_utils.bytearray_to_int(bflb_utils.bytearray_reverse(read_data[140:144]))
             bind_bootinfo = True
             group0_fw_with_bootinfo = False
             group1_fw_with_bootinfo = False
             if bind_bootinfo is True:
                 whole_img_len = 0
-                if (
-                    group0_img_offset + group0_img_len < group1_img_offset + group1_img_len
-                    and group1_used is True
-                ):
+                if group0_img_offset + group0_img_len < group1_img_offset + group1_img_len and group1_used is True:
                     whole_img_len = group1_img_offset + group1_img_len + group1_img_start
                 else:
                     whole_img_len = group0_img_offset + group0_img_len + group0_img_start
@@ -2570,16 +2422,13 @@ class BflbMcuTool(object):
                     group0_filedata = self.bl_get_file_data([group0_img_output_file])[0]
                     if group0_img_len != len(group0_filedata):
                         bflb_utils.printf(
-                            "group0 img len error, get %d except %d"
-                            % (group0_img_len, len(group0_filedata))
+                            "group0 img len error, get %d except %d" % (group0_img_len, len(group0_filedata))
                         )
                     if group0_bootinfo_filedata[0:4] == group0_filedata[0:4]:
                         whole_img_data = group0_filedata
                         group0_fw_with_bootinfo = True
                     else:
-                        whole_img_data[
-                            0 : len(group0_bootinfo_filedata)
-                        ] = group0_bootinfo_filedata
+                        whole_img_data[0 : len(group0_bootinfo_filedata)] = group0_bootinfo_filedata
                         whole_img_data[
                             group0_img_offset
                             + group0_img_start : group0_img_offset
@@ -2592,16 +2441,13 @@ class BflbMcuTool(object):
                     group1_filedata = self.bl_get_file_data([group1_img_output_file])[0]
                     if group1_img_len != len(group1_filedata):
                         bflb_utils.printf(
-                            "group1 img len error, get %d except %d"
-                            % (group1_img_len, len(group1_filedata))
+                            "group1 img len error, get %d except %d" % (group1_img_len, len(group1_filedata))
                         )
                     if group1_bootinfo_filedata[0:4] == group1_filedata[0:4]:
                         whole_img_data = group1_filedata
                         group1_fw_with_bootinfo = True
                     else:
-                        whole_img_data[
-                            0x1000 : 0x1000 + len(group1_bootinfo_filedata)
-                        ] = group1_bootinfo_filedata
+                        whole_img_data[0x1000 : 0x1000 + len(group1_bootinfo_filedata)] = group1_bootinfo_filedata
                         whole_img_data[
                             group1_img_offset
                             + group1_img_start : group1_img_offset
@@ -2626,22 +2472,14 @@ class BflbMcuTool(object):
                     file_list = convert_path(group0_img_output_file)
                     addr_list = "%x" % (group0_bootinfo_addr)
                 else:
-                    file_list = (
-                        convert_path(group0_bootinfo_file)
-                        + " "
-                        + convert_path(group0_img_output_file)
-                    )
+                    file_list = convert_path(group0_bootinfo_file) + " " + convert_path(group0_img_output_file)
                     addr_list = "%x %x" % (group0_bootinfo_addr, group0_img_offset)
             elif group0_used is False and group1_used is True:
                 if group1_fw_with_bootinfo is True:
                     file_list = convert_path(group1_img_output_file)
                     addr_list = "%x" % (group1_bootinfo_addr)
                 else:
-                    file_list = (
-                        convert_path(group1_bootinfo_file)
-                        + " "
-                        + convert_path(group1_img_output_file)
-                    )
+                    file_list = convert_path(group1_bootinfo_file) + " " + convert_path(group1_img_output_file)
                     addr_list = "%x %x" % (group1_bootinfo_addr, group1_img_offset)
             elif group0_used is True and group1_used is True:
                 if group0_fw_with_bootinfo is True:
@@ -2709,17 +2547,11 @@ class BflbMcuTool(object):
                 )
                 or (
                     values["sign_type-group0"] != "None"
-                    and values[  # values["public_key_cfg-group0"] != "" and\
-                        "private_key_cfg-group0"
-                    ]
-                    != ""
+                    and values["private_key_cfg-group0"] != ""  # values["public_key_cfg-group0"] != "" and\
                 )
                 or (
                     values["sign_type-group1"] != "None"
-                    and values[  # values["public_key_cfg-group1"] != "" and\
-                        "private_key_cfg-group1"
-                    ]
-                    != ""
+                    and values["private_key_cfg-group1"] != ""  # values["public_key_cfg-group1"] != "" and\
                 )
             ):
                 if values["boot_src"].upper() == "FLASH":
@@ -2727,7 +2559,7 @@ class BflbMcuTool(object):
                     self.efuse_load_en = True
         ret = bflb_img_create.compress_dir(self.chipname, "img_create_mcu", self.efuse_load_en)
         if ret is not True:
-            return bflb_utils.errorcode_msg()
+            return bflb_utils.get_error_code_msg()
         if not values["dl_comport"] and values["dl_device"].lower() == "uart":
             error = '{"ErrorCode":"FFFF","ErrorMsg":"BFLB INTERFACE HAS NO COM PORT"}'
             bflb_utils.printf(error)
@@ -2811,14 +2643,10 @@ class BflbMcuTool(object):
         )
 
         if cfg.has_option("LOAD_CFG", "xtal_type"):
-            bflb_utils.update_cfg(
-                cfg, "LOAD_CFG", "xtal_type", self.xtal_type_.index(values["xtal_type"])
-            )
+            bflb_utils.update_cfg(cfg, "LOAD_CFG", "xtal_type", self.xtal_type_.index(values["xtal_type"]))
         if values["img_type"] == "RAW":
             bflb_utils.update_cfg(cfg, "FLASH_CFG", "file", values["img1_file"])
-            bflb_utils.update_cfg(
-                cfg, "FLASH_CFG", "address", values["img1_addr"].replace("0x", "")
-            )
+            bflb_utils.update_cfg(cfg, "FLASH_CFG", "address", values["img1_addr"].replace("0x", ""))
         else:
             start_pos = 0
             if self.chiptype == "wb03":
@@ -2836,9 +2664,7 @@ class BflbMcuTool(object):
                 bootinfo_filedata = self.bl_get_file_data([group0_bootinfo_file])[0]
                 filedata = self.bl_get_file_data([group0_img_output_file])[0]
                 if group0_img_len != len(filedata):
-                    bflb_utils.printf(
-                        "group0 img len error, get %d except %d" % (group0_img_len, len(filedata))
-                    )
+                    bflb_utils.printf("group0 img len error, get %d except %d" % (group0_img_len, len(filedata)))
                 if bootinfo_filedata[0:4] == filedata[0:4]:
                     whole_img_len = group0_img_len
                     whole_img_data = self.bl_create_flash_default_data(whole_img_len)
@@ -2848,9 +2674,7 @@ class BflbMcuTool(object):
                     whole_img_len = group0_img_offset + group0_img_len
                     whole_img_data = self.bl_create_flash_default_data(whole_img_len)
                     whole_img_data[0 : len(bootinfo_filedata)] = bootinfo_filedata
-                    whole_img_data[
-                        group0_img_offset : group0_img_offset + len(filedata)
-                    ] = filedata
+                    whole_img_data[group0_img_offset : group0_img_offset + len(filedata)] = filedata
                     fw_with_bootinfo = False
 
                 fp = open(os.path.join(app_path, whole_img_output_file), "wb+")
@@ -2862,9 +2686,7 @@ class BflbMcuTool(object):
                 file_list = convert_path(group0_img_output_file)
                 addr_list = "00000000"
             else:
-                file_list = (
-                    convert_path(group0_bootinfo_file) + " " + convert_path(group0_img_output_file)
-                )
+                file_list = convert_path(group0_bootinfo_file) + " " + convert_path(group0_img_output_file)
                 addr_list = "00000000 %x" % (group0_img_offset)
             bflb_utils.update_cfg(cfg, "FLASH_CFG", "file", file_list)
             bflb_utils.update_cfg(cfg, "FLASH_CFG", "address", addr_list.replace("0x", ""))
@@ -2899,15 +2721,14 @@ class BflbMcuTool(object):
                 and values["aes_iv-group0"] != ""
             ) or (
                 values["sign_type-group0"] != "None"
-                and values["private_key_cfg-group0"]  # values["public_key_cfg-group0"] != "" and\
-                != ""
+                and values["private_key_cfg-group0"] != ""  # values["public_key_cfg-group0"] != "" and\
             ):
                 if values["boot_src"].upper() == "FLASH":
                     options.extend(["--efuse", "--createcfg=" + self.img_create_cfg])
                     self.efuse_load_en = True
         ret = bflb_img_create.compress_dir(self.chipname, "img_create_mcu", self.efuse_load_en)
         if ret is not True:
-            return bflb_utils.errorcode_msg()
+            return bflb_utils.get_error_code_msg()
         if not values["dl_comport"] and values["dl_device"].lower() == "uart":
             error = '{"ErrorCode":"FFFF","ErrorMsg":"BFLB INTERFACE HAS NO COM PORT"}'
             bflb_utils.printf(error)
@@ -2948,6 +2769,7 @@ class BflbMcuTool(object):
     def program_img_thread(self, values, callback=None, act="download"):
         ret = None
         bflb_utils.printf("========= eflash loader config =========")
+        self.eflash_loader_t = bflb_eflash_loader.BflbEflashLoader(self.chipname, self.chiptype)
         try:
             if not values["dl_comspeed"].isdigit() or not values["dl_jlinkspeed"].isdigit():
                 ret = '{"ErrorCode":"FFFF","ErrorMsg":"BAUDRATE MUST BE DIGIT"}'
@@ -2979,7 +2801,7 @@ class BflbMcuTool(object):
 
     def log_read_thread(self):
         try:
-            ret, data = self.eflash_loader_t.log_read_process()
+            ret, data = self.eflash_loader_t.read_log_process()
             self.eflash_loader_t.close_port()
             return ret, data
         except Exception as e:
@@ -2994,13 +2816,13 @@ def get_value(args):
     else:
         firmware = None
     if not firmware or not os.path.exists(firmware):
-        bflb_utils.printf("firmware is not existed")
+        bflb_utils.printf("firmware is non existent")
         sys.exit(1)
 
     if args.dts:
         dts = args.dts.replace("~", expanduser("~"))
         if not os.path.exists(dts):
-            bflb_utils.printf("device tree is not existed")
+            bflb_utils.printf("device tree is non existent")
             sys.exit(1)
     else:
         dts = None
@@ -3214,6 +3036,7 @@ def get_value(args):
 
     if args.sk_str:
         config["sign_type-group0"] = "ECC"
+        config["sign_type"] = "ECC"
         config["privatekey"] = args.sk_str
         if args.pk_str:
             config["publickey"] = args.pk_str
@@ -3235,28 +3058,20 @@ def run(argv):
         ports.append(item["port"])
     if ports:
         try:
-            port = sorted(ports, key=lambda x: int(re.match("COM(\d+)", x).group(1)))[0]
+            port = sorted(ports, key=lambda x: int(re.match("COM(\\d+)", x).group(1)))[0]
         except Exception:
             port = sorted(ports)[0]
-    firmware_default = os.path.join(app_path, "img/project.bin")
+    #firmware_default = os.path.join(app_path, "img/project.bin")
     parser = argparse.ArgumentParser(description="mcu-tool")
     parser.add_argument("--chipname", required=True, help="chip name")
     parser.add_argument("--interface", dest="interface", default="uart", help="interface to use")
     parser.add_argument("--bootsrc", dest="bootsrc", default="Flash", help="boot source select")
     parser.add_argument("--port", dest="port", default=port, help="serial port to use")
-    parser.add_argument(
-        "--baudrate",
-        dest="baudrate",
-        default=115200,
-        type=int,
-        help="the speed at which to communicate",
-    )
+    parser.add_argument("--baudrate", dest="baudrate", default=115200, type=int, help="the speed at which to communicate",)
     parser.add_argument("--xtal", dest="xtal", help="xtal type")
     parser.add_argument("--flashclk", dest="flashclk", help="flash clock")
     parser.add_argument("--pllclk", dest="pllclk", help="pll clock")
-    parser.add_argument(
-        "--firmware", dest="firmware", default=firmware_default, help="image to write"
-    )
+    parser.add_argument("--firmware", dest="firmware", help="image to write")
     parser.add_argument("--addr", dest="addr", default="0x2000", help="address to write")
     parser.add_argument("--dts", dest="dts", help="device tree")
     parser.add_argument("--build", dest="build", action="store_true", help="build image")

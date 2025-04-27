@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#  Copyright (C) 2021- BOUFFALO LAB (NANJING) CO., LTD.
+#  Copyright (C) 2016- BOUFFALO LAB (NANJING) CO., LTD.
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -53,7 +53,7 @@ def check_pt_file(file, addr):
         i = 0
         L = []
         if len(file) > len(addr):
-            bflb_utils.printf("error: tool path contains spaces!")
+            bflb_utils.printf("error: tool path contains spaces")
             return False
         while i < len(file):
             L.append([convert_path(file[i]), int(addr[i], 16)])
@@ -84,14 +84,13 @@ def compress_dir(chipname, zippath, efuse_load=False):
     cfg_file = os.path.join(chip_path, chipname, "eflash_loader/eflash_loader_cfg.ini")
     cfg = BFConfigParser()
     cfg.read(cfg_file)
-    flash_file = re.compile("\s+").split(cfg.get("FLASH_CFG", "file"))
-    address = re.compile("\s+").split(cfg.get("FLASH_CFG", "address"))
+    flash_file = re.compile("\\s+").split(cfg.get("FLASH_CFG", "file"))
+    address = re.compile("\\s+").split(cfg.get("FLASH_CFG", "address"))
     if check_pt_file(flash_file, address) is not True:
-        bflb_utils.printf("PT Check Fail")
+        bflb_utils.printf("partition table check failed")
         set_error_code("0082")
         return False
-    # factory_mode_set(os.path.join(chip_path, chipname, "eflash_loader/eflash_loader_cfg.ini"), "true")
-    flash_file.append(os.path.join(chip_path, chipname, "eflash_loader/eflash_loader_cfg.ini"))
+    flash_file.append(os.path.join(chip_path, chipname, "eflash_loader", "eflash_loader_cfg.ini"))
     if efuse_load:
         flash_file.append(cfg.get("EFUSE_CFG", "file"))
         flash_file.append(cfg.get("EFUSE_CFG", "maskfile"))
@@ -99,9 +98,7 @@ def compress_dir(chipname, zippath, efuse_load=False):
         i = 0
         try:
             while i < len(flash_file):
-                relpath = os.path.relpath(
-                    os.path.join(app_path, convert_path(flash_file[i])), chip_path
-                )
+                relpath = os.path.relpath(os.path.join(app_path, convert_path(flash_file[i])), chip_path)
                 dir = os.path.join(chip_path, chipname, relpath)
                 if os.path.isdir(os.path.dirname(dir)) is False:
                     os.makedirs(os.path.dirname(dir))
@@ -112,21 +109,16 @@ def compress_dir(chipname, zippath, efuse_load=False):
                 f.write(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
         except Exception as e:
             bflb_utils.printf(e)
-            factory_mode_set(
-                os.path.join(chipname, "eflash_loader/eflash_loader_cfg.ini"), "false"
-            )
+            factory_mode_set(os.path.join(chipname, "eflash_loader/eflash_loader_cfg.ini"), "false")
             return False
 
     try:
         z = zipfile.ZipFile(zip_file, "w")
         for dirpath, dirnames, filenames in os.walk(dir_path):
             for file in filenames:
-                # z.write(os.path.relpath(os.path.join(dirpath, file), os.path.join(app_path, chipname)))
                 z.write(
                     os.path.join(dirpath, file),
-                    os.path.relpath(
-                        os.path.join(dirpath, file), os.path.join(chip_path, chipname)
-                    ),
+                    os.path.relpath(os.path.join(dirpath, file), os.path.join(chip_path, chipname)),
                 )
         z.close()
         shutil.rmtree(dir_path)
@@ -144,13 +136,12 @@ def compress_dir_iot(chipname, outdir, efuse_load=False):
     cfg_file = os.path.join(chip_path, chipname, "eflash_loader/eflash_loader_cfg.ini")
     cfg = BFConfigParser()
     cfg.read(cfg_file)
-    flash_file = re.compile("\s+").split(cfg.get("FLASH_CFG", "file"))
-    address = re.compile("\s+").split(cfg.get("FLASH_CFG", "address"))
+    flash_file = re.compile("\\s+").split(cfg.get("FLASH_CFG", "file"))
+    address = re.compile("\\s+").split(cfg.get("FLASH_CFG", "address"))
     if check_pt_file(flash_file, address) is not True:
-        bflb_utils.printf("PT Check Fail")
+        bflb_utils.printf("partition table check failed")
         set_error_code("0082")
         return False
-    # factory_mode_set(os.path.join(chip_path, chipname, "eflash_loader", "eflash_loader_cfg.ini"), "true")
     flash_file.append(os.path.join(chip_path, chipname, "eflash_loader", "eflash_loader_cfg.ini"))
     if efuse_load:
         flash_file.append(cfg.get("EFUSE_CFG", "file"))
@@ -170,9 +161,7 @@ def compress_dir_iot(chipname, outdir, efuse_load=False):
                     ]:
                         dir = os.path.join(outdir, chipname, "img_create_iot", filename)
                     else:
-                        relpath = os.path.relpath(
-                            os.path.join(app_path, convert_path(flash_file[i])), chip_path
-                        )
+                        relpath = os.path.relpath(os.path.join(app_path, convert_path(flash_file[i])), chip_path)
                         dir = os.path.join(outdir, relpath)
                     if os.path.isdir(os.path.dirname(dir)) is False:
                         os.makedirs(os.path.dirname(dir))
@@ -183,14 +172,12 @@ def compress_dir_iot(chipname, outdir, efuse_load=False):
                             os.path.join(outdir, filename),
                         )
                 i += 1
-            verfile = os.path.join(dir_path, "version.txt")
-            with open(verfile, mode="w") as f:
+            ver_file = os.path.join(dir_path, "version.txt")
+            with open(ver_file, mode="w") as f:
                 f.write(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
         except Exception as e:
             bflb_utils.printf(e)
-            factory_mode_set(
-                os.path.join(chipname, "eflash_loader/eflash_loader_cfg.ini"), "false"
-            )
+            factory_mode_set(os.path.join(chipname, "eflash_loader/eflash_loader_cfg.ini"), "false")
             return False
 
     try:
@@ -201,7 +188,7 @@ def compress_dir_iot(chipname, outdir, efuse_load=False):
                     cfg_file = os.path.join(dirpath, file)
                     cfg = BFConfigParser()
                     cfg.read(cfg_file)
-                    flash_file = re.compile("\s+").split(cfg.get("FLASH_CFG", "file"))
+                    flash_file = re.compile("\\s+").split(cfg.get("FLASH_CFG", "file"))
                     list_file = []
                     for item in flash_file:
                         filedir = convert_path(item)
@@ -227,21 +214,6 @@ def compress_dir_iot(chipname, outdir, efuse_load=False):
     return True
 
 
-def img_create(args, chipname="bl60x", chiptype="bl60x", img_dir=None, config_file=None, **kwargs):
-    sub_module = __import__("libs." + chiptype, fromlist=[chiptype])
-    img_dir_path = os.path.join(chip_path, chipname, "img_create_iot")
-    if img_dir is None:
-        res = sub_module.img_create_do.img_create_do(args, img_dir_path, config_file, **kwargs)
-    else:
-        res = sub_module.img_create_do.img_create_do(args, img_dir, config_file, **kwargs)
-    return res
-
-
-def create_sp_media_image_file(config, chiptype="bl60x", cpu_type=None, security=False, **kwargs):
-    sub_module = __import__("libs." + chiptype, fromlist=[chiptype])
-    sub_module.img_create_do.create_sp_media_image(config, cpu_type, security, **kwargs)
-
-
 def get_img_offset(chiptype="bl60x", bootheader_data=None):
     sub_module = __import__("libs." + chiptype, fromlist=[chiptype])
     return sub_module.img_create_do.img_create_get_img_offset(bootheader_data)
@@ -249,9 +221,12 @@ def get_img_offset(chiptype="bl60x", bootheader_data=None):
 
 def encrypt_loader_bin(chiptype, file, sign, encrypt, key, iv, publickey, privatekey, **kwargs):
     sub_module = __import__("libs." + chiptype, fromlist=[chiptype])
-    return sub_module.img_create_do.encrypt_loader_bin_do(
-        file, sign, encrypt, key, iv, publickey, privatekey, **kwargs
-    )
+    return sub_module.img_create_do.encrypt_loader_bin_do(file, sign, encrypt, key, iv, publickey, privatekey, **kwargs)
+
+
+def create_sp_media_image_file(config, chiptype="bl60x", cpu_type=None, security=False, **kwargs):
+    sub_module = __import__("libs." + chiptype, fromlist=[chiptype])
+    sub_module.img_create_do.create_sp_media_image(config, cpu_type, security, **kwargs)
 
 
 def create_security_efuse(chiptype, key, sel):
@@ -274,11 +249,20 @@ def create_security_efuse(chiptype, key, sel):
     return efuse_data, mask_data
 
 
+def img_create(args, chipname="bl60x", chiptype="bl60x", img_dir=None, config_file=None, **kwargs):
+    sub_module = __import__("libs." + chiptype, fromlist=[chiptype])
+    img_dir_path = os.path.join(chip_path, chipname, "img_create_iot")
+    if img_dir is None:
+        res = sub_module.img_create_do.img_create_do(args, img_dir_path, config_file, **kwargs)
+    else:
+        res = sub_module.img_create_do.img_create_do(args, img_dir, config_file, **kwargs)
+    return res
+
+
 def run():
     parser_image = bflb_utils.image_create_parser_init()
     args = parser_image.parse_args()
-    # args = parser_image.parse_args("--image=media", "--signer=none")
-    bflb_utils.printf("Chipname: %s" % args.chipname)
+    bflb_utils.printf("chipname: {}".format(args.chipname))
     if args.chipname:
         chip_dict = {
             "bl56x": "bl60x",
@@ -296,9 +280,7 @@ def run():
         chipname = args.chipname
         chiptype = chip_dict[chipname]
         img_create_path = os.path.join(chip_path, chipname, "img_create_mcu")
-        img_create_cfg = (
-            os.path.join(chip_path, chipname, "img_create_mcu") + "/img_create_cfg.ini"
-        )
+        img_create_cfg = os.path.join(chip_path, chipname, "img_create_mcu") + "/img_create_cfg.ini"
         bh_cfg_file = img_create_path + "/efuse_bootheader_cfg.ini"
         bh_file = img_create_path + "/bootheader.bin"
         if args.imgfile:
@@ -312,7 +294,7 @@ def run():
         )
         img_create(args, chipname, chiptype, img_create_path, img_create_cfg)
     else:
-        bflb_utils.printf("Please set chipname config, exit")
+        bflb_utils.printf("please set chipname config, exit")
 
 
 if __name__ == "__main__":

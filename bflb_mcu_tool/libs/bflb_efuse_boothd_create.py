@@ -1,5 +1,5 @@
 # -*- coding:utf-8 -*-
-#  Copyright (C) 2021- BOUFFALO LAB (NANJING) CO., LTD.
+#  Copyright (C) 2016- BOUFFALO LAB (NANJING) CO., LTD.
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -41,9 +41,7 @@ def bootheader_update_flash_pll_crc(bootheader_data, chiptype):
     # magic+......+CRC32
     flash_cfg = bootheader_data[flash_cfg_start + 4 : flash_cfg_start + flash_cfg_len - 4]
     crcarray = bflb_utils.get_crc32_bytearray(flash_cfg)
-    bootheader_data[
-        flash_cfg_start + flash_cfg_len - 4 : flash_cfg_start + flash_cfg_len
-    ] = crcarray
+    bootheader_data[flash_cfg_start + flash_cfg_len - 4 : flash_cfg_start + flash_cfg_len] = crcarray
     pll_cfg_start = flash_cfg_start + flash_cfg_len
     pll_cfg_len = 4 + 8 + 4
     if chiptype == "bl808":
@@ -67,7 +65,7 @@ def get_int_mask(pos, length):
 
 
 def update_data_from_cfg(config_keys, config_file, section):
-    bflb_utils.printf("Updating data according to <" + config_file + "[" + section + "]>")
+    bflb_utils.printf("Updating data according to <{0}[{1}]>".format(config_file, section))
     cfg = BFConfigParser()
     cfg.read(config_file)
     # get finally data len
@@ -77,13 +75,13 @@ def update_data_from_cfg(config_keys, config_file, section):
         if offset > filelen:
             filelen = offset
     filelen += 4
-    bflb_utils.printf("Created file len:" + str(filelen))
+    bflb_utils.printf("created file len: ", filelen)
     data = bytearray(filelen)
     data_mask = bytearray(filelen)
     # bflb_utils.printf(binascii.hexlify(data))
     for key in cfg.options(section):
         if config_keys.get(key) is None:
-            bflb_utils.printf(key + " not exist")
+            bflb_utils.printf(key, " does not exist")
             continue
         # bflb_utils.printf(key)
         val = cfg.get(section, key)
@@ -96,18 +94,14 @@ def update_data_from_cfg(config_keys, config_file, section):
         pos = int(config_keys.get(key)["pos"], 10)
         bitlen = int(config_keys.get(key)["bitlen"], 10)
 
-        oldval = bflb_utils.bytearray_to_int(
-            bflb_utils.bytearray_reverse(data[offset : offset + 4])
-        )
-        oldval_mask = bflb_utils.bytearray_to_int(
-            bflb_utils.bytearray_reverse(data_mask[offset : offset + 4])
-        )
+        oldval = bflb_utils.bytearray_to_int(bflb_utils.bytearray_reverse(data[offset : offset + 4]))
+        oldval_mask = bflb_utils.bytearray_to_int(bflb_utils.bytearray_reverse(data_mask[offset : offset + 4]))
         newval = (oldval & get_int_mask(pos, bitlen)) + (val << pos)
         if val != 0:
             newval_mask = oldval_mask | (~get_int_mask(pos, bitlen))
         else:
             newval_mask = oldval_mask
-        # bflb_utils.printf(newval,binascii.hexlify(bflb_utils.int_to_4bytearray_l(newval)))
+        # bflb_utils.printf(newval, binascii.hexlify(bflb_utils.int_to_4bytearray_l(newval)))
         data[offset : offset + 4] = bflb_utils.int_to_4bytearray_l(newval)
         data_mask[offset : offset + 4] = bflb_utils.int_to_4bytearray_l(newval_mask)
     # bflb_utils.printf(binascii.hexlify(data))
@@ -117,11 +111,9 @@ def update_data_from_cfg(config_keys, config_file, section):
 def bootheader_create_do(chipname, chiptype, config_file, section, output_file=None, if_img=False):
     efuse_bootheader_path = os.path.join(chip_path, chipname, "efuse_bootheader")
     try:
-        bflb_utils.printf("Create bootheader using ", config_file)
+        bflb_utils.printf("create bootheader using ", config_file)
         sub_module = __import__("libs." + chiptype, fromlist=[chiptype])
-        bh_data, tmp = update_data_from_cfg(
-            sub_module.bootheader_cfg_keys.bootheader_cfg_keys, config_file, section
-        )
+        bh_data, tmp = update_data_from_cfg(sub_module.bootheader_cfg_keys.bootheader_cfg_keys, config_file, section)
         bh_data = bootheader_update_flash_pll_crc(bh_data, chiptype)
         if output_file is None:
             fp = open(efuse_bootheader_path + "/" + section.lower().replace("_cfg", ".bin"), "wb+")
@@ -164,117 +156,85 @@ def bootheader_create_do(chipname, chiptype, config_file, section, output_file=N
 
         if chiptype == "bl808":
             if section == "BOOTHEADER_GROUP0_CFG":
-                fp = open(efuse_bootheader_path + "/clock_para.bin", "wb+")
-                fp.write(bh_data[100 : 100 + 28])
-                fp.close()
-                fp = open(efuse_bootheader_path + "/flash_para.bin", "wb+")
-                fp.write(bh_data[12 : 12 + 84])
-                fp.close()
+                with open(efuse_bootheader_path + "/clock_para.bin", "wb+") as fp:
+                    fp.write(bh_data[100 : 100 + 28])
+                with open(efuse_bootheader_path + "/flash_para.bin", "wb+") as fp:
+                    fp.write(bh_data[12 : 12 + 84])
         elif chiptype == "bl628":
             if section == "BOOTHEADER_GROUP0_CFG":
-                fp = open(efuse_bootheader_path + "/clock_para.bin", "wb+")
-                fp.write(bh_data[100 : 100 + 24])
-                fp.close()
-                fp = open(efuse_bootheader_path + "/flash_para.bin", "wb+")
-                fp.write(bh_data[12 : 12 + 84])
-                fp.close()
+                with open(efuse_bootheader_path + "/clock_para.bin", "wb+") as fp:
+                    fp.write(bh_data[100 : 100 + 24])
+                with open(efuse_bootheader_path + "/flash_para.bin", "wb+") as fp:
+                    fp.write(bh_data[12 : 12 + 84])
         elif chiptype == "bl616":
             if section == "BOOTHEADER_GROUP0_CFG":
-                fp = open(efuse_bootheader_path + "/clock_para.bin", "wb+")
-                fp.write(bh_data[100 : 100 + 20])
-                fp.close()
-                fp = open(efuse_bootheader_path + "/flash_para.bin", "wb+")
-                fp.write(bh_data[12 : 12 + 84])
-                fp.close()
+                with open(efuse_bootheader_path + "/clock_para.bin", "wb+") as fp:
+                    fp.write(bh_data[100 : 100 + 20])
+                with open(efuse_bootheader_path + "/flash_para.bin", "wb+") as fp:
+                    fp.write(bh_data[12 : 12 + 84])
         elif chiptype == "wb03":
             if section == "BOOTHEADER_GROUP0_CFG":
-                fp = open(efuse_bootheader_path + "/clock_para.bin", "wb+")
-                fp.write(bh_data[208 + 100 : 208 + 100 + 20])
-                fp.close()
-                fp = open(efuse_bootheader_path + "/flash_para.bin", "wb+")
-                fp.write(bh_data[208 + 12 : 208 + 12 + 84])
-                fp.close()
+                with open(efuse_bootheader_path + "/clock_para.bin", "wb+") as fp:
+                    fp.write(bh_data[208 + 100 : 208 + 100 + 20])
+                with open(efuse_bootheader_path + "/flash_para.bin", "wb+") as fp:
+                    fp.write(bh_data[208 + 12 : 208 + 12 + 84])
         elif chiptype == "bl702l":
             if section == "BOOTHEADER_CFG":
-                fp = open(efuse_bootheader_path + "/clock_para.bin", "wb+")
-                fp.write(bh_data[100 : 100 + 16])
-                fp.close()
-                fp = open(efuse_bootheader_path + "/flash_para.bin", "wb+")
-                fp.write(bh_data[12 : 12 + 84])
-                fp.close()
+                with open(efuse_bootheader_path + "/clock_para.bin", "wb+") as fp:
+                    fp.write(bh_data[100 : 100 + 16])
+                with open(efuse_bootheader_path + "/flash_para.bin", "wb+") as fp:
+                    fp.write(bh_data[12 : 12 + 84])
         else:
-            fp = open(efuse_bootheader_path + "/flash_para.bin", "wb+")
-            fp.write(bh_data[12 : 12 + 84])
-            fp.close()
+            with open(efuse_bootheader_path + "/flash_para.bin", "wb+") as fp:
+                fp.write(bh_data[12 : 12 + 84])
     except Exception as e:
-        bflb_utils.printf("bootheader_create_do fail!!")
+        bflb_utils.printf("bootheader created failed")
         bflb_utils.printf(e)
         traceback.print_exc(limit=5, file=sys.stdout)
 
 
-def bootheader_create_process(
-    chipname, chiptype, config_file, output_file1=None, output_file2=None, if_img=False
-):
-    fp = open(config_file, "r")
-    data = fp.read()
-    fp.close()
+def bootheader_create_process(chipname, chiptype, config_file, output_file1=None, output_file2=None, if_img=False):
+    with open(config_file, "r") as fp:
+        data = fp.read()
     if "BOOTHEADER_CFG" in data:
-        bootheader_create_do(
-            chipname, chiptype, config_file, "BOOTHEADER_CFG", output_file1, if_img
-        )
+        bootheader_create_do(chipname, chiptype, config_file, "BOOTHEADER_CFG", output_file1, if_img)
     if "BOOTHEADER_CPU0_CFG" in data:
-        bootheader_create_do(
-            chipname, chiptype, config_file, "BOOTHEADER_CPU0_CFG", output_file1, if_img
-        )
+        bootheader_create_do(chipname, chiptype, config_file, "BOOTHEADER_CPU0_CFG", output_file1, if_img)
     if "BOOTHEADER_CPU1_CFG" in data:
-        bootheader_create_do(
-            chipname, chiptype, config_file, "BOOTHEADER_CPU1_CFG", output_file2, if_img
-        )
+        bootheader_create_do(chipname, chiptype, config_file, "BOOTHEADER_CPU1_CFG", output_file2, if_img)
     if "BOOTHEADER_GROUP0_CFG" in data:
-        bootheader_create_do(
-            chipname, chiptype, config_file, "BOOTHEADER_GROUP0_CFG", output_file1, if_img
-        )
+        bootheader_create_do(chipname, chiptype, config_file, "BOOTHEADER_GROUP0_CFG", output_file1, if_img)
     if "BOOTHEADER_GROUP1_CFG" in data:
-        bootheader_create_do(
-            chipname, chiptype, config_file, "BOOTHEADER_GROUP1_CFG", output_file2, if_img
-        )
+        bootheader_create_do(chipname, chiptype, config_file, "BOOTHEADER_GROUP1_CFG", output_file2, if_img)
 
 
 def efuse_create_process(chipname, chiptype, config_file, output_file=None):
     efuse_bootheader_path = os.path.join(chip_path, chipname, "efuse_bootheader")
     eflash_loader_path = os.path.join(chip_path, chipname, "eflash_loader")
     filedir = ""
-    bflb_utils.printf("Create efuse using ", config_file)
-    cfgfile = eflash_loader_path + "/eflash_loader_cfg.ini"
-    if os.path.isfile(cfgfile) is False:
-        shutil.copyfile(eflash_loader_path + "/eflash_loader_cfg.conf", cfgfile)
+    bflb_utils.printf("create efuse using ", config_file)
+    cfg_file = eflash_loader_path + "/eflash_loader_cfg.ini"
+    if os.path.isfile(cfg_file) is False:
+        shutil.copyfile(eflash_loader_path + "/eflash_loader_cfg.conf", cfg_file)
     cfg = BFConfigParser()
-    cfg.read(cfgfile)
+    cfg.read(cfg_file)
     sub_module = __import__("libs." + chiptype, fromlist=[chiptype])
-    efuse_data, mask = update_data_from_cfg(
-        sub_module.efuse_cfg_keys.efuse_cfg_keys, config_file, "EFUSE_CFG"
-    )
+    efuse_data, mask = update_data_from_cfg(sub_module.efuse_cfg_keys.efuse_cfg_keys, config_file, "EFUSE_CFG")
     if output_file is None:
         filedir = efuse_bootheader_path + "/efusedata.bin"
     else:
         filedir = output_file
-    fp = open(filedir, "wb+")
-    fp.write(efuse_data)
-    fp.close()
-    bflb_utils.update_cfg(
-        cfg, "EFUSE_CFG", "file", convert_path(os.path.relpath(filedir, app_path))
-    )
+    with open(filedir, "wb+") as fp:
+        fp.write(efuse_data)
+    bflb_utils.update_cfg(cfg, "EFUSE_CFG", "file", convert_path(os.path.relpath(filedir, app_path)))
     if output_file is None:
         filedir = efuse_bootheader_path + "/efusedata_mask.bin"
     else:
         filedir = output_file.replace(".bin", "_mask.bin")
-    fp = open(filedir, "wb+")
-    fp.write(mask)
-    fp.close()
-    bflb_utils.update_cfg(
-        cfg, "EFUSE_CFG", "maskfile", convert_path(os.path.relpath(filedir, app_path))
-    )
-    cfg.write(cfgfile, "w+")
+    with open(filedir, "wb+") as fp:
+        fp.write(mask)
+    bflb_utils.update_cfg(cfg, "EFUSE_CFG", "maskfile", convert_path(os.path.relpath(filedir, app_path)))
+    cfg.write(cfg_file, "w+")
 
 
 def efuse_boothd_create_process(chipname, chiptype, config_file):
@@ -300,9 +260,7 @@ def run():
     img_create_path = os.path.join(chip_path, chipname, "img_create_mcu")
     bh_cfg_file = img_create_path + "/efuse_bootheader_cfg.ini"
     bh_file = img_create_path + "/bootheader.bin"
-    bootheader_create_process(
-        chipname, chiptype, bh_cfg_file, bh_file, img_create_path + "/bootheader_dummy.bin"
-    )
+    bootheader_create_process(chipname, chiptype, bh_cfg_file, bh_file, img_create_path + "/bootheader_dummy.bin")
 
 
 if __name__ == "__main__":

@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-#  Copyright (C) 2021- BOUFFALO LAB (NANJING) CO., LTD.
+# -*- coding:utf-8 -*-
+#  Copyright (C) 2016- BOUFFALO LAB (NANJING) CO., LTD.
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -67,12 +67,7 @@ def cli_ble_tx_power(tx_power):
 
 
 def cli_ble_tx_start(tx_channel, length_of_test_data, packet_payload):
-    return (
-        "ET"
-        + str(tx_channel).upper()
-        + str(length_of_test_data).upper()
-        + str(packet_payload).upper()
-    )
+    return "ET" + str(tx_channel).upper() + str(length_of_test_data).upper() + str(packet_payload).upper()
 
 
 def cli_ble_rx_start(rx_channel):

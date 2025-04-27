@@ -20,9 +20,7 @@ def check_pt_data(data):
     if partition_magic_code != bflb_utils.bytearray_to_int(data[0:4]):
         bflb_utils.printf("partition bin magic check fail ", binascii.hexlify(data[0:4]))
         return False, 0, 0
-    table_count = bflb_utils.bytearray_to_int(data[6:7]) + (
-        bflb_utils.bytearray_to_int(data[7:8]) << 8
-    )
+    table_count = bflb_utils.bytearray_to_int(data[6:7]) + (bflb_utils.bytearray_to_int(data[7:8]) << 8)
     # bflb_utils.printf("table count: ", table_count)
     if table_count > 16:
         bflb_utils.printf("error, pt enter size > 16")

@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-#  Copyright (C) 2021- BOUFFALO LAB (NANJING) CO., LTD.
+# -*- coding:utf-8 -*-
+#  Copyright (C) 2016- BOUFFALO LAB (NANJING) CO., LTD.
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -19,8 +19,8 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #  SOFTWARE.
 
+import toml
 from libs import bflb_utils
-from libs import bflb_toml as toml
 
 
 class PtCreater(object):
@@ -29,8 +29,10 @@ class PtCreater(object):
         self.entry_max = 16
         self.pt_new = False
 
-    def __create_pt_table_do(self, lists, file):
-        entry_table = bytearray(36 * self.entry_max)
+    @staticmethod
+    def create_pt_table_do(lists, file):
+        entry_max = 16
+        entry_table = bytearray(36 * entry_max)
         entry_cnt = 0
         for item in lists:
             entry_type = item["type"]
@@ -44,35 +46,21 @@ class PtCreater(object):
             entry_table[36 * entry_cnt + 0] = bflb_utils.int_to_2bytearray_l(entry_type)[0]
             if "activeindex" in item:
                 entry_activeindex = item["activeindex"]
-                entry_table[36 * entry_cnt + 2] = bflb_utils.int_to_2bytearray_l(
-                    entry_activeindex
-                )[0]
+                entry_table[36 * entry_cnt + 2] = bflb_utils.int_to_2bytearray_l(entry_activeindex)[0]
             if len(entry_name) >= 8:
-                bflb_utils.printf("%s entry name is too long!" % entry_name)
+                bflb_utils.printf("{} entry name is too long".format(entry_name))
                 return False
             entry_table[36 * entry_cnt + 3 : 36 * entry_cnt + 3 + len(entry_name)] = bytearray(
                 entry_name, "utf-8"
             ) + bytearray(0)
-            entry_table[
-                36 * entry_cnt + 12 : 36 * entry_cnt + 16
-            ] = bflb_utils.int_to_4bytearray_l(entry_addr0)
-            entry_table[
-                36 * entry_cnt + 16 : 36 * entry_cnt + 20
-            ] = bflb_utils.int_to_4bytearray_l(entry_addr1)
-            entry_table[
-                36 * entry_cnt + 20 : 36 * entry_cnt + 24
-            ] = bflb_utils.int_to_4bytearray_l(entry_maxlen0)
-            entry_table[
-                36 * entry_cnt + 24 : 36 * entry_cnt + 28
-            ] = bflb_utils.int_to_4bytearray_l(entry_maxlen1)
-            entry_table[
-                36 * entry_cnt + 28 : 36 * entry_cnt + 32
-            ] = bflb_utils.int_to_4bytearray_l(entry_len)
+            entry_table[36 * entry_cnt + 12 : 36 * entry_cnt + 16] = bflb_utils.int_to_4bytearray_l(entry_addr0)
+            entry_table[36 * entry_cnt + 16 : 36 * entry_cnt + 20] = bflb_utils.int_to_4bytearray_l(entry_addr1)
+            entry_table[36 * entry_cnt + 20 : 36 * entry_cnt + 24] = bflb_utils.int_to_4bytearray_l(entry_maxlen0)
+            entry_table[36 * entry_cnt + 24 : 36 * entry_cnt + 28] = bflb_utils.int_to_4bytearray_l(entry_maxlen1)
+            entry_table[36 * entry_cnt + 28 : 36 * entry_cnt + 32] = bflb_utils.int_to_4bytearray_l(entry_len)
             if "age" in item:
                 entry_age = item["age"]
-                entry_table[
-                    36 * entry_cnt + 32 : 36 * entry_cnt + 36
-                ] = bflb_utils.int_to_4bytearray_l(entry_age)
+                entry_table[36 * entry_cnt + 32 : 36 * entry_cnt + 36] = bflb_utils.int_to_4bytearray_l(entry_age)
             entry_cnt += 1
         # partition table header
         # 0x54504642
@@ -87,14 +75,13 @@ class PtCreater(object):
             entry_table[0 : 36 * entry_cnt]
         )
         data = pt_table + entry_table[0 : 36 * entry_cnt + 4]
-        fp = open(file, "wb+")
-        fp.write(data)
-        fp.close()
+        with open(file, "wb+") as fp:
+            fp.write(data)
         return True
 
     def create_pt_table(self, file):
         self.pt_new = True
-        return self.__create_pt_table_do(self.parsed_toml["pt_entry"], file)
+        return self.create_pt_table_do(self.parsed_toml["pt_entry"], file)
 
     def get_pt_table_addr(self):
         addr0 = self.parsed_toml["pt_table"]["address0"]
@@ -112,10 +99,7 @@ class PtCreater(object):
         parcel["pt_addr1"] = self.parsed_toml["pt_table"]["address1"]
         version_sign = 1
         try:
-            if (
-                "version" in self.parsed_toml["pt_table"]
-                and self.parsed_toml["pt_table"]["version"] == 2
-            ):
+            if "version" in self.parsed_toml["pt_table"] and self.parsed_toml["pt_table"]["version"] == 2:
                 version_sign = 2
                 parcel["version"] = 2
         except:

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#  Copyright (C) 2021- BOUFFALO LAB (NANJING) CO., LTD.
+#  Copyright (C) 2016- BOUFFALO LAB (NANJING) CO., LTD.
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -19,6 +19,7 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #  SOFTWARE.
 
+import re
 import sys
 import time
 import socket
@@ -26,9 +27,8 @@ import threading
 import binascii
 import concurrent.futures
 
-from Crypto.Util import Counter
-from Crypto.Cipher import AES
-from Crypto.Hash import SHA256
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.primitives import padding, hashes, serialization
 
 try:
     import bflb_path
@@ -52,10 +52,54 @@ try:
 except ImportError:
     conf_sign = False
 
+import ctypes
+import inspect
+
+import multiprocessing
+
+list_process = []
+
+from libs.bflb_eflash_loader_worker import eflash_loader_worker
+
+
+def _async_raise(tid, exctype):
+    """Raises an exception in the threads with id tid"""
+    if not inspect.isclass(exctype):
+        raise TypeError("Only types can be raised (not instances)")
+    res = ctypes.pythonapi.PyThreadState_SetAsyncExc(ctypes.c_long(tid), ctypes.py_object(exctype))
+    if res == 0:
+        raise ValueError("invalid thread id")
+    elif res != 1:
+        # """if it returns a number greater than one, you're in trouble,
+        # and you should call it again with exc=NULL to revert the effect"""
+        ctypes.pythonapi.PyThreadState_SetAsyncExc(tid, None)
+        raise SystemError("PyThreadState_SetAsyncExc failed")
+
+
+def stop_thread(thread_name):
+    print(threading.enumerate())
+    for thread in threading.enumerate():
+        if thread.name == thread_name:
+            bflb_utils.printf("Kill thread {0}".format(thread_name))
+            # thread.terminate()
+            _async_raise(thread.ident, SystemExit)
+
+
+def stop_process(process_name):
+    for process in list_process:
+        if process.name == process_name:
+            if process.is_alive():
+                bflb_utils.printf("Kill process {0}".format(process_name))
+                process.terminate()
+            list_process.remove(process)
+
 
 def create_decrypt_data(data_bytearray, key_bytearray, iv_bytearray):
-    cryptor = AES.new(key_bytearray, AES.MODE_CBC, iv_bytearray)
-    plaintext = cryptor.decrypt(data_bytearray)
+    # 创建 AES-CBC解密器
+    cipher = Cipher(algorithms.AES(key_bytearray), modes.CBC(iv_bytearray))
+    decryptor = cipher.decryptor()
+    # 解密数据
+    plaintext = decryptor.update(data_bytearray) + decryptor.finalize()
     return plaintext
 
 
@@ -64,12 +108,13 @@ def eflash_loader_server(socket_server, port, echo, aes_key):
     socket_address = ("", port)
     socket_server.bind(socket_address)
     bflb_utils.enable_udp_send_log(echo)
+    count_total = multiprocessing.Value("i", 0)
+    count_success = multiprocessing.Value("i", 0)
     try:
         while True:
             try:
                 recv_data, recv_addr = socket_server.recvfrom(1024)
-                bflb_utils.printf("\n")
-                bflb_utils.printf("Recieve:[from IP:<%s>]" % recv_addr[0])
+                bflb_utils.printf("Receive: [from IP:<{}>]".format(recv_addr[0]))
             except Exception as e:
                 bflb_utils.printf(e)
                 continue
@@ -78,9 +123,7 @@ def eflash_loader_server(socket_server, port, echo, aes_key):
                 try:
                     if len(recv_data) % 16 != 0:
                         recv_data = recv_data + bytearray(16 - (len(recv_data) % 16))
-                    recv_data = create_decrypt_data(
-                        recv_data, bytearray.fromhex(aes_key), bytearray(16)
-                    )
+                    recv_data = create_decrypt_data(recv_data, bytearray.fromhex(aes_key), bytearray(16))
                     for i in range(len(recv_data)):
                         if recv_data[i : i + 1] == bytearray(1):
                             recv_data = recv_data[0:i]
@@ -93,7 +136,7 @@ def eflash_loader_server(socket_server, port, echo, aes_key):
                         tmp_ecdh = bflb_ecdh.BflbEcdh()
                         ssk = tmp_ecdh.create_public_key()
                         ecdh_private_key = binascii.hexlify(
-                            tmp_ecdh.ecdh.private_key.to_string()
+                            tmp_ecdh.private_key.private_numbers().private_value.to_bytes(32, "big")
                         ).decode("utf-8")
                         # bflb_utils.printf("ecdh private key")
                         # bflb_utils.printf(ecdh_private_key)
@@ -131,14 +174,26 @@ def eflash_loader_server(socket_server, port, echo, aes_key):
                     bytearray.fromhex(binascii.hexlify(b"Stop success.").decode("utf-8")),
                     recv_addr,
                 )
-                bflb_utils.printf("Stop server success.")
+                bflb_utils.printf("Stop server successfully")
                 socket_server.close()
                 break
-            eflash_loader_monitor_thread = threading.Thread(
-                target=eflash_loader_monitor, args=(recv_addr, recv_data)
-            )
-
-            eflash_loader_monitor_thread.start()
+            match = re.search("--port=(\S*)\s", recv_data.decode("utf-8", "ignore"), re.I)
+            if match is not None:
+                name_port = match.group(1)
+            else:
+                name_port = None
+            if name_port:
+                stop_process(name_port)
+                p = multiprocessing.Process(
+                    target=eflash_loader_worker, args=(recv_addr, recv_data, count_total, count_success)
+                )
+                p.name = name_port
+            else:
+                p = multiprocessing.Process(
+                    target=eflash_loader_worker, args=(recv_addr, recv_data, count_total, count_success)
+                )
+            list_process.append(p)
+            p.start()
             time.sleep(0.001)
     finally:
         return
@@ -157,46 +212,10 @@ def eflash_loader_monitor(client_addr, client_data):
             return_value = future.result()
             if return_value:
                 success_cnt += 1
-            bflb_utils.printf("State:" + str(success_cnt) + "/" + str(total_cnt))
+            bflb_utils.printf("State: {0}/{1}".format(success_cnt, total_cnt))
     except Exception:
-        bflb_utils.printf("eflash_loader_monitor fail")
-        bflb_utils.printf("State:" + str(success_cnt) + "/" + str(total_cnt))
-
-
-def eflash_loader_worker(client_addr, client_data):
-    tid = threading.get_ident()
-    request = client_data.decode("utf-8")
-    bflb_utils.printf("Worker ID:" + str(tid) + " deal request:" + request)
-    bflb_utils.add_udp_client(str(tid), client_addr)
-    ret = False
-    try:
-        parser = eflash_loader_parser_init()
-        args = parser.parse_args(request.split(" "))
-        eflash_loader_t = bflb_eflash_loader.BflbEflashLoader(
-            args.chipname, gol.dict_chip_cmd[args.chipname]
-        )
-        ret = eflash_loader_t.efuse_flash_loader(args, None, None)
-    finally:
-        udp_socket_result = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        bflb_utils.remove_udp_client(str(tid))
-        if ret is True:
-            udp_socket_result.sendto(
-                bytearray.fromhex(binascii.hexlify(b"Finished with success").decode("utf-8")),
-                client_addr,
-            )
-            bflb_utils.printf("Worker ID:" + str(tid) + " Finished with success")
-            udp_socket_result.close()
-            del eflash_loader_t
-            return True
-        else:
-            udp_socket_result.sendto(
-                bytearray.fromhex(binascii.hexlify(b"Finished with fail").decode("utf-8")),
-                client_addr,
-            )
-            bflb_utils.printf("Worker ID:" + str(tid) + " Finished with fail!!!!!!!!!")
-            udp_socket_result.close()
-            del eflash_loader_t
-            return False
+        bflb_utils.printf("eflash loader monitor failed")
+        bflb_utils.printf("State: {0}/{1}".format(success_cnt, total_cnt))
 
 
 def usage():
@@ -213,16 +232,15 @@ def eflash_loader_server_main():
     echo = False
     aes_key = ""
     parser = eflash_loader_parser_init()
-    args = parser.parse_args()
+    # args = parser.parse_args()
+    args, unparsed = parser.parse_known_args()
     if conf_sign:
         bflb_utils.printf(
             "Version: ",
-            bflb_version.eflash_loader_version_text.replace(
-                "bflb", cgc.eflash_loader_version_text_first_value
-            ),
+            bflb_version.eflash_loader_version_text.replace("bflb", cgc.eflash_loader_version_text_first_value),
         )
     else:
-        bflb_utils.printf("Version: ", bflb_version.eflash_loader_version_text)
+        bflb_utils.printf("eflash loader version: ", bflb_version.version_text.replace("(", "").replace(")", ""))
     if args.port:
         port = int(args.port)
     if args.key:
@@ -242,12 +260,14 @@ def eflash_loader_server_main():
         time.sleep(2)
         sys.exit()
     socket_server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    bflb_utils.printf("Listening on " + str(port))
-    eflash_loader_server_thread = threading.Thread(
-        target=eflash_loader_server, args=(socket_server, port, echo, aes_key)
-    )
-    eflash_loader_server_thread.start()
+    bflb_utils.printf("Listening on ", port)
+    #     eflash_loader_server_thread = threading.Thread(
+    #         target=eflash_loader_server, args=(socket_server, port, echo, aes_key)
+    #     )
+    #     eflash_loader_server_thread.start()
+    eflash_loader_server(socket_server, port, echo, aes_key)
 
 
 if __name__ == "__main__":
+    multiprocessing.freeze_support()
     eflash_loader_server_main()

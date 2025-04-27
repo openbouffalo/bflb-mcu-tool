@@ -1,5 +1,5 @@
 # -*- coding:utf-8 -*-
-#  Copyright (C) 2021- BOUFFALO LAB (NANJING) CO., LTD.
+#  Copyright (C) 2016- BOUFFALO LAB (NANJING) CO., LTD.
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -129,17 +129,12 @@ class BflbJLinkPort(object):
         if self._jlink.halted() is False:
             self._jlink.halt()
         if self._jlink.halted():
-            if (
-                self._chiptype == "bl602"
-                or self._chiptype == "bl702"
-                or self._chiptype == "bl702l"
-            ):
+            if self._chiptype == "bl602" or self._chiptype == "bl702" or self._chiptype == "bl702l":
                 jlink_script = "jlink.cmd"
-                fp = open(jlink_script, "w+")
                 cmd = "h\r\nSetPC " + str(self._jlink_run_addr) + "\r\nexit"
                 bflb_utils.printf(cmd)
-                fp.write(cmd)
-                fp.close()
+                with open(jlink_script, "w+") as fp:
+                    fp.write(cmd)
                 # jlink_cmd=r'C:/Keil_v5/ARM/Segger/JLink.exe -device Cortex-M4 -Speed 4000 -IF SWD  -JTAGConf -1,-1 -CommanderScript jlink.cmd'
                 if self._device:
                     jlink_cmd = (
@@ -303,7 +298,7 @@ class BflbJLinkPort(object):
         success, ack = self.if_read(2)
         bflb_utils.printf(binascii.hexlify(ack))
         if ack.find(b"\x4F") != -1 or ack.find(b"\x4B") != -1:
-            if self._password != None and len(self._password) != 0:
+            if self._password is not None and len(self._password) != 0:
                 cmd = bflb_utils.hexstr_to_bytearray("2400")
                 cmd += bflb_utils.int_to_2bytearray_l(len(self._password) // 2)
                 cmd += bflb_utils.hexstr_to_bytearray(self._password)
@@ -335,7 +330,7 @@ class BflbJLinkPort(object):
         err_code_str = str(binascii.hexlify(err_code[3:4] + err_code[2:3]).decode("utf-8"))
         ack = "FL"
         try:
-            ret = ack + err_code_str + "(" + bflb_utils.get_bflb_error_code(err_code_str) + ")"
+            ret = ack + err_code_str + "(" + bflb_utils.get_error_code_bflb(err_code_str) + ")"
         except Exception:
             ret = ""
         if err_code_str == "0a0a":

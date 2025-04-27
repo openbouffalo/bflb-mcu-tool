@@ -78,10 +78,10 @@ def create_flashcfg_data_from_cfg(cfg_len, cfgfile):
     cfg = BFConfigParser()
     cfg.read(cfgfile)
     data = bytearray(cfg_len)
-    minOffset = int(flash_cfg_keys.get("io_mode")["offset"], 10)
+    min_offset = int(flash_cfg_keys.get("io_mode")["offset"], 10)
 
     for key in cfg.options(section):
-        if flash_cfg_keys.get(key) == None:
+        if flash_cfg_keys.get(key) is None:
             bflb_utils.printf(key + " not exist")
             continue
         # bflb_utils.printf(key)
@@ -91,13 +91,11 @@ def create_flashcfg_data_from_cfg(cfg_len, cfgfile):
         else:
             val = int(val, 10)
         # bflb_utils.printf(val)
-        offset = int(flash_cfg_keys.get(key)["offset"], 10) - minOffset
+        offset = int(flash_cfg_keys.get(key)["offset"], 10) - min_offset
         pos = int(flash_cfg_keys.get(key)["pos"], 10)
         bitlen = int(flash_cfg_keys.get(key)["bitlen"], 10)
 
-        oldval = bflb_utils.bytearray_to_int(
-            bflb_utils.bytearray_reverse(data[offset : offset + 4])
-        )
+        oldval = bflb_utils.bytearray_to_int(bflb_utils.bytearray_reverse(data[offset : offset + 4]))
         newval = (oldval & get_int_mask(pos, bitlen)) + (val << pos)
         # bflb_utils.printf(newval,binascii.hexlify(bflb_utils.int_to_4bytearray_l(newval)))
         data[offset : offset + 4] = bflb_utils.int_to_4bytearray_l(newval)
@@ -110,10 +108,7 @@ def create_flashcfg_table(start_addr):
     single_flashcfg_len = 4 + 84 + 4
     flash_table_list = bytearray(0)
     flash_table_data = bytearray(0)
-    if conf_sign:
-        table_file = os.path.join(app_path, "utils", "flash", "bl702l", "flashcfg_list.csv")
-    else:
-        table_file = os.path.join(app_path, "utils", "flash", "bl702l", "flashcfg_list.csv")
+    table_file = os.path.join(app_path, "utils", "flash", "bl702l", "flashcfg_list.csv")
     with open(table_file, "r", encoding="utf-8-sig") as csvfile:
         table_list = []
         cfgfile_list = []

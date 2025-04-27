@@ -1,5 +1,5 @@
 # -*- coding:utf-8 -*-
-#  Copyright (C) 2021- BOUFFALO LAB (NANJING) CO., LTD.
+#  Copyright (C) 2016- BOUFFALO LAB (NANJING) CO., LTD.
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -26,39 +26,42 @@ import socket
 import signal
 import argparse
 import binascii
-from ecdsa import ECDH, NIST256p
 
-try:
-    # import Crypto.Util.Counter
-    from Crypto.Util import Counter
-    from Crypto.Cipher import AES
-    from Crypto.Hash import SHA256
-    import ecdsa
-except Exception as e:
-    print(e)
-    print("Import Crypto and ecdsa package error!!")
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.primitives import padding, hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import ec
+from cryptography.hazmat.primitives.asymmetric.utils import encode_dss_signature
 
 ecdh_enable = False
 key = None
 
 
-class BLECDH:
-    def __init__(self, curve=NIST256p):
-        self.ecdh = ECDH(curve)
-        self.local_public_key = None
-        self.sharedsecret = ""
+class BflbEcdh:
+    def __init__(self, curve=ec.SECP256R1()):
+        self.curve = curve
+        self.private_key = None
+        self.public_key = None
+        self.shared_key = None
 
     def create_public_key(self):
-        self.ecdh.generate_private_key()
-        self.local_public_key = self.ecdh.get_public_key()
-        ret = binascii.hexlify(self.local_public_key.to_string()).decode("utf-8")
+        self.private_key = ec.generate_private_key(self.curve, default_backend())
+        self.public_key = self.private_key.public_key()
+        public_numbers = self.public_key.public_numbers()
+        x = public_numbers.x
+        y = public_numbers.y
+        x_bytes = x.to_bytes(32, "big")
+        y_bytes = y.to_bytes(32, "big")
+        ret = binascii.hexlify(x_bytes + y_bytes).decode("utf-8")
         return ret
 
     def create_shared_key(self, peer_pk):
-        self.ecdh.load_received_public_key_bytes(binascii.unhexlify(peer_pk))
-        self.sharedsecret = self.ecdh.generate_sharedsecret_bytes()
-        ret = binascii.hexlify(self.sharedsecret).decode("utf-8")
-        print("secret key:")
+        peer_pk = "04" + peer_pk
+        peer_pk = binascii.unhexlify(peer_pk)
+        public_key = ec.EllipticCurvePublicKey.from_encoded_point(ec.SECP256R1(), peer_pk)
+        self.shared_key = self.private_key.exchange(ec.ECDH(), public_key)  # 32bytes
+        ret = binascii.hexlify(self.shared_key).decode("utf-8")
+        print("shared key:")
         print(ret)
         return ret
 
@@ -73,8 +76,11 @@ def eflash_loader_parser_init():
 
 
 def create_encrypt_data(data_bytearray, key_bytearray, iv_bytearray):
-    cryptor = AES.new(key_bytearray, AES.MODE_CBC, iv_bytearray)
-    ciphertext = cryptor.encrypt(data_bytearray)
+    # 创建 AES-CBC加密器
+    cipher = Cipher(algorithms.AES(key_bytearray), modes.CBC(iv_bytearray))
+    encryptor = cipher.encryptor()
+    # 加密数据
+    ciphertext = encryptor.update(data_bytearray) + encryptor.finalize()
     return ciphertext
 
 
@@ -84,15 +90,13 @@ def udp_socket_recv_key(udp_socket_client):
         public_key = recv_data[4:]
         return public_key
     else:
-        print("Recieve server shared key error ", recv_data.decode("utf-8", "ignore"))
+        print("Receive server shared key error:", recv_data.decode("utf-8", "ignore"))
     return None
 
 
 def udp_socket_recv_log(udp_socket_client):
     recv_data, recv_addr = udp_socket_client.recvfrom(1024)
-    print(
-        "Recieve:[from IP:%s>]" % recv_addr[0], recv_data.decode("utf-8", "ignore") + "\n", end=""
-    )
+    print("Receive:[from IP:<{}>]".format(recv_addr[0]), recv_data.decode("utf-8", "ignore"), end="")
     return recv_data
 
 
@@ -103,20 +107,18 @@ def udp_socket_send_client(udp_socket_client, send_address, key=None):
     if send_data == "quit":
         udp_socket_client.close()
         print("Quit successfully")
-        if sys.platform.startswith('win'):
+        if sys.platform.startswith("win"):
             os.system("taskkill /F /PID %d" % os.getpid())
         else:
             os.kill(os.getpid(), signal.SIGKILL)
     else:
         if ecdh_enable:
-            tmp_ecdh = BLECDH()
+            tmp_ecdh = BflbEcdh()
             csk = tmp_ecdh.create_public_key()
-            ecdh_private_key = binascii.hexlify(tmp_ecdh.ecdh.private_key.to_string()).decode(
-                "utf-8"
-            )
-            udp_socket_client.sendto(
-                bytearray.fromhex(binascii.hexlify(b"csk:").decode("utf-8") + csk), send_address
-            )
+            ecdh_private_key = binascii.hexlify(
+                tmp_ecdh.private_key.private_numbers().private_value.to_bytes(32, "big")
+            ).decode("utf-8")
+            udp_socket_client.sendto(bytearray.fromhex(binascii.hexlify(b"csk:").decode("utf-8") + csk), send_address)
             public_key = udp_socket_recv_key(udp_socket_client)
             if public_key is not None:
                 ecdh_peer_public_key = binascii.hexlify(public_key).decode("utf-8")
@@ -124,9 +126,7 @@ def udp_socket_send_client(udp_socket_client, send_address, key=None):
 
                 if len(sdata) % 16 != 0:
                     sdata = sdata + bytearray(16 - (len(sdata) % 16))
-                sdata = create_encrypt_data(
-                    sdata, bytearray.fromhex(ecdh_shared_key[0:32]), bytearray(16)
-                )
+                sdata = create_encrypt_data(sdata, bytearray.fromhex(ecdh_shared_key[0:32]), bytearray(16))
             else:
                 return False
         else:
@@ -135,32 +135,30 @@ def udp_socket_send_client(udp_socket_client, send_address, key=None):
                     sdata = sdata + bytearray(16 - (len(sdata) % 16))
                     sdata += bytearray(16)
                 sdata = create_encrypt_data(sdata, bytearray.fromhex(key), bytearray(16))
-        print(binascii.hexlify(sdata))
         udp_socket_client.sendto(sdata, send_address)
         start_time = time.time()
         while True:
             log = udp_socket_recv_log(udp_socket_client)
             if log.decode("utf-8", "ignore").find("Finished with success") != -1:
-                print("Program success")
+                print("Program succeeded")
                 return True
             elif log.decode("utf-8", "ignore").find("Finished with fail") != -1:
-                print("Program fail")
+                print("Program failed")
                 return False
             elif log.decode("utf-8", "ignore").find("Stop success") != -1:
-                print("Server stop")
+                print("Server stopped")
                 return True
             else:
-                if time.time() - start_time > 150:
-                    print("timeout, exit!")
+                if time.time() - start_time > 200:
+                    print("timeout, exit")
                     return False
-                pass
     return False
 
 
 def main(port, key=None):
     udp_socket_client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     udp_socket_client.settimeout(150)
-    print("Enter quit to exist program")
+    print("enter quit to exit program")
     host = socket.gethostname()
     # send_address is server address
     send_address = (host, port)
@@ -185,7 +183,7 @@ if __name__ == "__main__":
         key = args.key
     if args.ecdh:
         ecdh_enable = True
-        print("ECDH Enable")
+        print("ecdh enabled")
     else:
         ecdh_enable = False
     if args.usage:

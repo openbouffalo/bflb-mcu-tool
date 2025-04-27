@@ -1,5 +1,5 @@
 # -*- coding:utf-8 -*-
-#  Copyright (C) 2021- BOUFFALO LAB (NANJING) CO., LTD.
+#  Copyright (C) 2016- BOUFFALO LAB (NANJING) CO., LTD.
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -39,9 +39,8 @@ from glob import glob
 
 import pylink
 from serial import Serial
-from Crypto.Util import Counter
-from Crypto.Cipher import AES
-from CryptoPlus.Cipher import AES as AES_XTS
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.primitives import padding, hashes, serialization
 
 try:
     from PySide2 import QtCore
@@ -85,74 +84,7 @@ udp_send_log = False
 udp_log_local_echo = False
 udp_socket_server = None
 error_code_num = "FFFF"
-error_code_num_task = [
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-    "FFFF",
-]
+error_code_num_task = ["FFFF"] * 66
 local_log_en = True
 local_log_data = ""
 
@@ -242,7 +174,7 @@ if conf_sign:
 
     eflash_loader_error_code = {
         "0000": "SUCCESS",
-        "0001": "EFLASH LOADER SHAKEHAND FAIL",
+        "0001": "EFLASH LOADER HANDSHAKE FAIL",
         "0002": "OPTION SET UNSUPPORTED",
         "0003": "LOAD HELP BIN FAIL",
         "0004": "RESET CPU FAIL",
@@ -282,7 +214,7 @@ if conf_sign:
         "0043": "FLASH IDENTIFY FAIL",
         "0044": "FLASH CHIPERASE CONFLICT WITH SKIP MODE",
         "0045": "FLASH SIZE OVER FLOW",
-        "0050": "IMG LOAD SHAKEHAND FAIL",
+        "0050": "IMG LOAD HANDSHAKE FAIL",
         "0051": "IMG LOAD BOOT CHECK FAIL",
         "0060": "IMG CREATE FAIL",
         "0061": "IMG FILE NOT SET",
@@ -419,7 +351,7 @@ else:
 
     eflash_loader_error_code = {
         "0000": "BFLB SUCCESS",
-        "0001": "BFLB EFLASH LOADER SHAKEHAND FAIL",
+        "0001": "BFLB EFLASH LOADER HANDSHAKE FAIL",
         "0002": "BFLB OPTION SET UNSUPPORTED",
         "0003": "BFLB LOAD HELP BIN FAIL",
         "0004": "BFLB RESET CPU FAIL",
@@ -459,7 +391,7 @@ else:
         "0043": "BFLB FLASH IDENTIFY FAIL",
         "0044": "BFLB FLASH CHIPERASE CONFLICT WITH SKIP MODE",
         "0045": "BFLB FLASH SIZE OVER FLOW",
-        "0050": "BFLB IMG LOAD SHAKEHAND FAIL",
+        "0050": "BFLB IMG LOAD HANDSHAKE FAIL",
         "0051": "BFLB IMG LOAD BOOT CHECK FAIL",
         "0060": "BFLB IMG CREATE FAIL",
         "0061": "BFLB IMG FILE NOT SET",
@@ -542,19 +474,12 @@ def riscv_code(buffer, size, now_pos, is_encoder):
                 pc = 0 - pc
             addr += pc
             inst &= 0xFFF
-            inst |= (
-                ((addr & 0x100000) << 11)
-                | ((addr & 0x0007FE) << 20)
-                | ((addr & 0x000800) << 9)
-                | (addr & 0x0FF000)
-            )
+            inst |= ((addr & 0x100000) << 11) | ((addr & 0x0007FE) << 20) | ((addr & 0x000800) << 9) | (addr & 0x0FF000)
             write32le(buffer, i, inst)
             i += 2
         elif (inst & 0x7F) == 0x17:
             inst2 = read32le(buffer, i + 4)
-            if not (
-                (inst2 & 0x5B) == 0x03 or (inst2 & 0x707F) == 0x67 or (inst2 & 0x707F) == 0x13
-            ):
+            if not ((inst2 & 0x5B) == 0x03 or (inst2 & 0x707F) == 0x67 or (inst2 & 0x707F) == 0x13):
                 i += 8
                 continue
             auipc_rd = (inst >> 7) & 0x1F
@@ -628,16 +553,15 @@ def printf(*args):
         if udp_send_log:
             tid = str(threading.get_ident())
             if udp_log_local_echo:
-                print("[" + tid + ":]" + data.strip())  # .lower()
+                print("[{0}]{1}".format(tid, data.strip()))
             try:
-                udp_socket_server.sendto(
-                    (data.strip() + "\r\n").encode("utf-8"), udp_clinet_dict[tid]
-                )  # .lower()
+                if tid in udp_clinet_dict:
+                    udp_socket_server.sendto((data.strip() + "\r\n").encode("utf-8"), udp_clinet_dict[tid])  # .lower()
             except Exception as e:
                 print(e)
         else:
             if qt_sign and QtCore.QThread.currentThread().objectName():
-                print("[Task%s]" % str(QtCore.QThread.currentThread().objectName()) + data.strip())
+                print("[Task{0}]{1}".format(QtCore.QThread.currentThread().objectName(), data.strip()))
             else:
                 print(data.strip())
     sys.stdout.flush()
@@ -663,9 +587,6 @@ def local_log_save(local_path="log", key_word=""):
             rq = time.strftime("%Y%m%d%H%M%S", time.localtime(time.time()))
             log_name = rq + "_" + key_word + ".log"
             log_path = os.path.join(log_dir, log_name)
-            #             fp = open(log_path, 'w')
-            #             fp.write(local_log_data)
-            #             fp.close()
             with codecs.open(log_path, "w", encoding="utf-8") as fp:
                 fp.write(local_log_data)
         except Exception as e:
@@ -674,17 +595,12 @@ def local_log_save(local_path="log", key_word=""):
     local_log_data = ""
 
 
-def get_bflb_error_code(code):
-    global bflb_error_code
-    return bflb_error_code[code]
-
-
 def set_error_code(num_str, task=None):
     global error_code_num
     global error_code_num_task
-    if task != None:
+    if task is not None:
         if len(error_code_num_task) == 0:
-            for i in range(66):
+            for _ in range(66):
                 error_code_num_task.append("FFFF")
         if error_code_num_task[task] == "FFFF":
             error_code_num_task[task] = num_str
@@ -700,36 +616,67 @@ def set_error_code(num_str, task=None):
 def get_error_code(task=None):
     global error_code_num
     global error_code_num_task
-    if task != None:
+    if task is not None:
         return error_code_num_task[task]
     return error_code_num
 
 
-def errorcode_msg(task=None):
+def get_error_code_bflb(code):
+    global bflb_error_code
+    return bflb_error_code[code]
+
+
+def get_error_code_msg(task=None):
     global error_code_num
     global error_code_num_task
     global eflash_loader_error_code
     """
-    if task != None:
+    if task is not None:
         return '{"ErrorCode": "' + error_code_num_task[task] + \
             '", "ErrorMsg":"' + eflash_loader_error_code[error_code_num_task[task]] + '"}'
     return '{"ErrorCode": "' + error_code_num + \
         '", "ErrorMsg":"' + eflash_loader_error_code[error_code_num] + '"}'
     """
-    if task != None:
+    if task is not None:
         return (
             "ErrorCode: "
             + error_code_num_task[task]
             + " ErrorMsg: "
             + eflash_loader_error_code[error_code_num_task[task]]
         )
-    return (
-        "ErrorCode: " + error_code_num + ", ErrorMsg: " + eflash_loader_error_code[error_code_num]
-    )
+    return "ErrorCode: " + error_code_num + ", ErrorMsg: " + eflash_loader_error_code[error_code_num]
 
-# 12345678->0x12,0x34,0x56,0x78
-def hexstr_to_bytearray_b(hexstring):
-    return bytearray.fromhex(hexstring)
+
+def enable_udp_send_log(local_echo):
+    global udp_send_log, udp_socket_server, udp_log_local_echo
+    udp_send_log = True
+    udp_log_local_echo = local_echo
+    udp_socket_server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+
+def add_udp_client(tid, upd_client):
+    udp_clinet_dict[tid] = upd_client
+
+
+def remove_udp_client(tid):
+    del udp_clinet_dict[tid]
+
+
+def str_endian_switch(string):
+    s = string[6:8] + string[4:6] + string[2:4] + string[0:2]
+    return s
+
+
+def verify_hex_num(string):
+    length = len(string)
+    i = 0
+    while True:
+        if re.match("\A[0-9a-fA-F]+\Z", string[i : i + 1]) is None:
+            return False
+        i += 1
+        if i >= length:
+            break
+    return True
 
 
 def hexstr_to_bytearray(hexstring):
@@ -740,6 +687,11 @@ def hexstr_to_bytearray_l(hexstring):
     b = bytearray.fromhex(hexstring)
     b.reverse()
     return b
+
+
+# 12345678->0x12,0x34,0x56,0x78
+def hexstr_to_bytearray_b(hexstring):
+    return bytearray.fromhex(hexstring)
 
 
 def int_to_2bytearray_l(intvalue):
@@ -779,12 +731,28 @@ def bytearray_to_int(b):
     return int(binascii.hexlify(b), 16)
 
 
+def bytearray_to_string(bytesarray):
+    return str(bytesarray)
+
+
 def string_to_bytearray(string):
     return bytes(string, encoding="utf8")
 
 
-def bytearray_to_str(bytesarray):
-    return str(bytesarray)
+def string_number_reverse(str_number):
+    """
+    high position low data
+    data unit number:00000280
+    storage format:  80020000
+    """
+    reverse_str = ""
+    if len(str_number) == 8:
+        str_part1 = str_number[0:2]
+        str_part2 = str_number[2:4]
+        str_part3 = str_number[4:6]
+        str_part4 = str_number[6:8]
+        reverse_str = str_part4 + str_part3 + str_part2 + str_part1
+    return reverse_str
 
 
 def get_random_hexstr(n_bytes):
@@ -801,56 +769,10 @@ def get_crc32_bytearray(data):
     return int_to_4bytearray_l(crc)
 
 
-def add_to_16(par):
+def fill_to_16(par):
     while len(par) % 16 != 0:
         par += b"\x00"
     return par
-
-
-def enable_udp_send_log(local_echo):
-    global udp_send_log, udp_socket_server, udp_log_local_echo
-    udp_send_log = True
-    udp_log_local_echo = local_echo
-    udp_socket_server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-
-
-def add_udp_client(tid, upd_client):
-    udp_clinet_dict[tid] = upd_client
-
-
-def remove_udp_client(tid):
-    del udp_clinet_dict[tid]
-
-
-def update_cfg(cfg, section, key, value):
-    if cfg.has_option(section, key):
-        cfg.set(section, key, str(value))
-
-
-def get_byte_array(string):
-    return string.encode("utf-8")
-
-
-def verify_hex_num(string):
-    length = len(string)
-    i = 0
-    while True:
-        if re.match("\A[0-9a-fA-F]+\Z", string[i : i + 1]) is None:
-            return False
-        i += 1
-        if i >= length:
-            break
-    return True
-
-
-def get_eflash_loader(xtal):
-    xtal_suffix = str(xtal).lower().replace(".", "p").replace("M", "m").replace("RC", "rc")
-    return "eflash_loader_" + xtal_suffix + ".bin"
-
-
-def str_endian_switch(string):
-    s = string[6:8] + string[4:6] + string[2:4] + string[0:2]
-    return s
 
 
 # do hash of image
@@ -863,30 +785,38 @@ def img_create_sha256_data(data_bytearray):
 # encrypt image, mainly segdata
 def img_create_encrypt_data(data_bytearray, key_bytearray, iv_bytearray, flash_img):
     if flash_img == 0:
-        cryptor = AES.new(key_bytearray, AES.MODE_CBC, iv_bytearray)
-        ciphertext = cryptor.encrypt(data_bytearray)
+        # 创建 AES-CBC加密器
+        cipher = Cipher(algorithms.AES(key_bytearray), modes.CBC(iv_bytearray))
+        encryptor = cipher.encryptor()
+        # 加密数据
+        ciphertext = encryptor.update(data_bytearray) + encryptor.finalize()
     else:
-        iv = Counter.new(128, initial_value=int(binascii.hexlify(iv_bytearray), 16))
-        cryptor = AES.new(key_bytearray, AES.MODE_CTR, counter=iv)
-        ciphertext = cryptor.encrypt(data_bytearray)
+        # 创建 AES-CTR加密器
+        cipher = Cipher(algorithms.AES(key_bytearray), modes.CTR(iv_bytearray))
+        encryptor = cipher.encryptor()
+        # 加密数据
+        ciphertext = encryptor.update(data_bytearray) + encryptor.finalize()
     return ciphertext
 
 
 # decrypt image, mainly segdata
 def img_create_decrypt_data(data_bytearray, key_bytearray, iv_bytearray, flash_img):
     if flash_img == 0:
-        cryptor = AES.new(key_bytearray, AES.MODE_CBC, iv_bytearray)
-        ciphertext = cryptor.decrypt(data_bytearray)
+        # 创建 AES-CBC解密器
+        cipher = Cipher(algorithms.AES(key_bytearray), modes.CBC(iv_bytearray))
+        decryptor = cipher.decryptor()
+        # 解密数据
+        plaintext = decryptor.update(data_bytearray) + decryptor.finalize()
     else:
-        iv = Counter.new(128, initial_value=int(binascii.hexlify(iv_bytearray), 16))
-        cryptor = AES.new(key_bytearray, AES.MODE_CTR, counter=iv)
-        ciphertext = cryptor.decrypt(data_bytearray)
-    return ciphertext
+        # 创建 AES-CTR解密器
+        cipher = Cipher(algorithms.AES(key_bytearray), modes.CTR(iv_bytearray))
+        decryptor = cipher.decryptor()
+        # 解密数据
+        plaintext = decryptor.update(data_bytearray) + decryptor.finalize()
+    return plaintext
 
 
 def img_create_encrypt_data_xts(data_bytearray, key_bytearray, iv_bytearray, encrypt):
-    pass
-    """
     counter = binascii.hexlify(iv_bytearray[4:16]).decode()
     # data unit number default value is 0
     data_unit_number = 0
@@ -894,8 +824,6 @@ def img_create_encrypt_data_xts(data_bytearray, key_bytearray, iv_bytearray, enc
     key = (key_bytearray[0:16], key_bytearray[16:32])
     if encrypt == 2 or encrypt == 3:
         key = (key_bytearray, key_bytearray)
-    # bflb_utils.printf(key)
-    cipher = AES_XTS.new(key, AES_XTS.MODE_XTS)
     total_len = len(data_bytearray)
     ciphertext = bytearray(0)
     deal_len = 0
@@ -903,39 +831,23 @@ def img_create_encrypt_data_xts(data_bytearray, key_bytearray, iv_bytearray, enc
     while deal_len < total_len:
         data_unit_number = str(hex(data_unit_number)).replace("0x", "")
         data_unit_number_to_str = str(data_unit_number)
-        right_justify_str = data_unit_number_to_str.rjust(8, '0')
-        reverse_data_unit_number_str = reverse_str_data_unit_number(right_justify_str)
+        right_justify_str = data_unit_number_to_str.rjust(8, "0")
+        reverse_data_unit_number_str = string_number_reverse(right_justify_str)
         tweak = reverse_data_unit_number_str + counter
-        tweak = bflb_utils.hexstr_to_bytearray("0" * (32 - len(tweak)) + tweak)
-        # bflb_utils.printf(tweak)
+        tweak = hexstr_to_bytearray("0" * (32 - len(tweak)) + tweak)
+        cipher = Cipher(algorithms.AES(key), modes.XTS(tweak))
+        encryptor = cipher.encryptor()
         if 32 + deal_len <= total_len:
-            cur_block = data_bytearray[0 + deal_len:32 + deal_len]
-            # bflb_utils.printf(binascii.hexlify(cur_block))
-            ciphertext += cipher.encrypt(cur_block, tweak)
+            cur_block = data_bytearray[0 + deal_len : 32 + deal_len]
+            ciphertext += encryptor.update(cur_block) + encryptor.finalize()
         else:
-            cur_block = data_bytearray[0 + deal_len:16 + deal_len] + bytearray(16)
-            # bflb_utils.printf(binascii.hexlify(cur_block))
-            ciphertext += (cipher.encrypt(cur_block, tweak)[0:16])
+            cur_block = data_bytearray[0 + deal_len : 16 + deal_len] + bytearray(16)
+            ciphertext += (encryptor.update(cur_block) + encryptor.finalize())[0:16]
         deal_len += 32
-        data_unit_number = (int(data_unit_number, 16))
+        data_unit_number = int(data_unit_number, 16)
         data_unit_number += 1
 
-    # bflb_utils.printf("Result:")
-    # bflb_utils.printf(binascii.hexlify(ciphertext))
-
     return ciphertext
-"""
-
-
-def aes_decrypt_data(data, key_bytearray, iv_bytearray, flash_img):
-    if flash_img == 0:
-        cryptor = AES.new(key_bytearray, AES.MODE_CBC, iv_bytearray)
-        plaintext = cryptor.decrypt(data)
-    else:
-        iv = Counter.new(128, initial_value=int(binascii.hexlify(iv_bytearray), 16))
-        cryptor = AES.new(key_bytearray, AES.MODE_CTR, counter=iv)
-        plaintext = cryptor.decrypt(data)
-    return plaintext
 
 
 def get_security_key():
@@ -952,16 +864,26 @@ def get_aes_encrypted_security_key(cfg):
     # b"BOUFFALOLABIV\x00\x00\x00"
     iv_hex = "424f554646414c4f4c41424956000000"
     try:
-        cryptor = AES.new(hexstr_to_bytearray(key_hex), AES.MODE_CBC, hexstr_to_bytearray(iv_hex))
+        key_bytearray = hexstr_to_bytearray(key_hex)
+        iv_bytearray = hexstr_to_bytearray(iv_hex)
         with open(cfg, mode="rb") as fp:
-            data = fp.read()
-        plaintext = cryptor.decrypt(data)
+            data_bytearray = fp.read()
+        # 创建 AES-CBC解密器
+        cipher = Cipher(algorithms.AES(key_bytearray), modes.CBC(iv_bytearray))
+        decryptor = cipher.decryptor()
+        # 解密数据
+        plaintext = decryptor.update(data_bytearray) + decryptor.finalize()
         if len(plaintext) == 32:
             return True, plaintext[0:16], plaintext[16:32]
         else:
             return False, None, None
-    except Exception as e:
+    except Exception:
         return False, None, None
+
+
+def get_eflash_loader(xtal):
+    xtal_suffix = str(xtal).lower().replace(".", "p").replace("M", "m").replace("RC", "rc")
+    return "eflash_loader_" + xtal_suffix + ".bin"
 
 
 def open_file(file, mode="rb"):
@@ -969,15 +891,20 @@ def open_file(file, mode="rb"):
     return fp
 
 
-def copyfile(srcfile, dstfile):
+def copy_file(srcfile, dstfile):
     if os.path.isfile(srcfile):
         fpath, fname = os.path.split(dstfile)
         if not os.path.exists(fpath):
             os.makedirs(fpath)
         shutil.copyfile(srcfile, dstfile)
     else:
-        printf("Src file not exists")
+        printf("Src file does not exist")
         # sys.exit()
+
+
+def update_cfg(cfg, section, key, value):
+    if cfg.has_option(section, key):
+        cfg.set(section, key, str(value))
 
 
 def get_systype():
@@ -1124,6 +1051,13 @@ def cklink_openocd_enumerate():
     return ports_cklink, ports_openocd
 
 
+def firmware_auxiliary_parser_init():
+    parser = argparse.ArgumentParser(description="bouffalolab image auxiliary command")
+    parser.add_argument("--wdir", dest="wdir", help="sdk work directory")
+    parser.add_argument("--imgfile", dest="imgfile", help="image file")
+    return parser
+
+
 def image_create_parser_init():
     parser = argparse.ArgumentParser(description="bouffalolab image create command")
     parser.add_argument("--chipname", dest="chipname", help="chip name")
@@ -1136,67 +1070,6 @@ def image_create_parser_init():
     return parser
 
 
-def firmware_post_proc_parser_init():
-    parser = argparse.ArgumentParser(description="bouffalolab image create command")
-    parser.add_argument("--chipname", dest="chipname", help="chip name")
-    parser.add_argument("--cpuid", dest="cpuid", help="cpu id")
-    parser.add_argument(
-        "--brdcfgdir", dest="brdcfgdir", help="board config dir contains boot2,partition,etc."
-    )
-    parser.add_argument("--imgfile", dest="imgfile", help="image file to deal")
-    parser.add_argument("--datafile", dest="datafile", help="user data file")
-    parser.add_argument("--edatafile_in", dest="edatafile_in", help="input efuse data file")
-    parser.add_argument("--hd_append", dest="hd_append", help="header append file")
-    parser.add_argument("--fw_append", dest="fw_append", help="firmware append file")
-    parser.add_argument("--key", dest="aeskey", help="AES Key")
-    parser.add_argument("--keyoffset", dest="aeskeyoffset", help="AES Key offset in efuse")
-    parser.add_argument("--iv", dest="aesiv", help="AES IV")
-    parser.add_argument("--xtsmode", dest="xtsmode", help="xts mode enable")
-    parser.add_argument("--publickey", dest="publickey", help="ECC public key")
-    parser.add_argument("--privatekey", dest="privatekey", help="ECC private key")
-    parser.add_argument(
-        "--publickey_str", dest="publickey_str", help="ECC public key base 64 string"
-    )
-    parser.add_argument(
-        "--privatekey_str", dest="privatekey_str", help="ECC private key base 64 string"
-    )
-    parser.add_argument("--edbg_mode", dest="dbg_mode", help="debug mode:open/pswd/close")
-    parser.add_argument("--ejtag_close", dest="jtag_close", help="Close JTAG, mode: true/false")
-    parser.add_argument("--epswwd", dest="pswd", help="JTAG password value hex string")
-    parser.add_argument(
-        "--ehbn_sign",
-        dest="hbn_sign",
-        help="enable/disable signature check when HBN mode wakeup, mode: true/false",
-    )
-    parser.add_argument("--ehbn_jump", dest="hbn_jump", help="enable/disable hbn jump function")
-    parser.add_argument(
-        "--eanti_rollback", dest="anti_rollback", help="enable/disable anti-rollback function"
-    )
-    parser.add_argument(
-        "--eflash_pdelay", dest="flash_pdelay", help="flash power up delay value, value: 0-3"
-    )
-    parser.add_argument(
-        "--edata",
-        dest="edata",
-        help="efuse data content:start,hex_str ex:0x10,000102030405060708;0x20,01020304",
-    )
-    parser.add_argument("--appkeys", dest="appkeys", help="app use diffrent keys from bootloader ")
-    parser.add_argument(
-        "--checkpartition", dest="checkpartition", help="check partition in whole_flash_data.bin"
-    )
-    parser.add_argument(
-        "--releasenote", dest="releasenote", action="store_false", help="dump release note"
-    )
-    return parser
-
-
-def firmware_auxiliary_parser_init():
-    parser = argparse.ArgumentParser(description="bouffalolab image auxiliary command")
-    parser.add_argument("--wdir", dest="wdir", help="sdk work directory")
-    parser.add_argument("--imgfile", dest="imgfile", help="image file")
-    return parser
-
-
 def eflash_loader_parser_init():
     parser = argparse.ArgumentParser(description="bouffalolab eflash loader command")
     parser.add_argument("--chipname", dest="chipname", help="chip name")
@@ -1205,27 +1078,15 @@ def eflash_loader_parser_init():
     parser.add_argument("--flash", dest="flash", action="store_true", help="target is flash")
     parser.add_argument("--efuse", dest="efuse", action="store_true", help="target is efuse")
     parser.add_argument("--ram", dest="ram", action="store_true", help="target is ram")
-    parser.add_argument(
-        "--efusecheck", dest="efusecheck", action="store_true", help="efuse check data"
-    )
-    parser.add_argument(
-        "-w", "--write", dest="write", action="store_true", help="write to flash/efuse"
-    )
+    parser.add_argument("--efusecheck", dest="efusecheck", action="store_true", help="efuse check data")
+    parser.add_argument("-w", "--write", dest="write", action="store_true", help="write to flash/efuse")
     parser.add_argument("-e", "--erase", dest="erase", action="store_true", help="erase flash")
-    parser.add_argument(
-        "-r", "--read", dest="read", action="store_true", help="read from flash/efuse"
-    )
-    parser.add_argument(
-        "-n", "--none", dest="none", action="store_true", help="eflash loader environment init"
-    )
+    parser.add_argument("-r", "--read", dest="read", action="store_true", help="read from flash/efuse")
+    parser.add_argument("-n", "--none", dest="none", action="store_true", help="eflash loader environment init")
     parser.add_argument("-p", "--port", dest="port", help="serial port to use")
-    parser.add_argument(
-        "-b", "--baudrate", dest="baudrate", type=int, help="the speed at which to communicate"
-    )
+    parser.add_argument("-b", "--baudrate", dest="baudrate", type=int, help="the speed at which to communicate")
     parser.add_argument("-c", "--config", dest="config", help="eflash loader config file")
-    parser.add_argument(
-        "-i", "--interface", dest="interface", help="interface type: uart/jlink/openocd"
-    )
+    parser.add_argument("-i", "--interface", dest="interface", help="interface type: uart/jlink/openocd")
     parser.add_argument("--xtal", dest="xtal", help="xtal type")
     parser.add_argument("--start", dest="start", help="start address")
     parser.add_argument("--end", dest="end", help="end address")
@@ -1258,13 +1119,12 @@ def eflash_loader_parser_init():
     parser.add_argument("--dac_addr", dest="dac_addr", help="dac address")
     parser.add_argument("--dac_key", dest="dac_key", help="dac encrpt key")
     parser.add_argument("--dac_iv", dest="dac_iv", help="dac encrypt iv")
+    parser.add_argument("--auth", dest="auth", help="auth port")
     parser.add_argument(
         "--auto_efuse_verify",
         action="store_true",
         dest="auto_efuse_verify",
         help="auto efuse verify",
     )
-    parser.add_argument(
-        "-v", "--version", dest="version", action="store_true", help="display version"
-    )
+    parser.add_argument("-v", "--version", dest="version", action="store_true", help="display version")
     return parser

@@ -55,7 +55,7 @@ entry_points = {"console_scripts": ["bflb-mcu-tool = bflb_mcu_tool.__main__:run_
 
 setup(
     name="bflb-mcu-tool",
-    version="1.9.0",
+    version="1.10.0",
     author="bouffalolab",
     author_email="jxtan@bouffalolab.com",
     description="Bouffalolab Mcu Tool",
@@ -78,9 +78,9 @@ setup(
         "Programming Language :: Python :: 3",
     ],
     install_requires=[
-        "ecdsa>=0.15",
-        "pycryptodome==3.9.8",
-        "bflb-crypto-plus==1.0",
+        "toml==0.10.0",
+        "configobj==5.0.9",
+        "cryptography==37.0.4",
         "pycklink>=0.1.1",
         "pyserial==3.5",
         "pylink-square==0.5.0",

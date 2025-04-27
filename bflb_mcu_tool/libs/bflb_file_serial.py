@@ -1,4 +1,23 @@
 # -*- coding: utf-8 -*-
+#  Copyright (C) 2016- BOUFFALO LAB (NANJING) CO., LTD.
+#
+#  Permission is hereby granted, free of charge, to any person obtaining a copy
+#  of this software and associated documentation files (the "Software"), to deal
+#  in the Software without restriction, including without limitation the rights
+#  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+#  copies of the Software, and to permit persons to whom the Software is
+#  furnished to do so, subject to the following conditions:
+#
+#  The above copyright notice and this permission notice shall be included in all
+#  copies or substantial portions of the Software.
+#
+#  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+#  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+#  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+#  SOFTWARE.
 
 import os
 import sys
@@ -14,23 +33,25 @@ except ImportError:
 
 
 class FileSerial(object):
-    def _int_to_hex(self, data):
+    @staticmethod
+    def int_to_hex(data):
         hex_size = hex(data).replace("0x", "0x00")[-4:]
         low_hex_size = hex_size[-2:]
         hight_hex_size = hex_size[:-2]
         return low_hex_size, hight_hex_size
 
-    def _str_to_hex(self, data):
+    @staticmethod
+    def str_to_hex(data):
         message = hexlify(data)
         new_message = ""
         for i in range(0, len(message), 2):
             new_message += message[i : i + 2].decode() + " "
         return new_message
 
-    def _get_file_hash(self, file_path):
+    @staticmethod
+    def get_file_hash(file_path):
         with open(file_path, "rb") as f:
             message = f.read()
-
         data_sha = hashlib.sha256()
         data_sha.update(message)
         return data_sha.hexdigest()
@@ -85,9 +106,7 @@ class FileSerial(object):
         size = os.path.getsize(file_path)
         hex_size = hex(size).replace("0x", "0x0000000")
         first_message = bytes.fromhex(
-            "F0 00 04 00 {} {} {} {}".format(
-                hex_size[-2:], hex_size[-4:-2], hex_size[-6:-4], hex_size[-8:-6]
-            )
+            "F0 00 04 00 {} {} {} {}".format(hex_size[-2:], hex_size[-4:-2], hex_size[-6:-4], hex_size[-8:-6])
         )
         _ser.write(first_message)
         recv_message = _ser.read(2)
@@ -102,14 +121,12 @@ class FileSerial(object):
                 message = f.read(chunk_size)
                 if message:
                     len_mess = len(message)
-                    low_middle_size, hight_middle_size = self._int_to_hex(len_mess)
+                    low_middle_size, hight_middle_size = self.int_to_hex(len_mess)
                     if recv_message == b"OK":
                         recv_message = b""
-                        new_message = self._str_to_hex(message)
+                        new_message = self.str_to_hex(message)
                         middle_message = bytes.fromhex(
-                            "F1 00 {} {} {}".format(
-                                low_middle_size, hight_middle_size, new_message
-                            )
+                            "F1 00 {} {} {}".format(low_middle_size, hight_middle_size, new_message)
                         )
                         _ser.write(middle_message)
                         recv_message = _ser.read(2)
@@ -126,7 +143,7 @@ class FileSerial(object):
 
         recv_message = _ser.read(66)
         if b"OK" in recv_message:
-            file_sha256 = self._get_file_hash(file_path)
+            file_sha256 = self.get_file_hash(file_path)
             if recv_message[2:].hex() == file_sha256:
                 _ser.write(b"check hash")
                 _ser.close()

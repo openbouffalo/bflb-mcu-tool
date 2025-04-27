@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-#  Copyright (C) 2021- BOUFFALO LAB (NANJING) CO., LTD.
+# -*- coding:utf-8 -*-
+#  Copyright (C) 2016- BOUFFALO LAB (NANJING) CO., LTD.
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -19,5 +19,5 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #  SOFTWARE.
 
-version_text = "(V_2.5.1)"
-eflash_loader_version_text = "eflash_loader_v2.5.1"
+version_text = "(v2.6.0)"
+eflash_loader_version_text = "eflash_loader_v2.6.0"

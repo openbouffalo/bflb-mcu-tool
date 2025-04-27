@@ -73,7 +73,7 @@ def get_version_info(text):
 
 
 def strip_comments(text):
-    text = re.sub("//.*?(\r\n?|\n)|/\*.*?\*/", "\n", text, flags=re.S)
+    text = re.sub("//.*?(\r\n?|\n)|/\\*.*?\\*/", "\n", text, flags=re.S)
     return text
 
 
@@ -435,9 +435,7 @@ class PropStrings(Property):
     def append(self, value: str):
         assert isinstance(value, str)
         assert len(value) > 0, "Invalid strings value"
-        assert all(
-            c in printable or c in ("\r", "\n") for c in value
-        ), "Invalid chars in strings value"
+        assert all(c in printable or c in ("\r", "\n") for c in value), "Invalid chars in strings value"
         self.data.append(value)
 
     def pop(self, index: int):
@@ -535,9 +533,9 @@ class PropWords(Property):
 
     def append(self, value):
         assert isinstance(value, int), "Invalid object type"
-        assert (
-            0 <= value < 2**self.word_size
-        ), "Invalid word value {}, use <0x0 - 0x{:X}>".format(value, 2**self.word_size - 1)
+        assert 0 <= value < 2**self.word_size, "Invalid word value {}, use <0x0 - 0x{:X}>".format(
+            value, 2**self.word_size - 1
+        )
         self.data.append(value)
 
     def pop(self, index):
@@ -759,11 +757,7 @@ class Node(BaseItem):
         """Check node equality"""
         if not isinstance(node, Node):
             return False
-        if (
-            self.name != node.name
-            or len(self.props) != len(node.props)
-            or len(self.nodes) != len(node.nodes)
-        ):
+        if self.name != node.name or len(self.props) != len(node.props) or len(self.nodes) != len(node.nodes):
             return False
         for p in self.props:
             if p not in node.props:
@@ -1232,9 +1226,7 @@ class FDT:
             result += self.root.to_dts(tabsize)
         return result
 
-    def to_dtb(
-        self, version: int = None, last_comp_version: int = None, boot_cpuid_phys: int = None
-    ) -> bytes:
+    def to_dtb(self, version: int = None, last_comp_version: int = None, boot_cpuid_phys: int = None) -> bytes:
         """
         Export FDT Object into Binary Blob format (DTB)
 
@@ -1262,9 +1254,7 @@ class FDT:
                 blob_entries += pack(">QQ", entry["address"], entry["size"])
         blob_entries += pack(">QQ", 0, 0)
         blob_data_start = self.header.size + len(blob_entries)
-        (blob_data, blob_strings, data_pos) = self.root.to_dtb(
-            "", blob_data_start, self.header.version
-        )
+        (blob_data, blob_strings, data_pos) = self.root.to_dtb("", blob_data_start, self.header.version)
         blob_data += pack(">I", DTB_END)
         self.header.size_dt_strings = len(blob_strings)
         self.header.size_dt_struct = len(blob_data)

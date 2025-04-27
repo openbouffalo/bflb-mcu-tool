@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-#  Copyright (C) 2021- BOUFFALO LAB (NANJING) CO., LTD.
+# -*- coding:utf-8 -*-
+#  Copyright (C) 2016- BOUFFALO LAB (NANJING) CO., LTD.
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -19,7 +19,7 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #  SOFTWARE.
 
-from libs import bflb_toml as toml
+import toml
 
 
 class RoParamsTomlCfg(object):
@@ -76,15 +76,15 @@ class BroadInfo(object):
         brd_info_bytes = bytearray()
 
         # mac addr
-        def _mac_addr_to_bytes(mac_addr_s):
+        def mac_addr_to_bytes(mac_addr_s):
             mac_addr_int_l = []
             mac_addr_str_l = mac_addr_s.split(":")
             for mac_i in mac_addr_str_l:
                 mac_addr_int_l.append(int(mac_i, 16))
             return bytes(mac_addr_int_l)
 
-        brd_info_bytes.extend(_mac_addr_to_bytes(self.sta_mac_addr))
-        brd_info_bytes.extend(_mac_addr_to_bytes(self.ap_mac_addr))
+        brd_info_bytes.extend(mac_addr_to_bytes(self.sta_mac_addr))
+        brd_info_bytes.extend(mac_addr_to_bytes(self.ap_mac_addr))
         # coutry_code
         brd_info_bytes.append(self.country_code)
         # xtal_cap
@@ -119,9 +119,7 @@ def bl_ro_params_gen(in_toml_config, out_bin_file):
     toml_config = in_toml_config
     bin_file = out_bin_file
     ro_params_cfg = RoParamsTomlCfg(toml_config)
-    brd_info_b = BroadInfo(
-        ro_params_cfg.read_broad_info(), ro_params_cfg.read_broad_rf_info()
-    ).write()
+    brd_info_b = BroadInfo(ro_params_cfg.read_broad_info(), ro_params_cfg.read_broad_rf_info()).write()
     ap_info_b = ApInfo(ro_params_cfg.read_ap_info()).write()
     with open(bin_file, "wb") as bin_f:
         bin_f.write(str.encode("bl_ro_params") + b"\x00")

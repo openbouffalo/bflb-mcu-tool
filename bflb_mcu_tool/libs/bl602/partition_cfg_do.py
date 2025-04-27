@@ -22,9 +22,7 @@ def check_pt_data(data):
     if partition_magic_code != bflb_utils.bytearray_to_int(data[0:4]):
         bflb_utils.printf("partition bin magic check fail ", binascii.hexlify(data[0:4]))
         return False, 0, 0
-    table_count = bflb_utils.bytearray_to_int(data[6:7]) + (
-        bflb_utils.bytearray_to_int(data[7:8]) << 8
-    )
+    table_count = bflb_utils.bytearray_to_int(data[6:7]) + (bflb_utils.bytearray_to_int(data[7:8]) << 8)
     # bflb_utils.printf("table count: ", table_count)
     if table_count > 16:
         bflb_utils.printf("error, pt enter size > 16")
@@ -54,9 +52,7 @@ def parse_pt_data(data):
     if partition_magic_code != bflb_utils.bytearray_to_int(data[0:4]):
         bflb_utils.printf("partition bin magic check fail ", binascii.hexlify(data[0:4]))
         return False, 0, 0
-    table_count = bflb_utils.bytearray_to_int(data[6:7]) + (
-        bflb_utils.bytearray_to_int(data[7:8]) << 8
-    )
+    table_count = bflb_utils.bytearray_to_int(data[6:7]) + (bflb_utils.bytearray_to_int(data[7:8]) << 8)
     # bflb_utils.printf("table count: ", table_count)
     if table_count > 16:
         bflb_utils.printf("error, pt enter size > 16")
@@ -71,9 +67,7 @@ def parse_pt_data(data):
         return False, 0, 0
     ptdata = data[16:]
     for i in range(table_count):
-        if fireware_name == ptdata[i * 36 + 3 : i * 36 + 3 + len(fireware_name)].decode(
-            encoding="utf-8"
-        ):
+        if fireware_name == ptdata[i * 36 + 3 : i * 36 + 3 + len(fireware_name)].decode(encoding="utf-8"):
             addr_start = 0
             if bflb_utils.bytearray_to_int(ptdata[i * 36 + 2 : i * 36 + 3]) != 0:
                 addr_start = i * 36 + 16
@@ -87,18 +81,9 @@ def parse_pt_data(data):
             )
             maxlen = (
                 bflb_utils.bytearray_to_int(ptdata[addr_start + 0 + 8 : addr_start + 1 + 8])
-                + (
-                    bflb_utils.bytearray_to_int(ptdata[addr_start + 1 + 8 : addr_start + 2 + 8])
-                    << 8
-                )
-                + (
-                    bflb_utils.bytearray_to_int(ptdata[addr_start + 2 + 8 : addr_start + 3 + 8])
-                    << 16
-                )
-                + (
-                    bflb_utils.bytearray_to_int(ptdata[addr_start + 3 + 8 : addr_start + 4 + 8])
-                    << 24
-                )
+                + (bflb_utils.bytearray_to_int(ptdata[addr_start + 1 + 8 : addr_start + 2 + 8]) << 8)
+                + (bflb_utils.bytearray_to_int(ptdata[addr_start + 2 + 8 : addr_start + 3 + 8]) << 16)
+                + (bflb_utils.bytearray_to_int(ptdata[addr_start + 3 + 8 : addr_start + 4 + 8]) << 24)
             )
             entry_type.append(fireware_name)
             entry_addr.append(fwaddr)
@@ -117,18 +102,9 @@ def parse_pt_data(data):
             )
             maxlen = (
                 bflb_utils.bytearray_to_int(ptdata[addr_start + 0 + 8 : addr_start + 1 + 8])
-                + (
-                    bflb_utils.bytearray_to_int(ptdata[addr_start + 1 + 8 : addr_start + 2 + 8])
-                    << 8
-                )
-                + (
-                    bflb_utils.bytearray_to_int(ptdata[addr_start + 2 + 8 : addr_start + 3 + 8])
-                    << 16
-                )
-                + (
-                    bflb_utils.bytearray_to_int(ptdata[addr_start + 3 + 8 : addr_start + 4 + 8])
-                    << 24
-                )
+                + (bflb_utils.bytearray_to_int(ptdata[addr_start + 1 + 8 : addr_start + 2 + 8]) << 8)
+                + (bflb_utils.bytearray_to_int(ptdata[addr_start + 2 + 8 : addr_start + 3 + 8]) << 16)
+                + (bflb_utils.bytearray_to_int(ptdata[addr_start + 3 + 8 : addr_start + 4 + 8]) << 24)
             )
             entry_type.append(mfg_name)
             entry_addr.append(fwaddr)

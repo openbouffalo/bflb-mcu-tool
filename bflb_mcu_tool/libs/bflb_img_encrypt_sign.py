@@ -1,4 +1,23 @@
 # -*- coding:utf-8 -*-
+#  Copyright (C) 2016- BOUFFALO LAB (NANJING) CO., LTD.
+#
+#  Permission is hereby granted, free of charge, to any person obtaining a copy
+#  of this software and associated documentation files (the "Software"), to deal
+#  in the Software without restriction, including without limitation the rights
+#  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+#  copies of the Software, and to permit persons to whom the Software is
+#  furnished to do so, subject to the following conditions:
+#
+#  The above copyright notice and this permission notice shall be included in all
+#  copies or substantial portions of the Software.
+#
+#  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+#  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+#  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+#  SOFTWARE.
 
 import os
 import sys
@@ -22,25 +41,21 @@ class BflbImgEncryptSign(object):
         self.chiptype = chiptype
         self.image_type = image_type
 
-    def random_hex(self, length):
+    @staticmethod
+    def random_hex(length):
         result = hex(random.randint(0, 16**length)).replace("0x", "").upper()
         if len(result) < length:
             result = "0" * (length - len(result)) + result
         return result
 
-    def encrypt_sign_iot_data(self, dir, whole_flash_file, key, iv, publickey, privatekey):
-        fp = open(whole_flash_file, "rb")
-        whole_flash_data = bytearray(fp.read())
-        fp.close()
+    def encrypt_sign_iot_data(self, dir, whole_flash_file, key, iv, publickey, privatekey, **kwargs):
+        with open(whole_flash_file, "rb") as fp:
+            whole_flash_data = bytearray(fp.read())
 
         encrypt_ota_data = bytearray(0)
         sub_module = __import__("libs." + self.chiptype, fromlist=[self.chiptype])
-        if sub_module.partition_cfg_do.bootheader_magic_code != bflb_utils.bytearray_to_int(
-            whole_flash_data[0:4]
-        ):
-            bflb_utils.printf(
-                "bootheader bin magic check fail ", binascii.hexlify(whole_flash_data[0:4])
-            )
+        if sub_module.partition_cfg_do.bootheader_magic_code != bflb_utils.bytearray_to_int(whole_flash_data[0:4]):
+            bflb_utils.printf("bootheader bin magic check failed", binascii.hexlify(whole_flash_data[0:4]))
             return False
         efuse_data = bytearray(128)
         img_start_offset = 128
@@ -58,48 +73,16 @@ class BflbImgEncryptSign(object):
             img_start_offset = 128
             img_len_offset = 120
         boot2_addr = (
-            bflb_utils.bytearray_to_int(
-                whole_flash_data[img_start_offset + 0 : img_start_offset + 1]
-            )
-            + (
-                bflb_utils.bytearray_to_int(
-                    whole_flash_data[img_start_offset + 1 : img_start_offset + 2]
-                )
-                << 8
-            )
-            + (
-                bflb_utils.bytearray_to_int(
-                    whole_flash_data[img_start_offset + 2 : img_start_offset + 3]
-                )
-                << 16
-            )
-            + (
-                bflb_utils.bytearray_to_int(
-                    whole_flash_data[img_start_offset + 3 : img_start_offset + 4]
-                )
-                << 24
-            )
+            bflb_utils.bytearray_to_int(whole_flash_data[img_start_offset + 0 : img_start_offset + 1])
+            + (bflb_utils.bytearray_to_int(whole_flash_data[img_start_offset + 1 : img_start_offset + 2]) << 8)
+            + (bflb_utils.bytearray_to_int(whole_flash_data[img_start_offset + 2 : img_start_offset + 3]) << 16)
+            + (bflb_utils.bytearray_to_int(whole_flash_data[img_start_offset + 3 : img_start_offset + 4]) << 24)
         )
         boot2_len = (
             bflb_utils.bytearray_to_int(whole_flash_data[img_len_offset + 0 : img_len_offset + 1])
-            + (
-                bflb_utils.bytearray_to_int(
-                    whole_flash_data[img_len_offset + 1 : img_len_offset + 2]
-                )
-                << 8
-            )
-            + (
-                bflb_utils.bytearray_to_int(
-                    whole_flash_data[img_len_offset + 2 : img_len_offset + 3]
-                )
-                << 16
-            )
-            + (
-                bflb_utils.bytearray_to_int(
-                    whole_flash_data[img_len_offset + 3 : img_len_offset + 4]
-                )
-                << 24
-            )
+            + (bflb_utils.bytearray_to_int(whole_flash_data[img_len_offset + 1 : img_len_offset + 2]) << 8)
+            + (bflb_utils.bytearray_to_int(whole_flash_data[img_len_offset + 2 : img_len_offset + 3]) << 16)
+            + (bflb_utils.bytearray_to_int(whole_flash_data[img_len_offset + 3 : img_len_offset + 4]) << 24)
         )
         pt_data = whole_flash_data[0xE000:0xF000]
         entry_type, entry_addr, entry_len = sub_module.partition_cfg_do.parse_pt_data(pt_data)
@@ -109,12 +92,7 @@ class BflbImgEncryptSign(object):
             efuse_data,
             img_len,
         ) = sub_module.img_create_do.create_encryptandsign_flash_data(
-            whole_flash_data[0 : boot2_len + boot2_addr],
-            boot2_addr,
-            key,
-            iv,
-            publickey,
-            privatekey,
+            whole_flash_data[0 : boot2_len + boot2_addr], boot2_addr, key, iv, publickey, privatekey, **kwargs
         )
         for i, val in enumerate(entry_type):
             if entry_addr[i] > len(whole_flash_data):
@@ -135,10 +113,9 @@ class BflbImgEncryptSign(object):
                     iv,
                     publickey,
                     privatekey,
+                    **kwargs,
                 )
-                encrypt_ota_data = whole_flash_data[
-                    entry_addr[i] : entry_addr[i] + 0x1000 + img_len
-                ]
+                encrypt_ota_data = whole_flash_data[entry_addr[i] : entry_addr[i] + 0x1000 + img_len]
             if val == sub_module.partition_cfg_do.mfg_name:
                 (
                     whole_flash_data[entry_addr[i] : entry_addr[i] + entry_len[i]],
@@ -151,22 +128,21 @@ class BflbImgEncryptSign(object):
                     iv,
                     publickey,
                     privatekey,
+                    **kwargs,
                 )
         if self.image_type == "all" or self.image_type == "ota":
-            fp = open(os.path.join(dir, "FW_OTA.bin"), "wb+")
-            fp.write(encrypt_ota_data)
-            fp.close()
+            with open(os.path.join(dir, "FW_OTA.bin"), "wb+") as fp:
+                fp.write(encrypt_ota_data)
         if self.image_type == "all" or self.image_type == "image":
-            fp = open(os.path.join(dir, "output.bin"), "wb+")
-            fp.write(whole_flash_data)
-            fp.close()
+            with open(os.path.join(dir, "output.bin"), "wb+") as fp:
+                fp.write(whole_flash_data)
 
 
 def flasher_encrypt_sign(args):
     chipname = args.chipname
     chiptype = gol.dict_chip_cmd.get(chipname, "unkown chip type")
     if chiptype not in ["bl60x", "bl602", "bl702", "bl702l", "bl808", "bl616", "bl628"]:
-        bflb_utils.printf("Chip type is not in bl602/bl702/bl702l/bl808/bl616/bl628")
+        bflb_utils.printf("chip type is not in bl602/bl702/bl702l/bl808/bl616/bl628")
         return
 
     key = ""
@@ -183,7 +159,7 @@ def flasher_encrypt_sign(args):
         publickey = args.publickey
         privatekey = args.privatekey
     if key == "" and iv == "" and publickey == "" and privatekey == "":
-        bflb_utils.printf("Please selete encrypt key/iv or sign publickey/privatekey")
+        bflb_utils.printf("please selete encrypt key/iv or sign publickey/privatekey")
         return
     bflb_utils.printf(dir, whole_flash_file, key, iv, publickey, privatekey)
     obj_iot = BflbImgEncryptSign(chipname, chiptype, "all")

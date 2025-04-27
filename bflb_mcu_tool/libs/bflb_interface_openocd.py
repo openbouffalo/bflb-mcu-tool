@@ -1,5 +1,5 @@
 # -*- coding:utf-8 -*-
-#  Copyright (C) 2021- BOUFFALO LAB (NANJING) CO., LTD.
+#  Copyright (C) 2016- BOUFFALO LAB (NANJING) CO., LTD.
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -103,17 +103,9 @@ class ThreadOpenocdServer(threading.Thread):
                     + "/utils/openocd/tgt_702.cfg"
                 )
         else:
-            cmd = (
-                openocd_path
-                + " -f "
-                + app_path
-                + "/utils/openocd/openocd-usb-sipeed.cfg "
-                + cmd_ftdi_serial
-            )
+            cmd = openocd_path + " -f " + app_path + "/utils/openocd/openocd-usb-sipeed.cfg " + cmd_ftdi_serial
         bflb_utils.printf(cmd)
-        p = subprocess.Popen(
-            cmd, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-        )
+        p = subprocess.Popen(cmd, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         out, err = p.communicate()
         bflb_utils.printf(out)
 
@@ -197,12 +189,9 @@ class BflbOpenocdPort(object):
     def if_raw_write(self, addr, data_send):
         addr_int = int(addr, 16)
         if len(data_send) > 32:
-            fp = open("openocd_load_data.bin", "wb+")
-            fp.write(data_send)
-            fp.close()
-            self.tn.write(
-                ("load_image openocd_load_data.bin " + hex(addr_int)).encode("ascii") + b"\n"
-            )
+            with open("openocd_load_data.bin", "wb+") as fp:
+                fp.write(data_send)
+            self.tn.write(("load_image openocd_load_data.bin " + hex(addr_int)).encode("ascii") + b"\n")
         else:
             for data in data_send:
                 self.tn.write(("mwb " + hex(addr_int) + " " + hex(data)).encode("ascii") + b"\n")
@@ -231,9 +220,7 @@ class BflbOpenocdPort(object):
                     hexstr = d[6:8] + d[4:6] + d[2:4] + d[0:2]
                     data += bflb_utils.hexstr_to_bytearray(hexstr)
         else:
-            data += bflb_utils.hexstr_to_bytearray(
-                strdata[index + 2 : strdata.find("WaitCmd") - 6].replace(" ", "")
-            )
+            data += bflb_utils.hexstr_to_bytearray(strdata[index + 2 : strdata.find("WaitCmd") - 6].replace(" ", ""))
         return data
 
     def if_addr_unaligned_read(self, addr, data_len):
@@ -278,9 +265,7 @@ class BflbOpenocdPort(object):
             pre_read_len = 4 - (addr_int % 4)
             if pre_read_len != 0:
                 data += self.if_addr_unaligned_read(addr, pre_read_len)
-            data += self.if_addr_aligned_read(
-                hex(addr_int + pre_read_len), data_len - pre_read_len
-            )
+            data += self.if_addr_aligned_read(hex(addr_int + pre_read_len), data_len - pre_read_len)
             return data[:data_len]
 
     def if_read(self, data_len):
@@ -322,7 +307,7 @@ class BflbOpenocdPort(object):
         success, ack = self.if_read(2)
         bflb_utils.printf(binascii.hexlify(ack))
         if ack.find(b"\x4F") != -1 or ack.find(b"\x4B") != -1:
-            if self._password != None and len(self._password) != 0:
+            if self._password is not None and len(self._password) != 0:
                 cmd = bflb_utils.hexstr_to_bytearray("2400")
                 cmd += bflb_utils.int_to_2bytearray_l(len(self._password) // 2)
                 cmd += bflb_utils.hexstr_to_bytearray(self._password)
@@ -358,7 +343,7 @@ class BflbOpenocdPort(object):
         err_code_str = str(binascii.hexlify(err_code[3:4] + err_code[2:3]).decode("utf-8"))
         ack = "FL"
         try:
-            ret = ack + err_code_str + "(" + bflb_utils.get_bflb_error_code(err_code_str) + ")"
+            ret = ack + err_code_str + "(" + bflb_utils.get_error_code_bflb(err_code_str) + ")"
         except Exception:
             ret = ack + err_code_str + " unknown"
         bflb_utils.printf(ret)

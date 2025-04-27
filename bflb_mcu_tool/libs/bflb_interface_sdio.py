@@ -1,5 +1,5 @@
 # -*- coding:utf-8 -*-
-#  Copyright (C) 2021- BOUFFALO LAB (NANJING) CO., LTD.
+#  Copyright (C) 2016- BOUFFALO LAB (NANJING) CO., LTD.
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -105,7 +105,7 @@ class BflbSdioPort(object):
         success, ack = self.if_read(2)
         bflb_utils.printf(binascii.hexlify(ack))
         if ack.find(b"\x4F") != -1 or ack.find(b"\x4B") != -1:
-            if self._password != None and len(self._password) != 0:
+            if self._password is not None and len(self._password) != 0:
                 cmd = bflb_utils.hexstr_to_bytearray("2400")
                 cmd += bflb_utils.int_to_2bytearray_l(len(self._password) // 2)
                 cmd += bflb_utils.hexstr_to_bytearray(self._password)
@@ -136,7 +136,7 @@ class BflbSdioPort(object):
         err_code_str = str(binascii.hexlify(err_code[3:4] + err_code[2:3]).decode("utf-8"))
         ack = "FL"
         try:
-            ret = ack + err_code_str + "(" + bflb_utils.get_bflb_error_code(err_code_str) + ")"
+            ret = ack + err_code_str + "(" + bflb_utils.get_error_code_bflb(err_code_str) + ")"
         except Exception:
             ret = ack + err_code_str + " unknown"
         bflb_utils.printf(ret)
@@ -172,7 +172,7 @@ if __name__ == "__main__":
     try:
         eflash_loader_t = BflbSdioPort()
         eflash_loader_t.if_init("", 10086, "bl602")
-        bflb_utils.printf("shakehand test")
+        bflb_utils.printf("handshake test")
         eflash_loader_t.if_shakehand()
     except Exception as e:
         NUM_ERR = 5
